@@ -6,13 +6,16 @@
         <h1 class="users-div__title">使用者列表</h1>
       </div>
       <div class="users-div__user scrollbar">
-        <div class="users-div__user--card">
+        <div 
+          v-for="user in users"
+          :key ="user.id"
+          class="users-div__user--card">
           <div class="card-background"></div>
-          <img class="card-avatar" src="https://picsum.photos/100
+          <img class="card-avatar" :src="user.coverImg
 " alt="">
           <div class="card-info">
-            <div class="card-info-name">John Doe</div>
-            <div class="card-info-account">@heyjohn</div>
+            <div class="card-info-name">{{user.name}}</div>
+            <div class="card-info-account">@{{user.account}}</div>
             <div class="card-info-tweets-likes">
               <div class="card-info-tweets">
                 <img src="../assets/static/images/post@2x.png" alt="">
@@ -34,19 +37,7 @@
               </div>
             </div>
           </div>
-        </div>
-        <div class="users-div__user--card"></div>
-        <div class="users-div__user--card"></div>
-        <div class="users-div__user--card"></div>
-        <div class="users-div__user--card"></div>
-        <div class="users-div__user--card"></div>
-        <div class="users-div__user--card"></div>
-        <div class="users-div__user--card"></div>
-        <div class="users-div__user--card"></div>
-        <div class="users-div__user--card"></div>
-        <div class="users-div__user--card"></div>
-        <div class="users-div__user--card"></div>
-        
+        </div>  
       </div>
     </div>
     <div></div>
@@ -55,13 +46,39 @@
 
 <script>
 import Sidebar from '../components/Sidebar.vue'
+import adminAPI from '../apis/admin'
+import {Toast} from '../utils/helpers'
 
 export default {
   components: { 
     Sidebar 
   },
-  methods: {
+  data(){
+    return{
+      users:[]
+    }   
   },
+  methods: {
+    async getUsers(){
+      // TODO:塞缺少的資料（推文數、按讚數、追蹤、被追蹤）
+      try{
+        const {data} = await adminAPI.get()
+        console.log(data)
+        this.users = data.data
+        if(data.status !== 'success'){
+          throw new Error(data.status)
+        }
+      }catch(error){
+        Toast.fire({
+          icon: 'error',
+          title: '無法取的使用者，請稍後再試'
+        })
+      }     
+    }
+  },
+  created(){
+    this.getUsers()
+  }
 };
 </script>
 
