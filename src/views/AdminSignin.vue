@@ -15,12 +15,12 @@
 
       <div class="signin-form__div signin-form__input-account">
         <label for="">帳號</label>
-        <input type="text" placeholder="請輸入帳號" />
+        <input v-model="email" type="text" placeholder="請輸入帳號" />
       </div>
 
       <div class="signin-form__div signin-form__input-password">
         <label for="">密碼</label>
-        <input type="text" placeholder="請輸入密碼" />
+        <input v-model="password" type="text" placeholder="請輸入密碼" />
       </div>
 
       <button class="btn btn-signin" type="submit" :disabled="isProcessing">
@@ -44,7 +44,9 @@ export default {
   name: 'AdminSignin',
   data () {
     return {
-      isProcessing: false
+      isProcessing: false,
+      email:'',
+      password:''
     }
   },
 }
