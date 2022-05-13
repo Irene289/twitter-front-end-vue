@@ -28,13 +28,7 @@ const routes = [
     name: 'setting',
     component: () => import('../views/Setting.vue')
   },
-  // 後台
-  {
-    path: '/admin',
-    name: 'admin',
-    component: Signin
-  },
-  // 前台
+  // 前台首頁
   {
     path: '/twitter',
     name: 'twitter-main',
@@ -52,6 +46,7 @@ const routes = [
       }
     ]
   },
+  // 前台使用者主頁
   {
     path: '/users/:id/tweets',
     name: 'user-tweets',  
@@ -72,6 +67,7 @@ const routes = [
 
     ]
   },
+  // 前台使用者追蹤頁
   {
     path: '/users/:id/follow',
     name: 'user-follow',
@@ -90,6 +86,12 @@ const routes = [
   {
     path:'/users/:id',
     redirect:'/users/:id/tweets'
+  },
+  // 後台
+  {
+    path: '/admin',
+    name: 'admin',
+    component: Signin
   },
   {
     path: '/admin/tweets',
