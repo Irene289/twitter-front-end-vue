@@ -48,7 +48,6 @@
       <button class="btn btn-signin" type="submit" :disabled="isProcessing">
         登入
       </button>
-
       <div 
         v-if="frontStage"
         class="cancel-signin"
@@ -96,7 +95,7 @@ export default {
   // beforeRouteUpdate(to, from, next) {
   //   console.log({to, from})
   //   next()
-  // },
+  // },test
   methods: {
     async handleSubmit() {
       try {
@@ -120,26 +119,20 @@ export default {
         }
         //前後台帳號不能互登，會跳出警告
         //TODO:此功能待測試，需要後端資料建好
-        const route = this.$route.name
-        if(route === 'sign-in' && user.is_admin === true){
+        // const route = this.$route.name
+        if(!user.is_admin){
+          // token
+        localStorage.setItem('token', data.data.token)
+        this.$router.push('/twitter')
+        }else if(user.is_admin === true){
+          this.isProcessing = false
+          console.log('isadmin')
           Toast.fire({
             icon:'warning',
             title:'此帳號不存在'
           })
-        } else if(route === 'admin' && user.is_admin === false){
-          Toast.fire({
-          icon:'warning',
-          title:'此帳號不存在'
-          })
-        }
-        // token
-        localStorage.setItem('token', data.data.token)
-        
-        if(user.is_admin){
-          this.$router.push('/admin/tweets')
           return
         }
-        this.$router.push('/twitter')
       } catch (error) {
         this.isProcessing = false
         this.password = ''

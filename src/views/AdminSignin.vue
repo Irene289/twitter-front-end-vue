@@ -8,30 +8,49 @@
           alt=""
         />
       </div>
-
       <div class="title">
-        <h1 class="signin-form__title">後台登入</h1>
+        <h1 
+          v-if="frontStage"
+          class="signin-form__title"
+        >
+          登入 Alphitter
+        </h1>
+        <h1 
+          v-else
+          class="signin-form__title "
+        >
+          後台登入
+        </h1>
       </div>
-
-      <div class="signin-form__div signin-form__input-account">
-        <label for="">帳號</label>
-        <input v-model="email" type="text" placeholder="請輸入帳號" />
+      <div class="form-container">
+        <SignInForm 
+          @after-click-signin="afterClickSignin"
+        />
       </div>
-
-      <div class="signin-form__div signin-form__input-password">
-        <label for="">密碼</label>
-        <input v-model="password" type="text" placeholder="請輸入密碼" />
-      </div>
-
-      <button class="btn btn-signin" type="submit" :disabled="isProcessing">
-        登入
-      </button>
-
-      <div class="cancel-signin">
+        <div 
+        v-if="frontStage"
+        class="cancel-signin"
+      >
         <p>
-          <router-link class="frontstage-signin" to="/signin">
-            前台登入
-          </router-link>
+          <router-link class="regist" to="/regist"> 註冊 </router-link>
+        </p>
+        <p>・</p>
+        <p 
+          class="backstage-signin sign-in" 
+          @click="toggleRoute"
+        >
+          後台登入
+        </p>
+      </div>
+      <div 
+        v-else
+        class="cancel-signin"
+      >
+        <p
+          class="frontstage-signin sign-in" 
+          @click="toggleRoute"
+        >
+          前台登入
         </p>
       </div>
     </form>
@@ -40,15 +59,49 @@
 </template>
 
 <script>
+import SignInForm from '../components/SignInForm.vue'
+import {Toast} from './../utils/helpers'
 export default {
   name: 'AdminSignin',
+  components:{
+    SignInForm
+  },
   data () {
     return {
-      isProcessing: false,
-      email:'',
-      password:''
+      isAdmin: true,
+      frontStage: true,
     }
   },
+  methods:{
+    afterClickSignin(isAdmin){
+      const route = this.$route.name
+      this.isAdmin = isAdmin
+      if(isAdmin && route === 'admin'){
+        this.$router.push('/admin/tweets')
+        return
+        } 
+      else if(!isAdmin && route === 'sign-in'){
+        this.$router.push('/twitter')
+        return
+      } else {
+          console.log('notadmin')
+          Toast.fire({
+            icon:'warning',
+            title:'此帳號不存在'
+          })
+        }
+    },
+     toggleRoute () {
+      const route = this.$route.path
+      if (route === '/signin') {
+        this.frontStage = false
+        this.$router.push('/admin')
+      } else if (route === '/admin') {
+        this.frontStage = true
+        this.$router.push('/signin')
+      }
+    }
+  }
 }
 </script>
 
@@ -61,6 +114,9 @@ export default {
   justify-content: center;
   align-items: center;
 }
+.form-container{
+  width:365px;
+}
 .logo img {
   width: 50px;
   height: 50px;
@@ -71,35 +127,7 @@ export default {
   margin-top: 24px;
   margin-bottom: 8px;
 }
-.signin-form__div {
-  @extend %input-block;
-  display: flex;
-  flex-flow: column nowrap;
-  label {
-    @extend %form-label;
-  }
-  input {
-    @extend %form-input;
-    border: none;
-    background: $form-input-grey;
-  }
-  input::placeholder {
-    color: $form-input-placeholder;
-  }
-  &::after {
-    content: "";
-    @extend %input-bottom;
-  }
-}
-.btn {
-  @extend %button-orange;
-  width: 356px;
-  height: 46px;
-  margin-top: 40px;
-  margin-bottom: 16px;
-  font-size: 20px;
-  line-height: 30px;
-}
+
 .cancel-signin {
   display: flex;
   justify-content: flex-end;
@@ -110,8 +138,12 @@ export default {
     color: $form-link-blue;
     font-size: 16px;
     font-weight: 400;
-    text-decoration: none;
     padding: 6px 12px;
   }
+}
+.sign-in, .regist{
+  cursor: pointer;
+  color: $form-link-blue;
+  text-decoration: underline;
 }
 </style>
