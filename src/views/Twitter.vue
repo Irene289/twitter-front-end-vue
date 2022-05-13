@@ -119,10 +119,7 @@ export default {
   padding: 24px;
   border-bottom: 1px solid $border-grey;
   h1 {
-    color: $font-black;
-    font-weight: 700;
-    font-size: 24px;
-    line-height: 26px;
+    @extend %heading-24;
   }
 }
 .tweet-div {
