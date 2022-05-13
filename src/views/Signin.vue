@@ -109,19 +109,36 @@ export default {
           })
           return
         } 
-
-        const { data } = await authorizationAPI.signIn({
+        const {data} = await authorizationAPI.signIn({
           account: this.account,
           password: this.password
         })
-        
+        const {user} = data.data
+        console.log(user)
         if ( data.status !== 'success' ) {
           throw new Error(data.message)
         }
-
+        //前後台帳號不能互登，會跳出警告
+        //TODO:此功能待測試，需要後端資料建好
+        const route = this.$route.name
+        if(route === 'sign-in' && user.is_admin === true){
+          Toast.fire({
+            icon:'warning',
+            title:'此帳號不存在'
+          })
+        } else if(route === 'admin' && user.is_admin === false){
+          Toast.fire({
+          icon:'warning',
+          title:'此帳號不存在'
+          })
+        }
         // token
         localStorage.setItem('token', data.data.token)
         
+        if(user.is_admin){
+          this.$router.push('/admin/tweets')
+          return
+        }
         this.$router.push('/twitter')
       } catch (error) {
         this.isProcessing = false
@@ -137,10 +154,10 @@ export default {
     toggleRoute () {
       const route = this.$route.path
       if (route === '/signin') {
-        this.frontStage = true
+        this.frontStage = false
         this.$router.push('/admin')
       } else if (route === '/admin') {
-        this.frontStage = false
+        this.frontStage = true
         this.$router.push('/signin')
       }
     }
