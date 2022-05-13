@@ -114,31 +114,24 @@ export default {
           account: this.account,
           password: this.password
         })
-
-        console.log(data)
         
         if ( data.status !== 'success' ) {
           throw new Error(data.message)
         }
 
-        // 存 token
-        localStorage.setItem('token', data.token)
+        // token
+        localStorage.setItem('token', data.data.token)
         
-        // 登入成功
         this.$router.push('/twitter')
       } catch (error) {
-        // 按鈕可以重複送出
         this.isProcessing = false
-
-        // 將密碼欄位清空
         this.password = ''
 
-        // 給使用者的提示
+        console.log('Error', error)
         Toast.fire({
           icon: 'warning',
           title: '請確認您輸入了正確的帳號密碼'
         })
-        console.log('Error', error)
       }
     },
     toggleRoute () {
