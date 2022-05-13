@@ -6,5 +6,14 @@ export default {
       account,
       password
     })
+  },
+  regist({ account, name, email, password, passwordCheck }) {
+    return apiHelper.post('/users', {
+      account, 
+      name, 
+      email, 
+      password, 
+      passwordCheck
+    })
   }
 }
