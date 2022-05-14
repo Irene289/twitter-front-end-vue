@@ -14,7 +14,7 @@
          {{reply.account}}
       </template>
        <template v-slot:post-time>
-         {{reply.createTime}}
+         {{reply.createTime | fromNow}}
       </template>
        <template v-slot:text>
          <div class="reply-tag">回覆 <span>@{{reply.to}}</span></div>
@@ -25,7 +25,10 @@
 </template>
 <script>
 import UserTweetCard from '../components/UserTweetCard.vue'
+import { fromNowFilter } from './../utils/mixins'
+
 export default {
+  mixins: [fromNowFilter],
   components:{
     UserTweetCard
   },
