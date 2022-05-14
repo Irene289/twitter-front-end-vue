@@ -71,15 +71,16 @@ const routes = [
   // 前台使用者追蹤頁
   {
     path: '/users/:id/follow',
-    name: 'user-follow',
     component: () => import('../views/UserFollow.vue'),
     children: [
       {
         path: '',
+        name:'follower',
         component: () => import('../views/UserFollower.vue')
       },
       {
         path: 'following',
+        name:'following',
         component: () => import('../views/UserFollowing.vue')
       }  
     ]

@@ -3,10 +3,10 @@
     <div class="user__container">
       <div class="user__image-container">
         <div class="background-wrapper">
-          <img src="https://picsum.photos/700/200" alt="" class="background">
+          <img :src="user.coverImg" alt="" class="background">
         </div>
         <div class="avatar-wrapper">
-          <img src="../assets/static/images/noImage@2x.png" alt="" class="avatar">
+          <img :src="user.avatarImg" alt="" class="avatar">
         </div>      
       </div>
       <div class="user__btn__group">
@@ -19,10 +19,14 @@
               <img v-if="!isSubscribe" class="notify" src="../assets/static/images/notfi@2x.png" alt="">
               <img v-else class="notified" src="../assets/static/images/notfied@2x.png" alt="">
             </div>
-            <div class="group-item follow">
-              <button class="follow">跟隨</button>
+            <div v-if="!user.isFollowing" class="group-item follow">
+              <button 
+                @click.stop.prevent="follow"
+                class="follow">跟隨</button>
             </div>
-            <div class="group-item">           
+            <div v-else 
+              @click.stop.prevent="unfollow"
+              class="group-item">           
                 <button class="following">正在跟隨</button>           
             </div>
           </template>         
@@ -34,22 +38,28 @@
         </div>
       </div>
       <div class="user__container__info">
-        <p class="name">John Doe</p>
-        <p class="id">@johndoe</p>
-        <p class="intro">It is a long established fact that a reader that a reader.</p>
+        <p class="name">{{user.name}}</p>
+        <p class="id">{{user.account}}</p>
+        <p class="intro">{{user.intro}}</p>
         <div class="user__follow">
           <router-link
-            to="/users/:id/follow/following"
+            :to="{
+              name:'follower',
+              params: {id: user.id}
+            }"
           >
             <p class="user__follow__item following">
-              <span class="num">30</span>個<span class="status">跟隨中</span>
+              <span class="num">{{user.followedAmount.count}}</span>個<span class="status">跟隨中</span>
             </p>
           </router-link>
           <router-link
-            to="/users/:id/follow"
+           :to="{
+              name:'following',
+              params: {id: user.id}
+            }"
           >
             <p class="user__follow__item follower">
-              <span class="num">30</span>個<span class="status">跟隨者</span>
+              <span class="num">{{user.followingAmount.count}}</span>個<span class="status">跟隨者</span>
             </p>
           </router-link>
         </div>
@@ -63,6 +73,40 @@
   </div> 
 </template>
 <script>
+const dummyData = {
+     user:{
+        "id": 2,
+        "account": "user1",
+        "name": "Leola.Kutch",
+        "coverImg": "https://picsum.photos/800/300",
+        "avatarImg": "https://i.pravatar.cc/300",
+        "intro": "It is a long established fact that a reader that a reader.",
+        'isFollowing': true,
+        "tweetAmount": {
+          "count": 2,
+          "rows": [
+              {
+                  "id": 45
+              },
+              {
+                  "id": 47
+              }
+          ]
+        },
+        "likeAmount": {
+            "count": 0,
+            "rows": []
+        },
+        "followingAmount": {
+            "count": 0,
+            "rows": []
+        },
+        "followedAmount": {
+            "count": 0,
+            "rows": []
+        }
+    }
+}
   import Modal from '../components/EditModal.vue'
   export default {
     components:{
@@ -72,7 +116,10 @@
       return{
         isEditing: false,
         isCurrentUser: true,
-        isSubscribe: false
+        isSubscribe: false,
+        user:{},
+        currentUserId:4
+       
     }
     },
     methods:{
@@ -81,7 +128,36 @@
       },
       openModal(){
         this.isEditing = true
+      },
+      fetchUser(){
+        //TODO:串API: /users/:id
+        this.user = dummyData.user
+        console.log(this.user.id)
+        if(this.user.id === this.currentUserId){
+          this.isCurrentUser = true
+        }else{
+          this.isCurrentUser = false
+        }
+      },
+      follow(){
+        //TODO: 串 /followships
+        this.user = {
+          ...this.user,
+          isFollowing: true
+        }
+      },
+      unfollow(){
+         //TODO: 串 /followships/:followingId
+       this.user = {
+          ...this.user,
+          isFollowing: false
+        }
+
       }
+    
+    },
+    created(){
+      this.fetchUser()
     }
 }
 </script>
@@ -109,6 +185,7 @@
         border-radius: 50%;
         img{
           width:100%;
+          border-radius: 50%;
         }
       }
     }
