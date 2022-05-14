@@ -60,8 +60,6 @@ export default {
         if ( data.status !== 'success' ) {
           throw new Error(data.message)
         }
-        // token
-        localStorage.setItem('token', data.data.token)
         const {user} = data.data
         const isAdmin = user.is_admin
         const route = this.$route.name
@@ -69,18 +67,20 @@ export default {
           this.isValid = false
         }
        if(isAdmin && route === 'admin'){
+         // token
+        localStorage.setItem('token', data.data.token)
         this.$router.push('/admin/tweets')
         return
         } 
       else if(!isAdmin && route === 'sign-in'){
+        localStorage.setItem('token', data.data.token)
         this.$router.push('/twitter')
         return
       } else {
         this.isValid = false
         }
          this.password = ''
-        //回傳是否為admin
-        // this.$emit('after-click-signin', isAdmin)
+      
         this.isProcessing = false
       }catch(error){
         this.isProcessing = false
