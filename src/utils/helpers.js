@@ -9,7 +9,7 @@ export const apiHelper = axios.create({
 
 export const Toast = Swal.mixin({
   toast: true,
-  position: 'top-end',
+  position: 'center',
   showConfirmButton: false,
   timer: 3000
 })
