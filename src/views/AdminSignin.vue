@@ -60,7 +60,7 @@
 
 <script>
 import SignInForm from '../components/SignInForm.vue'
-import {Toast} from './../utils/helpers'
+// import {Toast} from './../utils/helpers'
 export default {
   name: 'AdminSignin',
   components:{
@@ -73,24 +73,24 @@ export default {
     }
   },
   methods:{
-    afterClickSignin(isAdmin){
-      const route = this.$route.name
-      this.isAdmin = isAdmin
-      if(isAdmin && route === 'admin'){
-        this.$router.push('/admin/tweets')
-        return
-        } 
-      else if(!isAdmin && route === 'sign-in'){
-        this.$router.push('/twitter')
-        return
-      } else {
-          console.log('notadmin')
-          Toast.fire({
-            icon:'warning',
-            title:'此帳號不存在'
-          })
-        }
-    },
+    // afterClickSignin(isAdmin){
+    //   console.log(isAdmin)
+    //   const route = this.$route.name
+    //   this.isAdmin = isAdmin
+    //   if(isAdmin && route === 'admin'){
+    //     this.$router.push('/admin/tweets')
+    //     return
+    //     } 
+    //   else if(!isAdmin && route === 'sign-in'){
+    //     this.$router.push('/twitter')
+    //     return
+    //   } else {
+    //       Toast.fire({
+    //         icon:'warning',
+    //         title:'此帳號不存在'
+    //       })
+    //     }
+    // },
      toggleRoute () {
       const route = this.$route.path
       if (route === '/signin') {
