@@ -6,22 +6,25 @@
         <h1 class="tweets-div__title">推文清單</h1>
       </div>
       <div class="tweets-div__tweets scrollbar">
-        <div class="tweets-div__tweet">
+        <div 
+          v-for ="tweet in tweets"
+          :key ="tweet.id"
+          class="tweets-div__tweet">
           <div class="tweets-div__tweet--img">
-            <img src="../assets/static/images/noImage@2x.png" alt="">
+            <img :src="tweet.User.avatarImg" alt="" class="avatar">
           </div>
           <div class="tweets-div__tweet--content">
             <div class="content-info">
-              <p class="content-info-name">Apple</p>
-              <p class="content-info-account">@apple</p>
-              <p class="content-info-time">3 小時</p>
+              <p class="content-info-name">{{tweet.User.name}}</p>
+              <p class="content-info-account">@{{tweet.User.account}}</p>
+              <p class="content-info-time">{{tweet.createdAt }}小時</p>
             </div>
             <div class="content-text">
-              <p>{{ ellipsisWords() }}</p>
+              <p>{{ ellipsisWords(tweet.description) }}</p>
             </div>
             <button 
               class="btn close-btn"
-              @click.stop.prevent="deleteTweet"
+              @click.stop.prevent="deleteTweet(tweet.id)"
             >
               <img src="../assets/static/images/close@2x.png" alt="">
             </button>
@@ -34,32 +37,63 @@
 
 <script>
 import Sidebar from '../components/Sidebar.vue'
-
+import {Toast} from '../utils/helpers'
+import tweetAPI from '../apis/tweet'
 export default {
   components: { 
     Sidebar 
   },
   data () {
     return {
-      text: 'Lorem ipsum dolor sit amet consectetur adipisicing elit. Eius sed suscipit incidunt veniam ipsa, laboriosam quo fugit earum nisi sunt? Nesciunt sint nam vitae facilis quam nemo, laboriosam aspernatur distinctio.loremLorem ipsum dolor sit amet consectetur adipisicing elit. Eius sed suscipit incidunt veniam ipsa, laboriosam quo fugit earum nisi sunt? Nesciunt sint nam vitae facilis quam nemo, laboriosam aspernatur distinctio.lorem',
+      tweets:[],
       isAdmin: true,
     }
   },
   methods: {
-    ellipsisWords () {
-      const words = this.text
+    ellipsisWords (text) {
+      const words = text
       const word = words.split(' ')
       const wordLength = word.length
-
       if (wordLength > 50) {
         let txt = word.slice(0, 50).join(' ') + '...'
         return txt
       }
+      return text
     },
-    deleteTweet () {
+    async deleteTweet (id) {
+      try{
+        const {data} = await tweetAPI.deleteTweet({id})
+        console.log(data)
+        if(data.status !== 'success'){
+          throw new Error (data.status)
+        }
+        this.tweets = this.tweets.filter(tweet => tweet.id !== id)
+      }catch(error){
+        Toast.fire({
+          icon: 'error',
+          title: '無法刪除貼文，請稍後再試'
+        })
+      }
       console.log('Delete')
-    }
+    },
+    async fetchTweets(){
+      try{  
+        const {data, statusText} = await tweetAPI.getTweets()
+        this.tweets = data
+        if(statusText !== 'OK'){
+          throw new Error(statusText) 
+        }
+      }catch(error){
+        Toast.fire({
+          icon:'error',
+          title:'無法取得推文資料，請稍後再試'
+        })
+      }
+    },
   },
+  created(){
+    this.fetchTweets()
+  }
 }
 </script>
 
@@ -98,6 +132,7 @@ export default {
   &--img img {
     width: 50px;
     height: 50px;
+    border-radius: 50%;
     margin-left: 24px;
     margin-right: 8px;
   }
