@@ -6,11 +6,13 @@
        <div class="signin-form__div signin-form__input-account">
         <label for="">帳號</label>
         <input v-model="account" type="text" placeholder="請輸入帳號" />
+        <p v-if="!isValid" :class="{invalid:!isValid}">此帳號不存在</p>
       </div>
 
       <div class="signin-form__div signin-form__input-password">
         <label for="">密碼</label>
         <input v-model="password" type="password" placeholder="請輸入密碼" />
+        <p v-if="!isValid" :class="{invalid:!isValid}">此帳號不存在</p>
       </div>
 
       <button class="btn btn-signin" type="submit" :disabled="isProcessing">
@@ -28,8 +30,15 @@ export default {
   data () {
     return {
       isProcessing: false,
+      isValid: true,
       account:'',
-      password:''
+      password:'',
+    }
+  },
+  watch:{
+    //當切換前台或後台登入的頁面時會將顯示的不是當前登入者提示移除
+    $route(){
+      this.isValid = true
     }
   },
   methods:{
@@ -54,16 +63,29 @@ export default {
         // token
         localStorage.setItem('token', data.data.token)
         const {user} = data.data
-        console.log(user)
         const isAdmin = user.is_admin
-        console.log(isAdmin)
+        const route = this.$route.name
+        if(!user.id){
+          this.isValid = false
+        }
+       if(isAdmin && route === 'admin'){
+        this.$router.push('/admin/tweets')
+        return
+        } 
+      else if(!isAdmin && route === 'sign-in'){
+        this.$router.push('/twitter')
+        return
+      } else {
+        this.isValid = false
+        }
+         this.password = ''
         //回傳是否為admin
-        this.$emit('after-click-signin', isAdmin)
+        // this.$emit('after-click-signin', isAdmin)
         this.isProcessing = false
       }catch(error){
         this.isProcessing = false
         this.password = ''
-
+        this.isValid = false     
         console.log('Error', error)
         Toast.fire({
           icon: 'warning',
@@ -78,22 +100,10 @@ export default {
 <style lang="scss" scoped>
   @import "../assets/scss/basic.scss";
 
-  // .signin-form {
-  //   display: flex;
-  //   flex-flow: column nowrap;
-  //   justify-content: center;
-  //   align-items: center;
-  // }
-  // .logo img {
-  //   width: 50px;
-  //   height: 50px;
-  //   margin-top: 69px;
-  // }
-  // .title h1 {
-  //   @extend %heading;
-  //   margin-top: 24px;
-  //   margin-bottom: 8px;
-  // }
+  .invalid{
+    color:#FC5A5A;
+
+  }
   .signin-form__div {
     @extend %input-block;
     display: flex;
