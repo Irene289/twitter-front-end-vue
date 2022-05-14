@@ -104,7 +104,7 @@ export default {
           id:3,
           iconActive: require('../assets/static/images/orangeSet@2x.png'),
           iconInactive: require('../assets/static/images/setIcon@2x.png'),
-          path:'/setting'        
+          path:'/users/:id/setting'        
         }      
       ],
       dNone: true,
