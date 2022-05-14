@@ -24,7 +24,6 @@
       </div>
       <div class="form-container">
         <SignInForm 
-          @after-click-signin="afterClickSignin"
         />
       </div>
         <div 
@@ -73,24 +72,6 @@ export default {
     }
   },
   methods:{
-    // afterClickSignin(isAdmin){
-    //   console.log(isAdmin)
-    //   const route = this.$route.name
-    //   this.isAdmin = isAdmin
-    //   if(isAdmin && route === 'admin'){
-    //     this.$router.push('/admin/tweets')
-    //     return
-    //     } 
-    //   else if(!isAdmin && route === 'sign-in'){
-    //     this.$router.push('/twitter')
-    //     return
-    //   } else {
-    //       Toast.fire({
-    //         icon:'warning',
-    //         title:'此帳號不存在'
-    //       })
-    //     }
-    // },
      toggleRoute () {
       const route = this.$route.path
       if (route === '/signin') {
