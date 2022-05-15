@@ -7,7 +7,11 @@
         </div>
         <div class="col-7 content-container">
           <div class="title">
-            <img class="title__item " src="../assets/static/images/leftArrow@2x.png" alt="">
+            <img 
+              class="title__item " 
+              src="../assets/static/images/leftArrow@2x.png" 
+              alt=""
+            >
             <div class= "title__item user">
               <p class= "name">Jone Doe</p>
               <p class= "tweet-num">45推文</p>
@@ -23,8 +27,10 @@
                 </router-link>         
               </template>
             </NavTab>
-          </div>            
-          <router-view/>
+          </div>     
+          <div class="scrollbar">
+            <router-view />
+          </div>
         </div>
         <div class="col-3  popular-users">
           <Popular />
@@ -63,41 +69,56 @@
   }
 </script>
 <style lang="scss" scoped>
- @import "../assets/scss/_basic.scss";
-  .content-container{
-    padding:0;
-    border: 1px solid $border-grey;
-    
+@import "../assets/scss/_basic.scss";
+.content-container{
+  padding:0;
+  border: 1px solid $border-grey;
+  
+}
+.title{
+  padding-left: 28px;
+  height: 75px;
+  display: flex;
+  align-items: center;
+  border-bottom: 1px solid $border-grey;
+  img{
+    width: 17px;
+    height: 14px;
+    cursor: pointer;
   }
-  .title{
-    padding-left: 28px;
-    height: 75px;
-    display: flex;
-    align-items: center;
-    border-bottom: 1px solid $border-grey;
-    img{
-      width: 17px;
-      height: 14px;
+  .user{
+    margin-left: 19px;
+    .name{
+      @extend %tweet-name;
+      font-size: 18px;
     }
-    .user{
-      margin-left: 19px;
-      .name{
-        @extend %tweet-name;
-        font-size: 18px;
-      }
-      .tweet-num{
-         @extend %tweet-account;
-         font-weight: 500;
-         font-size:13px;
-         line-height: 18px;
-         
-      }
+    .tweet-num{
+        @extend %tweet-account;
+        font-weight: 500;
+        font-size:13px;
+        line-height: 18px;
+        
     }
   }
-  .nav-container{
-    display: flex;
-    height: 54px;
-    border-bottom: 1px solid $border-grey;
+}
+.nav-container{
+  display: flex;
+  height: 54px;
+  border-bottom: 1px solid $border-grey;
+}
+.scrollbar {
+    height: calc(100vh - 130px);
+    overflow-y: scroll;
+    &::-webkit-scrollbar {
+      width: 8px;
+    }
+    &::-webkit-scrollbar-track {
+      box-shadow: inset 0 0 1px $scrollbar;
+      border-radius: 4px;
+    }
+    &::-webkit-scrollbar-thumb {
+      border-radius: 4px;
+      background-color: $scrollbar;
+    }
   }
-
 </style>

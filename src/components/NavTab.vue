@@ -20,6 +20,7 @@
       }
       &:hover{
         color: $orange;
+        padding: 14px 0; // fix hover jitter
         border-bottom: 2px solid $orange;
         a{
           color: $orange;      
