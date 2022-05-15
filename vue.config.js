@@ -1,12 +1,5 @@
-// module.exports = {
-//   css: {
-//     loaderOptions: {
-//       // sass: {
-//       //   additionalData: `@import "@/assets/scss/main.scss"`
-//       // },
-//       scss: {
-//         additionalData: `@import "@/assets/scss/variable.scss";`
-//       },
-//     }
-//   }
-// }
+module.exports = {
+  publicPath: process.env.NODE_ENV === 'production'
+    ? '/twitter-front-end-vue/'
+    : '/'
+}
