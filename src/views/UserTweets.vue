@@ -1,5 +1,6 @@
 <template>
-  <div class="user-tweet scrollbar">
+<!-- <div class="user-tweet scrollbar"> -->
+  <div class="user-tweet">
      <UserTweetCard 
       v-for="tweet in tweets"
       :key="tweet.id"
@@ -14,7 +15,7 @@
          {{tweet.account}}
       </template>
        <template v-slot:post-time>
-         {{tweet.createTime}}
+         {{tweet.createTime | fromNow}}
       </template>
        <template v-slot:text>
          {{tweet.text}}
@@ -36,8 +37,11 @@
 </template>
 <script>
 import UserTweetCard from '../components/UserTweetCard.vue'
+import { fromNowFilter } from './../utils/mixins'
+
 export default {
   name: 'UserTweets',
+  mixins: [fromNowFilter],
   components:{
     UserTweetCard
   },
@@ -71,22 +75,22 @@ export default {
 </script>
 <style lang="scss" scoped>
 @import "../assets/scss/_basic.scss";
-.user-tweet{
-  height: 100vh;
-  overflow-y: scroll;
-}
+// .user-tweet{
+//   height: 100vh;
+//   overflow-y: scroll;
+// }
 
-.scrollbar {
-  &::-webkit-scrollbar {
-    width: 8px;
-  }
-  &::-webkit-scrollbar-track {
-    box-shadow: inset 0 0 1px #C1C1C1; 
-    border-radius: 4px;
-  }
-  &::-webkit-scrollbar-thumb {
-    border-radius: 4px;
-    background-color: #C1C1C1;
-  }
-}
+// .scrollbar {
+//   &::-webkit-scrollbar {
+//     width: 8px;
+//   }
+//   &::-webkit-scrollbar-track {
+//     box-shadow: inset 0 0 1px #C1C1C1; 
+//     border-radius: 4px;
+//   }
+//   &::-webkit-scrollbar-thumb {
+//     border-radius: 4px;
+//     background-color: #C1C1C1;
+//   }
+// }
 </style>

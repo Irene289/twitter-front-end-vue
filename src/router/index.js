@@ -24,15 +24,10 @@ const routes = [
     name: 'regist',
     component: () => import('../views/Regist.vue')
   },
-  {
-    path: '/setting',
-    name: 'setting',
-    component: () => import('../views/Setting.vue')
-  },
   // 前台首頁
   {
     path: '/twitter',
-    name: 'twitter-main',
+    // name: 'twitter-main',
     component: TwitterMain,
     children: [
       {
@@ -50,7 +45,7 @@ const routes = [
   // 前台使用者主頁
   {
     path: '/users/:id/tweets',
-    name: 'user-tweets',  
+    // name: 'user-tweets',  
     component: () => import('../views/User.vue'),
     children:[
       {
@@ -71,6 +66,7 @@ const routes = [
   // 前台使用者追蹤頁
   {
     path: '/users/:id/follow',
+    // name: 'user-follow',
     component: () => import('../views/UserFollow.vue'),
     children: [
       {
@@ -88,6 +84,11 @@ const routes = [
   {
     path:'/users/:id',
     redirect:'/users/:id/tweets'
+  },
+  {
+    path: '/users/:id/setting',
+    name: 'user-setting',
+    component: () => import('../views/Setting.vue')
   },
   // 後台
   {

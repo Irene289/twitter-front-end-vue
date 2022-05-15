@@ -9,7 +9,7 @@
       <div class="account">
         <p class="name"><slot name="name" ></slot></p>
         <p class="id"><slot name="id" ></slot></p>
-        <p class="post-time">・<slot name="post-time" ></slot>小時</p>
+        <p class="post-time">・<slot name="post-time" ></slot></p>
       </div>
       <p class="text">
         <slot name="text" ></slot>

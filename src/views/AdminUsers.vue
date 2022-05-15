@@ -102,10 +102,7 @@ export default {
   width: 100%;
   border-bottom: 1px solid $border-grey;
   h1 {
-    font-size: 24px;
-    line-height: 26px;
-    font-weight: 700;
-    color: $font-black;
+    @extend %heading-24;
     margin: 24px auto 24px 25px;
   }
 }
