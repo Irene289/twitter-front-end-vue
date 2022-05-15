@@ -40,7 +40,7 @@
       <div class="user__container__info">
         <p class="name">{{user.name}}</p>
         <p class="id">{{user.account}}</p>
-        <p class="intro">{{user.intro}}</p>
+        <p class="intro">{{user.bio}}</p>
         <div class="user__follow">
           <router-link
             :to="{
@@ -49,7 +49,7 @@
             }"
           >
             <p class="user__follow__item following">
-              <span class="num">{{user.followedAmount.count}}</span>個<span class="status">跟隨中</span>
+              <span class="num">{{user.followingCount}}</span>個<span class="status">跟隨中</span>
             </p>
           </router-link>
           <router-link
@@ -59,7 +59,7 @@
             }"
           >
             <p class="user__follow__item follower">
-              <span class="num">{{user.followingAmount.count}}</span>個<span class="status">跟隨者</span>
+              <span class="num">{{user.followerCount}}</span>個<span class="status">跟隨者</span>
             </p>
           </router-link>
         </div>
@@ -67,67 +67,36 @@
     </div> 
     <template v-if="isEditing">
       <Modal
-      :initial-user-edit="userEdit"
+      :initial-user-edit="user"
       @close-modal="closeModal"
       />
     </template>       
   </div> 
 </template>
 <script>
-const dummyData = {
-     user:{
-        "id": 2,
-        "account": "user1",
-        "name": "Leola.Kutch",
-        "coverImg": "https://picsum.photos/800/300",
-        "avatarImg": "https://i.pravatar.cc/300",
-        "intro": "It is a long established fact that a reader that a reader.",
-        'isFollowing': true,
-        "tweetAmount": {
-          "count": 2,
-          "rows": [
-              {
-                  "id": 45
-              },
-              {
-                  "id": 47
-              }
-          ]
-        },
-        "likeAmount": {
-            "count": 0,
-            "rows": []
-        },
-        "followingAmount": {
-            "count": 0,
-            "rows": []
-        },
-        "followedAmount": {
-            "count": 0,
-            "rows": []
-        }
-    }
-}
-  import Modal from '../components/EditModal.vue'
-  export default {
-    components:{
-      Modal
-    },
-    data(){
-      return{
-        isEditing: false,
-        isCurrentUser: true,
-        isSubscribe: false,
-        user:{},
-        userEdit:{
-          id:-1,
-          coverImg: "",
-          avatarImg: "",
-          intro: "",
-
-        },
-        currentUserId:2
-       
+import userAPI from '../apis/user'
+import {Toast} from '../utils/helpers'
+import Modal from '../components/EditModal.vue'
+export default {
+  components:{
+    Modal
+  },
+  data(){
+    return{
+      isEditing: false,
+      isCurrentUser: true,
+      isSubscribe: false,
+      user:{
+        name: '',
+        id:'',
+        account:'',
+        avatarImg:'',
+        coverImg:'',
+        is_following:'',
+        followerCount:'',
+        followingCount:'',
+      },      
+      currentUserId:8      
     }
     },
     methods:{
@@ -137,24 +106,43 @@ const dummyData = {
       openModal(){
         this.isEditing = true
       },
-      fetchUser(){
-        //TODO:串API: /users/:id
-        const {user} = dummyData
-        const {id,name ,coverImg, avatarImg, intro} = user
-        this.user = user
-        this.userEdit = {
-          id,
-          coverImg,
-          avatarImg,
-          intro,
-          name
-        }
-        console.log(this.user.id)
-        if(this.user.id === this.currentUserId){
-          this.isCurrentUser = true
-        }else{
-          this.isCurrentUser = false
-        }
+      async fetchUser(userId){
+        try{
+          const {data, statusText} = await userAPI.get({id:userId})       
+          const {userData} = data
+          const {id,name, account ,coverImg, avatarImg, bio, is_following:isFollowing, Following: following, Follower: follower} = userData[0]
+          let newBio = ''
+          if(bio.length > 160){
+            newBio = bio.slice(0,160) 
+          }else{
+            newBio = bio
+          }
+          this.user = {
+            id,
+            name,
+            account,
+            coverImg,
+            avatarImg,
+            bio: newBio,
+            isFollowing,
+            followingCount: following.length,
+            followerCount: follower.length
+          }
+          if(this.user.id === this.currentUserId){
+            this.isCurrentUser = true
+          }else{
+            this.isCurrentUser = false
+          }
+          if(statusText !== 'OK'){
+            throw new Error(statusText)
+          }
+
+        }catch(error){
+          Toast.fire({
+            icon:'error',
+            title:'無法載入使用者資訊，請稍後再試'
+          })
+        }       
       },
       follow(){
         //TODO: 串 /followships
@@ -170,11 +158,11 @@ const dummyData = {
           isFollowing: false
         }
 
-      }
-    
+      }   
     },
     created(){
-      this.fetchUser()
+      const {id} = this.$route.params
+      this.fetchUser(id)
     }
 }
 </script>

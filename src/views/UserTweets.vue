@@ -9,24 +9,24 @@
         <img class="avatar" :src="tweet.img" alt="">
       </template>
        <template v-slot:name>
-         {{tweet.name}}
+         {{tweet.User.name}}
       </template>
        <template v-slot:id>
-         {{tweet.account}}
+         {{tweet.User.account}}
       </template>
        <template v-slot:post-time>
-         {{tweet.createTime | fromNow}}
+         {{tweet.created_at | fromNow}}
       </template>
        <template v-slot:text>
-         {{tweet.text}}
+         {{tweet.description}}
          <div class="icons">
         <div class="icon-wrapper">
           <img src="../assets/static/images/reply@2x.png" alt="">
-          <p class="count">{{tweet.replyNum}}</p>
+          <p class="count">{{tweet.Replies}}</p>
         </div>
         <div class="icon-wrapper">
           <img src="../assets/static/images/like@2x.png" alt="">
-          <p class="count">{{tweet.likeNum}}</p>
+          <p class="count">{{tweet.Likes}}</p>
         </div>     
       </div>
       </template>
@@ -38,7 +38,8 @@
 <script>
 import UserTweetCard from '../components/UserTweetCard.vue'
 import { fromNowFilter } from './../utils/mixins'
-
+import userAPI from '../apis/user'
+import {Toast} from '../utils/helpers'
 export default {
   name: 'UserTweets',
   mixins: [fromNowFilter],
@@ -47,32 +48,36 @@ export default {
   },
   data(){
     return{
-      tweets:[
-         {
-           id: 1,
-           name: 'John Doe',
-           img: require('../assets/static/images/noImage@2x.png'),
-           account: '@johndoe',
-           text:'The point of using Lorem Ipsum is that it has a more-or-less normal distribution of letters, as opposed to using making it look like readable English.',
-           likeNum: 50,
-           replyNum: 30,
-           createTime: 3,
-         },
-          {
-           id: 2,
-           name: 'John Doe',
-           img: require('../assets/static/images/noImage@2x.png'),
-           account: '@johndoe',
-           text:'The point of using Lorem Ipsum is that it has a more-or-less normal distribution of letters, as opposed to using making it look like readable English.',
-           likeNum: 50,
-           replyNum: 30,
-           createTime: 3,           
-         }
-       ]
+      currentUserId: 8,
+      tweets:[]
     }
+  },
+  methods:{
+    //TODO:需要使用者圖片
+    async fetchUserTweets(id){
+      try{
+        const {data,statusText} = await userAPI.getTweets({id})
+        this.tweets = data
+        console.log(data)
+        if(statusText !== 'OK'){
+          throw new Error(statusText)
+        }
+
+      }catch(error){
+        Toast.fire({
+          icon:'error',
+          title: '無法載入用戶推文，請稍後再試'
+        })
+      }
+    }
+  },
+  created(){
+    const {id} = this.$route.params
+    this.fetchUserTweets(id)
   }
 }
 </script>
+
 <style lang="scss" scoped>
 @import "../assets/scss/_basic.scss";
 // .user-tweet{

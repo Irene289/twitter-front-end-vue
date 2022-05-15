@@ -46,20 +46,32 @@
       <div class="user__info">
         <div class="info-item">
           <label for="name">名稱</label>
-          <input v-model="user.name" class="name" name="name" type="text" maxlength="50"/>
-          <p class="length">{{user.name.length}}/50</p>
+          <input 
+            v-model="user.name" :class="{red:!nameIsValid}" 
+            class="name" name="name" type="text" 
+          />
+          <div class="hint-group">
+            <p :class="{hidden:nameIsValid}" class="warning">字數超出上限</p>
+            <p class="length">{{user.name.length}}/50</p>
+          </div>
+         <!-- maxlength="50" -->
         </div>
         <div class="info-item">
           <label for="intro">自我介紹</label>
-          <textarea v-model="user.intro" name="intro" class="intro" cols="30" rows="10" maxlength="160"></textarea>
-          <p class="length">{{user.intro.length}}/160</p>
+          <textarea 
+            v-model="user.bio" :class="{red:!introIsValid}"
+            name="intro" class="intro" cols="30" rows="10" ></textarea>
+          <div class="hint-group">
+            <p :class="{hidden:introIsValid}" class="warning" >字數超出上限</p>
+            <p class="length">{{user.bio.length}}/160</p>
+          </div>
         </div>        
       </div>     
     </form>
   </div>
 </template>
 <script>
-import {Toast} from '../utils/helpers'
+// import {Toast} from '../utils/helpers'
 export default {
   props:{
     initialUserEdit:{
@@ -70,7 +82,7 @@ export default {
           name:'',
           coverImg: '',
           avatarImg: require('../assets/static/images/noImage@2x.png'),
-          intro: ''
+          bio: ''
         }       
       }  
     }
@@ -79,7 +91,9 @@ export default {
     return{
       user:{...this.initialUserEdit},
       initialAvatar:'',
-      initialCover:this.initialUserEdit.coverImg
+      initialCover:this.initialUserEdit.coverImg,
+      nameIsValid: true,
+      introIsValid: true
     }
   },
   methods:{
@@ -121,12 +135,19 @@ export default {
       this.closeModal()
     },
     warning(){
-      if(this.user.name.length > 50 || this.user.intro.length > 160){
-        Toast.fire({
-          icon:'warning',
-          title:'名字不可超過50字，自我介紹不可超過160字'
-        })
-        return
+      const name = this.user.name
+      const intro = this.user.bio
+      if(name.length > 50){
+        this.nameIsValid = false
+      } 
+      if(intro.length > 160){
+       this.introIsValid = false
+      }
+      if(name.length < 50){
+        this.nameIsValid = true
+      }
+      if(intro.length < 160){
+       this.introIsValid = true
       }
     }
   },
@@ -134,10 +155,11 @@ export default {
     user:{
       deep: true,
       handler: function(){
-         this.warning()
+        this.warning()
       }
     }
-  }
+  },
+  
 }
 </script>
 <style lang="scss" scoped>
@@ -147,6 +169,20 @@ export default {
     width: 20px;
     height: 20px;
     padding:0;
+  }
+  .hint-group{
+    position:absolute;
+    bottom:0.7rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+  }
+  .hidden{
+    visibility:hidden;
+  }
+  .warning{
+    color:#FC5A5A;
   }
   .modal {
   position: fixed;
@@ -198,7 +234,6 @@ export default {
     .user__image {
       position: relative;
       input {
-        // color: red;
           display: none;
       }
       .label-group {
@@ -255,11 +290,8 @@ export default {
     .info-item{
       position: relative;
       .length{
-          position: absolute;
           font-size: 12px;
           color: $font-small;
-          bottom: 10px;
-          right: 0;
         }
       label{
         cursor: none;
@@ -277,7 +309,10 @@ export default {
         }
         &.intro{
           height: 145px;
-        }       
+        } 
+        &.red{
+          border-bottom: 2px solid #FC5A5A;
+        }      
       }
     }
   }
