@@ -62,11 +62,11 @@ export default {
     async getUsers(){
       // TODO:推文數、按讚數、追蹤、被追蹤的單位Ｋ？
       try{
-        const {data} = await adminAPI.get()
+        const {data, statusText} = await adminAPI.get()
         console.log(data)
-        this.users = data.data
-        if(data.status !== 'success'){
-          throw new Error(data.status)
+        this.users = data
+        if(statusText !== 'OK'){
+          throw new Error(statusText)
         }
       }catch(error){
         Toast.fire({
