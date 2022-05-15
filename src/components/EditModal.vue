@@ -1,6 +1,8 @@
 <template>
   <div class="modal">
-    <form class="form" action="submit">
+    <form 
+      @submit.stop.prevent="handleSubmit"
+      class="form" action="submit">
       <div class="top__bar">
         <img
           @click="closeModal"
@@ -11,54 +13,129 @@
       <div class="user__image">
         <div class="user__image__form-item item-background">
           <div class="background-wrapper">
-            <img src="https://picsum.photos/700/200" alt="" class="background">
+            <img :src="user.coverImg" alt="" class="background">
           </div>
           <div class="label-group">
             <label for="background-update">
               <img class="icon" src="../assets/static/images/update@2x.png" alt="">
             </label>
             <label>
-              <img class="icon" src="../assets/static/images/whiteClose@2x.png" alt="">
+              <img 
+                @click.stop.prevent ="cancelUpdateCover"
+                class="icon" src="../assets/static/images/whiteClose@2x.png" alt="">
             </label>
           </div>
-          <input type="file" id="background-update" name="backgroundImage" accept="image/*">
+          <input 
+            @change.stop.prevent="handleCoverChange"
+            type="file" id="background-update" name="backgroundImage" accept="image/*">
         </div>
         <div class="user__image__form-item item__avatar">
           <div class="avatar-wrapper">
-            <img src="https://picsum.photos/100" alt="" class="avatar">
+            <img :src="user.avatarImg" alt="" class="avatar">
           </div>
-          <label class="label-avatar" for="avatar-update"> 
+          <label
+            
+            class="label-avatar" for="avatar-update"> 
             <img class="icon" src="../assets/static/images/update@2x.png" alt="">
           </label>
-          <input type="file" id="avatar-update" name="avatar" accept="image/*">
+          <input
+            @change.stop.prevent="handleAvatarChange"
+            type="file" id="avatar-update" name="avatar" accept="image/*">
         </div>
       </div>
       <div class="user__info">
         <div class="info-item">
           <label for="name">名稱</label>
-          <input class="name" name="name" type="text" maxlength="50"/>
-          <p class="length">8/50</p>
+          <input v-model="user.name" class="name" name="name" type="text" maxlength="50"/>
+          <p class="length">{{user.name.length}}/50</p>
         </div>
         <div class="info-item">
           <label for="intro">自我介紹</label>
-          <textarea name="intro" class="intro" cols="30" rows="10" maxlength="160"></textarea>
-          <p class="length">6/160</p>
+          <textarea v-model="user.intro" name="intro" class="intro" cols="30" rows="10" maxlength="160"></textarea>
+          <p class="length">{{user.intro.length}}/160</p>
         </div>        
       </div>     
     </form>
   </div>
 </template>
 <script>
-
+import {Toast} from '../utils/helpers'
 export default {
+  props:{
+    initialUserEdit:{
+      type: Object,
+      default: () => {
+        return{
+          id: -1,
+          name:'',
+          coverImg: '',
+          avatarImg: require('../assets/static/images/noImage@2x.png'),
+          intro: ''
+        }       
+      }  
+    }
+  },
   data(){
     return{
-      
+      user:{...this.initialUserEdit},
+      initialAvatar:'',
+      initialCover:this.initialUserEdit.coverImg
     }
   },
   methods:{
     closeModal(){
       this.$emit('close-modal')
+    },
+    handleAvatarChange(e){
+      const file = e.target.files
+      if(file.length === 0) {
+      // 沒有選取相片使用原本預設的舊照片，如果每有設定if(file.length===0) 在下一步window.URL.createObjectURL(file[0])時會因為取不到資料而報錯
+      this.user.coverImg = this.initialCover
+      return
+      }  
+      const imgUrl = window.URL.createObjectURL(file[0]) 
+      this.user.avatarImg = imgUrl
+    },
+    handleCoverChange(e){
+      //TODO: bug:取消再選擇時無法崇福選擇同一張，一定要先選別張，才能再選原本那張，推斷元印是因為change，由於取消後file裡面的檔案是一樣的，再次選擇同一張時，因為沒有改變故無法觸發change
+      let file = e.target.files
+      if(file.length === 0) {
+      // 沒有選取相片使用原本預設的舊照片，如果每有設定if(file.length===0) 在下一步window.URL.createObjectURL(file[0])時會因為取不到資料而報錯
+      this.user.coverImg = this.initialCover
+      return
+      }
+      const imgUrl = window.URL.createObjectURL(file[0]) 
+      this.user.coverImg = imgUrl
+    },
+    cancelUpdateCover(){
+      this.user.coverImg = this.initialCover
+    },
+    handleSubmit(e){
+      this.warning()
+      const form = e.target
+      const formData = new FormData(form)
+      //test
+      for (let [name,value] of formData){
+        console.log(name,":", value)
+      }
+      this.closeModal()
+    },
+    warning(){
+      if(this.user.name.length > 50 || this.user.intro.length > 160){
+        Toast.fire({
+          icon:'warning',
+          title:'名字不可超過50字，自我介紹不可超過160字'
+        })
+        return
+      }
+    }
+  },
+  watch:{
+    user:{
+      deep: true,
+      handler: function(){
+         this.warning()
+      }
     }
   }
 }
@@ -90,8 +167,9 @@ export default {
     transform: translate(-50%, -50%);
     z-index: 99;
     opacity: 1;
-    width: 610px;
-    height: 590px;
+    padding-bottom: 40px;
+    width: 634px;
+    height: 610px;
     background: white;
     border-radius: 14px;
     label {
@@ -120,6 +198,7 @@ export default {
     .user__image {
       position: relative;
       input {
+        // color: red;
           display: none;
       }
       .label-group {
@@ -141,8 +220,10 @@ export default {
       }
       .background-wrapper {
         width: 100%;
+        height: 200px;
         img {
           width: 100%;
+          height: 100%;
         }
       }
       .item__avatar {

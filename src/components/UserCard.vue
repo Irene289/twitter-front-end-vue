@@ -67,6 +67,7 @@
     </div> 
     <template v-if="isEditing">
       <Modal
+      :initial-user-edit="userEdit"
       @close-modal="closeModal"
       />
     </template>       
@@ -118,7 +119,14 @@ const dummyData = {
         isCurrentUser: true,
         isSubscribe: false,
         user:{},
-        currentUserId:4
+        userEdit:{
+          id:-1,
+          coverImg: "",
+          avatarImg: "",
+          intro: "",
+
+        },
+        currentUserId:2
        
     }
     },
@@ -131,7 +139,16 @@ const dummyData = {
       },
       fetchUser(){
         //TODO:串API: /users/:id
-        this.user = dummyData.user
+        const {user} = dummyData
+        const {id,name ,coverImg, avatarImg, intro} = user
+        this.user = user
+        this.userEdit = {
+          id,
+          coverImg,
+          avatarImg,
+          intro,
+          name
+        }
         console.log(this.user.id)
         if(this.user.id === this.currentUserId){
           this.isCurrentUser = true
