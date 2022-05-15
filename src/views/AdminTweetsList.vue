@@ -36,6 +36,7 @@
 </template>
 
 <script>
+//TODO:日期顯示待調整
 import Sidebar from '../components/Sidebar.vue'
 import {Toast} from '../utils/helpers'
 import tweetAPI from '../apis/tweet'
