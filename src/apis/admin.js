@@ -11,4 +11,5 @@ export default {
   get(){
     return apiHelper.get('/admin/users')
   }
+  
 }

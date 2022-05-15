@@ -1,7 +1,8 @@
 import axios from 'axios'
 import Swal from 'sweetalert2'
 
-const baseURL = 'http://localhost:3000/api'
+// const baseURL = 'https://cryptic-castle-05556.herokuapp.com/api/'
+const baseURL = 'http://localhost:3000/api/'
 
 const axiosInstance = axios.create({
   baseURL

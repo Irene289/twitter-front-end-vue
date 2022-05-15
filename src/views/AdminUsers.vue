@@ -19,20 +19,20 @@
             <div class="card-info-tweets-likes">
               <div class="card-info-tweets">
                 <img src="../assets/static/images/post@2x.png" alt="">
-                <span class="counts">1.5k</span>
+                <span class="counts">{{user.tweetAmount.count}}k</span>
               </div>
               <div class="card-info-likes">
                 <img src="../assets/static/images/like@2x.png" alt="">
-                <span class="counts">20k</span>
+                <span class="counts">{{user.likeAmount.count}}k</span>
               </div>
             </div>
             <div class="card-info-follow">
               <div class="card-info-followings">
-                <span class="counts">34 個</span>
+                <span class="counts">{{user.followedAmount.count}} 個</span>
                 <span class="type">跟隨中</span>
               </div>
               <div class="card-info-followers">
-                <span class="counts">59 位</span>
+                <span class="counts">{{user.followingAmount.count}}  位</span>
                 <span class="type">跟隨者</span>
               </div>
             </div>
@@ -60,7 +60,7 @@ export default {
   },
   methods: {
     async getUsers(){
-      // TODO:塞缺少的資料（推文數、按讚數、追蹤、被追蹤）
+      // TODO:推文數、按讚數、追蹤、被追蹤的單位Ｋ？
       try{
         const {data} = await adminAPI.get()
         console.log(data)
