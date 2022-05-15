@@ -17,7 +17,7 @@
             <div class="content-info">
               <p class="content-info-name">{{tweet.User.name}}</p>
               <p class="content-info-account">@{{tweet.User.account}}</p>
-              <p class="content-info-time">{{tweet.createdAt }}小時</p>
+              <p class="content-info-time">{{tweet.createdAt | fromNowHour }}</p>
             </div>
             <div class="content-text">
               <p>{{ ellipsisWords(tweet.description) }}</p>
@@ -36,6 +36,8 @@
 </template>
 
 <script>
+//TODO:日期顯示待調整
+import { fromNowFilter } from './../utils/mixins'
 import Sidebar from '../components/Sidebar.vue'
 import {Toast} from '../utils/helpers'
 import tweetAPI from '../apis/tweet'
@@ -43,6 +45,7 @@ export default {
   components: { 
     Sidebar 
   },
+  mixins:[fromNowFilter],
   data () {
     return {
       tweets:[],

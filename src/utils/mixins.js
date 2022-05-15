@@ -33,6 +33,9 @@ export const fromNowFilter = {
       const createdAt = moment(datetime).format("A hh:mm・YYYY年MM月DD日")
       
       return createdAt
+    },
+    fromNowHour(dataTime) {
+      return dataTime ? moment(dataTime).fromNow() : '-'
     }
   }
 }

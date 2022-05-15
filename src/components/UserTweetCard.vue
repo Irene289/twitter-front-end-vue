@@ -2,7 +2,7 @@
   <div class="tweet__card">
     <div class="tweet__card__item">
       <slot name="avatar">
-      <img src="" alt="">
+      <img class="avatar" src="" alt="">
       </slot>
     </div>
     <div class="tweet__card__item">
@@ -26,12 +26,12 @@ export default {
 @import "../assets/scss/_basic.scss";
   .tweet__card{
     display: flex;
-    max-height:168px;
     padding: 16px;
     border-bottom: 1px solid $border-grey;
     .avatar{
         width: 50px;
         height: 50px;
+        border-radius: 50%;
     }
     &__item:nth-child(2){
       padding-left: 10px;

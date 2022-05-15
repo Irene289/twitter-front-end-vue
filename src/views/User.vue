@@ -19,15 +19,42 @@
           </div>     
         <UserCard />
         <div class="nav-container">       
-        <NavTab v-for="item in navList" :key="item.id">
-          <template v-slot:nav-item> 
-            <router-link
-              :to="item.path"
-            >
-            <p>{{item.title}}</p> 
-            </router-link>         
-          </template>
-        </NavTab>
+          <NavTab >
+            <template v-slot:nav-item> 
+              <router-link
+                :to="{
+                  name:'user-tweets',
+                  params:currentUserId
+                }"
+              >
+              <p>推文</p> 
+              </router-link>         
+            </template>
+          </NavTab>
+          <NavTab >
+            <template v-slot:nav-item> 
+              <router-link
+               :to="{
+                  name:'user-replies',
+                  params:currentUserId
+                }"
+              >
+              <p>回覆</p> 
+              </router-link>         
+            </template>
+          </NavTab>
+          <NavTab >
+            <template v-slot:nav-item> 
+              <router-link
+                :to="{
+                  name:'user-like',
+                  params:currentUserId
+                }"
+              >
+              <p>喜歡的內容</p> 
+              </router-link>         
+            </template>
+          </NavTab>
         </div>
         <div class="scrollbar">
           <router-view />
@@ -55,6 +82,7 @@
     },
     data(){
       return {
+        currentUserId:8,
         navList:[
           { id: 1,
             title: '推文',

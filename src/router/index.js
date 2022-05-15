@@ -44,20 +44,23 @@ const routes = [
   },
   // 前台使用者主頁
   {
-    path: '/users/:id/tweets',
+    path: '/users/:id',
     // name: 'user-tweets',  
     component: () => import('../views/User.vue'),
     children:[
       {
-        path:'',
+        path: 'tweets',
+        name: 'user-tweets',
         component: () => import('../views/UserTweets.vue')
       },
       {
         path: 'replies',
+        name: 'user-replies',
         component: () => import('../views/UserReply.vue')
       },
       {
         path: 'likes',
+        name: 'user-like',
         component: () => import('../views/UserLike.vue')
       },
 
@@ -82,14 +85,15 @@ const routes = [
     ]
   },
   {
-    path:'/users/:id',
-    redirect:'/users/:id/tweets'
-  },
-  {
     path: '/users/:id/setting',
     name: 'user-setting',
     component: () => import('../views/Setting.vue')
   },
+  {
+    path:'/users/:id',
+    redirect:{name: 'user-tweet'}
+  },
+ 
   // 後台
   {
     path: '/admin',

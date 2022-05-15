@@ -4,17 +4,35 @@
     <ul class="nav__list">
       <img class="logo" src="../assets/static/images/navLogo@2x.png" alt="">
       <template v-if="!isAdmin">
-      <li 
-        v-for="item in navList"
-        :key="item.id"
-        class="nav__list__item ">
-        <router-link
-          :to="item.path"
-        >
+      <li class="nav__list__item ">
+        <router-link to="/twitter">
           <div class="nav__list__item__wrapper">
-            <img class="active" :src="item.iconActive" alt="">
-            <img class="inactive" :src="item.iconInactive" alt="">
-            <p>{{item.title}}</p>
+            <img class="active" src="../assets/static/images/orangeHome@2x.png" alt="">
+            <img class="inactive" src="../assets/static/images/home@2x.png" alt="">
+            <p>首頁</p>
+          </div>  
+        </router-link>     
+      </li>
+       <li class="nav__list__item ">
+        <router-link 
+          :to="{
+            name:'user-tweets',
+            params:{id:currentUserId}
+            
+            }">
+          <div class="nav__list__item__wrapper">
+            <img class="active" src="../assets/static/images/orangeUser@2x.png" alt="">
+            <img class="inactive" src="../assets/static/images/user@2x.png" alt="">
+            <p>個人資料</p>
+          </div>  
+        </router-link>     
+      </li>
+       <li class="nav__list__item ">
+        <router-link to="/users/:id/setting">
+          <div class="nav__list__item__wrapper">
+            <img class="active" src="../assets/static/images/orangeSet@2x.png" alt="">
+            <img class="inactive" src="../assets/static/images/setIcon@2x.png" alt="">
+            <p>設定</p>
           </div>  
         </router-link>     
       </li>
@@ -69,6 +87,7 @@ export default {
     return{
       route: 'user',
       isAdmin: false,
+      currentUserId:'8',
       navAdmin:[
          {
           title: '推文清單',
@@ -83,29 +102,6 @@ export default {
           iconInactive: require('../assets/static/images/user@2x.png'),
           path:'/admin/users'        
         }
-      ],
-      navList:[
-        {
-          title: '首頁',
-          id:1,
-          iconActive: require('../assets/static/images/orangeHome@2x.png'),
-          iconInactive: require('../assets/static/images/home@2x.png'),
-          path:'/twitter'        
-        },
-        {
-          title: '個人資料',
-          id:2,
-          iconActive: require('../assets/static/images/orangeUser@2x.png'),
-          iconInactive: require('../assets/static/images/user@2x.png'), 
-          path:'/users/:id'       
-        },
-        {
-          title: '設定',
-          id:3,
-          iconActive: require('../assets/static/images/orangeSet@2x.png'),
-          iconInactive: require('../assets/static/images/setIcon@2x.png'),
-          path:'/users/:id/setting'        
-        }      
       ],
       dNone: true,
     }
