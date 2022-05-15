@@ -59,7 +59,7 @@ export default {
            createTime: 3,
          },
           {
-           id: 1,
+           id: 2,
            name: 'John Doe',
            img: require('../assets/static/images/noImage@2x.png'),
            account: '@johndoe',

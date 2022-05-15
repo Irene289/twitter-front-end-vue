@@ -120,6 +120,8 @@ export default {
       }
     },
     onClickLogout () {
+      this.$store.commit('revokeAuthentication')
+      localStorage.removeItem('token')
       this.$router.push('/signin')
     },
     tweetModal() {
