@@ -29,7 +29,7 @@
                   </slot>
                 </div>
                 <div class="content-text">
-                  <p></p>
+                  <p><slot name="replytoText"></slot></p>
                 </div>
                 <div class="content-replyto">
                   回覆給 <span><slot name="replytoAccount">

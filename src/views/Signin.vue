@@ -127,7 +127,7 @@ export default {
         // this.$router.push('/twitter')
         }else if(user.is_admin === true){
           this.isProcessing = false
-          console.log('isadmin')
+          // console.log('isadmin')
           Toast.fire({
             icon:'warning',
             title:'此帳號不存在'

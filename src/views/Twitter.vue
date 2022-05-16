@@ -9,7 +9,7 @@
         <label for=""></label>
         <textarea v-model="text" name="tweet" placeholder="有什麼新鮮事？">
         </textarea>
-        <button class="btn tweet-btn" @click.stop.prevent="tweetModal">
+        <button class="btn tweet-btn" @click.stop.prevent="createTweet">
           推文
         </button>
       </form>
@@ -59,10 +59,7 @@
     </div>
 
     <!-- modal -->
-    <div 
-      class="container" 
-      :class="{'d-none': dNoneReplyModal}"
-    >
+    <div class="container" :class="{ 'd-none': dNoneReplyModal }">
       <div class="modal row">
         <form class="modal-content col-6" action="">
           <div class="modal-content-cancel">
@@ -73,26 +70,31 @@
 
           <TweetModal>
             <!--   推文 -->
-            <template 
-              v-slot:isReplyModel
-              v-if="!isReplyModel"
-            >
-              <div class="tweet-div">
-              </div>
-            </template>  
+            <template v-slot:isReplyModel v-if="!isReplyModel">
+              <div class="tweet-div"></div>
+            </template>
             <template v-slot:replytoAvatarImg>
-              <img class="avatar" :src="user.avatarImg" alt="" />
+              <img class="avatar" :src="tweet.User.avatarImg" alt="" />
             </template>
             <template v-slot:replyto>
-              <p class="content-info-name">{{ tweets.description }}</p>
-              <p class="content-info-account">@{{ user.account }}</p>
-              <p class="content-info-time">{{ tweets.createdAt }}</p>
+              <p class="content-info-name">{{ tweet.User.name }}</p>
+              <p class="content-info-account">@{{ tweet.User.account }}</p>
+              <p class="content-info-time">{{ tweet.createdAt | fromNow }}</p>
             </template>
-            <template v-slot:replytoAccount> @{{ user.account }} </template>
+            <template v-slot:replytoAccount>
+              @{{ tweet.User.account }}
+            </template>
+            <template v-slot:replytoText>
+              {{tweet.description}}
+            </template>
 
             <!-- 回覆 -->
             <template v-slot:avatarImg>
-              <img class="modal-content-avatar" :src="user.avatarImg" alt="" />
+              <img
+                class="modal-content-avatar"
+                :src="user.avatarImg"
+                alt=""
+              />
             </template>
             <template v-slot:text>
               <textarea
@@ -104,19 +106,22 @@
             </template>
             <template v-slot:alert>
               <p class="modal-alert">
-                {{ isReplyModel ? "內容不可空白" : "字數不可超過 140 字" }}</p>
+                {{ isReplyModel ? "內容不可空白" : "字數不可超過 140 字" }}
+              </p>
             </template>
           </TweetModal>
 
-          <button 
+          <button
             v-if="isReplyModel"
             class="btn modal-tweet"
+            @click.stop.prevent="handleReply"
           >
             回覆
           </button>
-          <button 
+          <button
             v-else
             class="btn modal-tweet"
+            @click.stop.prevent="createTweet"
           >
             推文
           </button>
@@ -153,130 +158,7 @@ import TweetModal from "../components/TweetModal";
 import { fromNowFilter } from "./../utils/mixins";
 import tweetAPI from "../apis/tweet";
 import { Toast } from "../utils/helpers";
-
-const dummyUser = {
-  status: "success",
-  data: {
-    user: {
-      id: 2,
-      account: "user1",
-      name: "Kamron25",
-      email: "user1@example.com",
-      nickname: "Rubye",
-      coverImg: "https://picsum.photos/800/300",
-      avatarImg: "https://i.pravatar.cc/300",
-      bio: "Pariatur accusantium et magnam sint sed voluptate quia aperiam.",
-      identityId: 2,
-      createdAt: "2022-05-14T17:34:57.000Z",
-      updatedAt: "2022-05-14T17:34:57.000Z",
-      Tweets: [
-        {
-          id: 1,
-          description:
-            "At alias aut quo rem commodi harum voluptatem dolorum. Saepe quas eum natus laudantium reprehenderit delectus neque. Et molestiae velit dicta ducimus eum ea nam.",
-          UserId: 2,
-          createdAt: "2022-05-14T17:34:57.000Z",
-          updatedAt: "2022-05-14T17:34:57.000Z",
-          userId: 2,
-        },
-        {
-          id: 7,
-          description:
-            "Est omnis ducimus exercitationem minima consectetur cum ut. Ea quia sapiente. Dolores excepturi occaecati eum aut alias eum velit. Totam explicabo totam ipsam.",
-          UserId: 2,
-          createdAt: "2022-05-14T17:34:57.000Z",
-          updatedAt: "2022-05-14T17:34:57.000Z",
-          userId: 2,
-        },
-        {
-          id: 10,
-          description:
-            "Dignissimos quod dolor eius. Occaecati vel voluptates quia hic aperiam cumque. Qui similique alias corrupti sunt quisquam nostrum. Saepe doloribus et fugit aut magni laboriosam. A repudiandae et rem aut amet laborum.\n \rOdio rerum porro fugit. Est suscipit deleniti magni alias. Cupiditate impedit porro id similique consequatur quo eos.\n \rEum dolor voluptas quo ea aut. Sed odio ut laudantium. Est cupiditate tempore nesciunt consequatur consequatur dolores occaecati veritatis. Est laboriosam quam quia qui ratione dolorem recusandae.",
-          UserId: 2,
-          createdAt: "2022-05-14T17:34:57.000Z",
-          updatedAt: "2022-05-14T17:34:57.000Z",
-          userId: 2,
-        },
-        {
-          id: 19,
-          description:
-            "Quia a tempora ullam.\nVoluptatum ad explicabo at similique omnis neque aut.\nQuia quae est sapiente ea aspernatur ducimus quia provident.",
-          UserId: 2,
-          createdAt: "2022-05-14T17:34:57.000Z",
-          updatedAt: "2022-05-14T17:34:57.000Z",
-          userId: 2,
-        },
-        {
-          id: 27,
-          description: "Occaecati rem quia.",
-          UserId: 2,
-          createdAt: "2022-05-14T17:34:57.000Z",
-          updatedAt: "2022-05-14T17:34:57.000Z",
-          userId: 2,
-        },
-        {
-          id: 33,
-          description:
-            "Voluptatum quia commodi. Ut et quam placeat ipsam laborum ut mollitia dolor non. Tempore praesentium ea assumenda. Laboriosam provident molestiae neque quia. Quas voluptates at repellendus doloremque.",
-          UserId: 2,
-          createdAt: "2022-05-14T17:34:57.000Z",
-          updatedAt: "2022-05-14T17:34:57.000Z",
-          userId: 2,
-        },
-        {
-          id: 35,
-          description: "et",
-          UserId: 2,
-          createdAt: "2022-05-14T17:34:57.000Z",
-          updatedAt: "2022-05-14T17:34:57.000Z",
-          userId: 2,
-        },
-        {
-          id: 44,
-          description:
-            "Sunt dolor vel dolores nihil dolorem omnis provident. Quo odio eos. Nostrum repellat aut. Quasi dolorem eum sit dolores sit.",
-          UserId: 2,
-          createdAt: "2022-05-14T17:34:57.000Z",
-          updatedAt: "2022-05-14T17:34:57.000Z",
-          userId: 2,
-        },
-        {
-          id: 47,
-          description: "Aperiam qui magni.",
-          UserId: 2,
-          createdAt: "2022-05-14T17:34:57.000Z",
-          updatedAt: "2022-05-14T17:34:57.000Z",
-          userId: 2,
-        },
-      ],
-      Follower: [
-        {
-          id: 4,
-          account: "user3",
-          name: "Gino_OConnell77",
-          email: "user3@example.com",
-          password:
-            "$2a$10$0CiK27bSCHhIXI9BdRSBS.NTeW6z/hxoLX/GPHlfo1sKJXJi5IDdC",
-          nickname: "Elmore",
-          coverImg: "https://picsum.photos/800/300",
-          avatarImg: "https://i.pravatar.cc/300",
-          bio: "Sed laborum assumenda ut est ea et delectus. Quas voluptas neque sunt eum dolorum accusantium. Maiores esse rem. Ut quo eveniet.",
-          identityId: 2,
-          createdAt: "2022-05-14T17:34:57.000Z",
-          updatedAt: "2022-05-14T17:34:57.000Z",
-          Followship: {
-            followerId: 2,
-            followingId: 4,
-            createdAt: "2022-05-14T17:34:57.000Z",
-            updatedAt: "2022-05-14T17:34:57.000Z",
-          },
-        },
-      ],
-      Following: [],
-      is_admin: false,
-    },
-  },
-};
+import { mapState } from "vuex";
 
 export default {
   name: "Twitter",
@@ -287,14 +169,26 @@ export default {
   },
   data() {
     return {
-      user: "",
-      text: "",
-      textReply: "",
-      dNone: true,
+      user: {
+        avatarImg: ''
+      },
+      text: "",         // 推文
+      textReply: "",    // 回覆
       dNoneReplyModal: true,
-      tweets: [],
+      tweets: [],       // 全部推文
+      tweet: {          // 單一推文
+        id: -1,
+        description: "",
+        createdAt: "",
+        User: {
+          avatarImg: '',
+          name: '',
+          account: '',
+        }
+      }, 
+      newTweet: [],     // 新推文
       isReplyModel: true,
-      placeholder: ''
+      placeholder: "",
     };
   },
   created() {
@@ -303,11 +197,7 @@ export default {
   },
   methods: {
     fetchUser() {
-      const { data } = dummyUser;
-      const { user } = data;
-      // console.log(data)
-      // console.log(user)
-      this.user = user;
+      this.user = this.currentUser
     },
     async fetchTweets() {
       try {
@@ -319,6 +209,8 @@ export default {
 
         const { data } = response;
         this.tweets = data;
+        // console.log(data)
+        // this.newTweet = data.description;
       } catch (error) {
         console.log(error);
         Toast.fire({
@@ -327,29 +219,81 @@ export default {
         });
       }
     },
+    async createTweet() {
+      try {
+        // 內容空白處理
+        if (!this.text) {
+          Toast.fire({
+            icon: "warning",
+            title: "內容不可空白",
+          });
+          this.isProcessing = false;
+          return;
+        }
+
+        const { data } = await tweetAPI.createTweet({
+          text: this.text,
+        })
+
+        this.newTweet.push({
+          description: this.text,
+          UserId: this.currentUser.id,
+          createdAt: new Date(),
+        })
+
+        console.log(data)
+
+        if (data.status !== "success") {
+          throw new Error(data.message);
+        }
+        this.text = "";
+      } catch (error) {
+        console.log(error);
+        Toast.fire({
+          icon: "error",
+          title: "暫時無法推文",
+        });
+      }
+    },
     onClickAvatar() {
       console.log(this.tweets.User.id);
     },
-    // onClickText() {
-    //   console.log(this.tweets.id)
-    // },
     handleCloseBtn() {
       // this.$emit('reply-modal')
       this.dNoneReplyModal = !this.dNoneReplyModal;
       this.textReply = "";
     },
     tweetModal() {
-      this.dNoneReplyModal = !this.dNoneReplyModal;
-      // this.dNone = !this.dNone;
-      this.isReplyModel = false
-      this.placeholder = '有什麼新鮮事？'
-    },
-    replyModal(id) {
-      console.log(id)
       this.dNoneReplyModal = !this.dNoneReplyModal
-      this.isReplyModel = true
-      this.placeholder = '推你的回覆'
+      this.isReplyModel = false;
+      this.placeholder = "有什麼新鮮事？";
     },
+    async replyModal(id) {
+      try {
+        console.log(id);
+
+        const { data, statusText } = await tweetAPI.getReply({ id });
+        console.log(data);
+
+        if (statusText !== "OK") {
+          throw new Error(statusText);
+        }
+
+        this.tweet = data;
+        this.dNoneReplyModal = !this.dNoneReplyModal;
+        this.isReplyModel = true;
+        this.placeholder = "推你的回覆";
+      } catch (error) {
+        console.log(error);
+        Toast.fire({
+          icon: "error",
+          title: "暫時無法取得推文",
+        });
+      }
+    },
+  },
+  computed: {
+    ...mapState(["currentUser"]),
   },
 };
 </script>
@@ -430,7 +374,7 @@ export default {
 }
 // modal
 .modal {
-  background-color: $modal-background; 
+  background-color: $modal-background;
   position: fixed;
   top: 0;
   right: 0;

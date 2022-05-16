@@ -142,6 +142,7 @@ import TweetModal from "../components/TweetModal";
 import { fromNowFilter } from "./../utils/mixins";
 import tweetAPI from "../apis/tweet";
 import { Toast } from "../utils/helpers";
+import { mapState } from 'vuex'
 
 export default {
   name: "TwitterReply",
@@ -152,12 +153,6 @@ export default {
   },
   data() {
     return {
-      currentUser: {
-        account: "user",
-        avatarImg: "https://i.pravatar.cc/300",
-        id: 5,
-        name: "Favian",
-      },
       // 要回覆的對象
       tweet: {},
       user: {
@@ -209,6 +204,9 @@ export default {
       this.textReply = "";
     },
   },
+  computed: {
+    ...mapState(['currentUser'])
+  }
 };
 </script>
 

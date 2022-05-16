@@ -18,7 +18,7 @@
             <!--   推文 -->
             <template 
               v-slot:isReplyModel
-              v-show="false"
+              v-if="isReplyModel"
             >
               <div class="tweet-div">
               </div>
@@ -35,11 +35,11 @@
 
             <!-- 回覆 -->
             <template v-slot:avatarImg>
-              <img class="modal-content-avatar" :src="user.avatarImg" alt="" />
+              <img class="modal-content-avatar" :src="currentUser.avatarImg" alt="" />
             </template>
             <template v-slot:text>
               <textarea
-                v-model="textReply"
+                v-model="text"
                 name="tweet"
                 placeholder="有什麼新鮮事？"
               >
@@ -53,6 +53,7 @@
 
           <button
             class="modal-tweet"
+            @click.stop.prevent="tweetModal"
           >
             推文
           </button>
@@ -88,7 +89,7 @@
         </router-link>     
       </li>
        <li class="nav__list__item ">
-        <router-link to="/users/:id/setting">
+        <router-link :to="{name: 'user-setting', params: {id: currentUser.id}}">
           <div class="nav__list__item__wrapper">
             <img class="active" src="../assets/static/images/orangeSet@2x.png" alt="">
             <img class="inactive" src="../assets/static/images/setIcon@2x.png" alt="">
@@ -113,10 +114,11 @@
           </router-link>
              
         </li> 
-      </template>
-           
-    </ul>  
+      </template>       
+    </ul> 
+
     <button 
+      class="tweet-btn"
       v-if="!isAdmin"
       @click.stop.prevent="tweetModal"
     >
@@ -137,6 +139,7 @@
 </template>
 <script>
 import TweetModal from "../components/TweetModal"
+import { mapState } from 'vuex'
 
 export default {
   name:'Sidebar',
@@ -163,8 +166,9 @@ export default {
           path:'/admin/users'        
         }
       ],
-      // dNone: true,
+      text: '',
       dNoneReplyModal: true,
+      isReplyModel: true,
     }
   },
   methods:{
@@ -176,6 +180,9 @@ export default {
         this.isAdmin = false
       }
     },
+    handleCloseBtn () {
+      this.dNoneReplyModal = true
+    },
     onClickLogout () {
       this.$store.commit('revokeAuthentication')
       localStorage.removeItem('token')
@@ -184,6 +191,9 @@ export default {
     tweetModal() {
       this.dNoneReplyModal = !this.dNoneReplyModal;
     },
+  },
+  computed: {
+    ...mapState(['currentUser'])
   },
   created(){
     this.toggleNavList()
@@ -235,7 +245,7 @@ export default {
         }
       }
     }
-    button{
+    .tweet-btn {
       @extend %button-orange;
       width:100%;
       max-width: 178px;
