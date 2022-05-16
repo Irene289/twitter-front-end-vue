@@ -58,7 +58,6 @@ export default {
       try{
         const {data,statusText} = await userAPI.getTweets({id})
         this.tweets = data
-        console.log(data)
         if(statusText !== 'OK'){
           throw new Error(statusText)
         }
