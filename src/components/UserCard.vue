@@ -108,9 +108,10 @@ export default {
       },
       async fetchUser(userId){
         try{
-          const {data, statusText} = await userAPI.get({id:userId})       
-          const {userData} = data
-          const {id,name, account ,coverImg, avatarImg, bio, is_following:isFollowing, Following: following, Follower: follower} = userData[0]
+          const {data, statusText} = await userAPI.get({id:userId})   
+          // console.log(response)    
+          // const {userData} = data
+          const {id,name, account ,coverImg, avatarImg, bio, is_following:isFollowing, Following: following, Follower: follower} = data
           let newBio = ''
           if(bio.length > 160){
             newBio = bio.slice(0,160) 
