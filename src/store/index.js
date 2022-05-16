@@ -54,7 +54,7 @@ export default new Vuex.Store({
           avatarImg,
           is_admin          
         })
-        console.log('state',this.state.currentUser)
+        // console.log('currentUser: ',this.state.currentUser)
         return true
       }catch(error){
         Toast.fire({

@@ -77,7 +77,7 @@
             type="submit"
             :disabled="isProcessing"
           >
-            儲存
+            {{ isProcessing ? "處理中..." : "儲存" }}
           </button>
         </form>
 
@@ -90,21 +90,23 @@
 
 <script>
 import Sidebar from '../components/Sidebar'
+import userAPI from '../apis/user'
 import { Toast } from '../utils/helpers'
+import { mapState } from 'vuex'
 
-const dummyData = {
-  currentUser: {
-    id: 1,
-    account: "root",
-    name: "root",
-    email: "root@example.com",
-    password: "$2a$10$lvYqyY7mfVRmhHlQSJjeMed8Yd3yNAsEYoY0TzurnyQzTmI90Sz4S",
-    nickname: "root",
-    coverImg: "https://picsum.photos/800/300",
-    avatarImg: "https://i.pravatar.cc/300",
-    bio: null,
-  }
-};
+// const dummyData = {
+//   currentUser: {
+//     id: 1,
+//     account: "root",
+//     name: "root",
+//     email: "root@example.com",
+//     password: "$2a$10$lvYqyY7mfVRmhHlQSJjeMed8Yd3yNAsEYoY0TzurnyQzTmI90Sz4S",
+//     nickname: "root",
+//     coverImg: "https://picsum.photos/800/300",
+//     avatarImg: "https://i.pravatar.cc/300",
+//     bio: null,
+//   }
+// };
 
 export default {
   name: "Setting",
@@ -125,19 +127,18 @@ export default {
     }
   },
   created() {
+    if (this.currentUser.id === -1) return
     const { id } = this.$route.params
-    this.getUser(id)
+    this.setUser(id)
   },
   methods: {
-    getUser (userId) {
-      // TODO:使用currentUser
-      console.log('userId:', userId)
+    setUser () {
       const { 
         id,
         account,
         name,
         email
-       } = dummyData.currentUser
+       } = this.currentUser
 
       this.user = {
         id,
@@ -146,37 +147,59 @@ export default {
         email
       }
     },
-    handleSubmit (e) {
-      // TODO:API
-      this.isProcessing = true
+    async handleSubmit (e) {
+      try{
+        // TODO:API
+        this.isProcessing = true
 
-      console.log(this.user.password)
+        // 必填而未填處理
+        if ( 
+            !this.user.account || 
+            !this.user.name || 
+            !this.user.email || 
+            !this.user.password || 
+            !this.user.passwordCheck
+        ) {
+          Toast.fire({
+            icon: 'warning',
+            title: '請輸入所有欄位'
+          })
+          this.isProcessing = false
+          return
+        } 
+        
+        // 密碼錯誤處理
+        if (this.user.password !== this.user.passwordCheck) {
+          alert('密碼不一致，請再次輸入')
+          this.isProcessing = false
+        }
 
-      if ( 
-          !this.user.account || 
-          !this.user.name || 
-          !this.user.email || 
-          !this.user.password || 
-          !this.user.passwordCheck
-      ) {
-        Toast.fire({
-          icon: 'warning',
-          title: '請輸入所有欄位'
+        const form = e.target
+        const formData = new FormData(form)
+        console.log(formData)
+
+        const { data } = await userAPI.update({ 
+          userId: this.user.id,
+          formData
         })
-        this.isProcessing = false
-        return
-      } 
 
-      if (this.user.password !== this.user.passwordCheck) {
-        alert('密碼不一致，請再次輸入')
+        console.log(data)
+        
+
+      } catch (error) {
         this.isProcessing = false
+
+        console.log('Error', error)
+        Toast.fire({
+          icon: 'error',
+          title: '無法編輯，請稍後再試'
+        })
       }
-
-      const form = e.target
-      const formData = new FormData(form)
-      console.log(formData)
     }
   },
+  computed: {
+    ...mapState(['currentUser'])
+  }
 }
 </script>
 

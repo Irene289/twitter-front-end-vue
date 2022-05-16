@@ -9,9 +9,10 @@ export const fromNowFilter = {
 
       let now = new Date().getFullYear() 
       
-      if (moment().year() === now) {
+      if (moment().year() === now && days.includes('days')) {
+        // console.log(days)
         return moment(datetime).format("MM月DD日")
-      } else if (days.includes('day')) {
+      } else if (moment().year() !== now) {
         return moment(datetime).format("YYYY年MM月DD日")
       } else {
         return moment(datetime).fromNow()

@@ -1,4 +1,5 @@
 <template>
+<!-- TODO: delete this .vue -->
   <div class="container">
     <form 
       class="signin-form"
@@ -123,10 +124,10 @@ export default {
         if(!user.is_admin){
           // token
         localStorage.setItem('token', data.data.token)
-        this.$router.push('/twitter')
+        // this.$router.push('/twitter')
         }else if(user.is_admin === true){
           this.isProcessing = false
-          console.log('isadmin')
+          // console.log('isadmin')
           Toast.fire({
             icon:'warning',
             title:'此帳號不存在'

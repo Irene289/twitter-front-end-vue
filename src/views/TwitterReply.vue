@@ -14,22 +14,26 @@
           <img :src="user.avatarImg" alt="" />
         </div>
         <div class="user-info">
-          <p class="user-info-name">{{user.name}}</p>
-          <p class="user-info-account">@{{user.account}}</p>
+          <p class="user-info-name">{{ user.name }}</p>
+          <p class="user-info-account">@{{ user.account }}</p>
         </div>
       </div>
       <div class="reply-div-content">
         <div class="content-text">
           <p>
-            {{tweet.description}}
+            {{ tweet.description }}
           </p>
         </div>
         <div class="content-when">
-          <p>{{tweet.createdAt | format}}</p>
+          <p>{{ tweet.createdAt | format }}</p>
         </div>
         <div class="content-counts">
-          <div class="content-counts-reply"><span>{{tweet.replyTotal}}</span> 回覆</div>
-          <div class="content-counts-like"><span>{{tweet.likeTotal}}</span> 喜歡次數</div>
+          <div class="content-counts-reply">
+            <span>{{ tweet.replyTotal }}</span> 回覆
+          </div>
+          <div class="content-counts-like">
+            <span>{{ tweet.likeTotal }}</span> 喜歡次數
+          </div>
         </div>
         <div class="content-response">
           <img
@@ -46,96 +50,164 @@
         </div>
       </div>
       <!-- slot -->
-      <UserTweetCard 
-        v-for="reply in replies"
-        :key="reply.id"
-        >
+      <UserTweetCard v-for="reply in replies" :key="reply.id">
         <template v-slot:avatar>
-          <img class="avatar" :src="reply.User.avatarImg" alt="">
+          <img class="avatar" :src="reply.User.avatarImg" alt="" />
         </template>
         <template v-slot:name>
-          {{reply.User.name}}
+          {{ reply.User.name }}
         </template>
         <template v-slot:id>
-          {{reply.User.account}}
+          {{ reply.User.account }}
         </template>
         <template v-slot:post-time>
-          {{tweet.User.createdAt | fromNow}}
+          {{ tweet.User.createdAt | fromNow }}
         </template>
         <template v-slot:text>
-          <div class="reply-tag">回覆 <span>@{{tweet.User.account}}</span></div>
-          {{reply.comment}}
-        </template>   
-      </UserTweetCard>  
-
+          <div class="reply-tag">
+            回覆 <span>@{{ tweet.User.account }}</span>
+          </div>
+          {{ reply.comment }}
+        </template>
+      </UserTweetCard>
     </div>
-    <ReplyModal 
+
+    <!-- modal -->
+    <div 
+      class="container" 
+      :class="{ 'd-none': dNoneReplyModal }"
+    >
+      <div class="modal row">
+        <form class="modal-content col-6" action="">
+          <div class="modal-content-cancel">
+            <button class="btn" @click.stop.prevent="handleCloseBtn">
+              <img src="../assets/static/images/orangeClose@2x.png" alt="" />
+            </button>
+          </div>
+
+          <TweetModal>
+            <!--   推文 -->
+            <template v-slot:isReplyModel>
+              <div v-show="true" class="tweet-div"></div>
+            </template>
+            <template v-slot:replytoAvatarImg>
+              <img class="avatar" :src="currentUser.avatarImg" alt="" />
+            </template>
+            <template v-slot:replyto>
+              <p class="content-info-name">
+                {{ tweet.description }}
+                <!-- jdfhjdsahf -->
+              </p>
+              <p class="content-info-account">@{{ currentUser.account }}</p>
+              <p class="content-info-time">{{ currentUser.createdAt }}</p>
+            </template>
+            <template v-slot:replytoAccount> @{{ currentUser.account }} </template>
+
+            <!-- 回覆 -->
+            <template v-slot:avatarImg>
+              <img
+                class="modal-content-avatar"
+                :src="currentUser.avatarImg"
+                alt=""
+              />
+            </template>
+            <template v-slot:text>
+              <textarea
+                v-model="textReply"
+                name="tweet"
+                placeholder="推你的回覆"
+              >
+              </textarea>
+            </template>
+            <template v-slot:alert>
+              <p class="modal-alert">內容不可空白</p>
+            </template>
+          </TweetModal>
+
+          <button class="btn modal-tweet">回覆</button>
+        </form>
+      </div>
+    </div>
+
+    <!-- <ReplyModal 
       :d-none-reply-modal="dNoneReplyModal"
       @reply-modal="replyModal"
-    />
+    /> -->
   </div>
 </template>
 
 <script>
-import UserTweetCard from '../components/UserTweetCard.vue'
-import ReplyModal from "../components/ReplyModal"
-import { fromNowFilter } from './../utils/mixins'
-import tweetAPI from '../apis/tweet'
-import { Toast } from '../utils/helpers'
+import UserTweetCard from "../components/UserTweetCard.vue";
+import TweetModal from "../components/TweetModal";
+import { fromNowFilter } from "./../utils/mixins";
+import tweetAPI from "../apis/tweet";
+import { Toast } from "../utils/helpers";
+import { mapState } from 'vuex'
 
 export default {
   name: "TwitterReply",
   mixins: [fromNowFilter],
   components: {
     UserTweetCard,
-    ReplyModal,
+    TweetModal
   },
   data() {
     return {
+      // 要回覆的對象
       tweet: {},
       user: {
-        avatarImg: '',
-        name: '',
-        account: ''
+        avatarImg: "",
+        name: "",
+        account: "",
       },
+      // 回覆對象的其他回覆
       replies: [],
-      avatarImg: '',
+      avatarImg: "",
+      textReply: "",
+      // isReplyModel: true,
       dNoneReplyModal: true,
     };
   },
-  created () {
-    const { id: id } = this.$route.params
-    this.fetchReplies(id)
+  created() {
+    const { id: id } = this.$route.params;
+    this.fetchReplies(id);
   },
   methods: {
     async fetchReplies(id) {
       try {
-        const { data, statusText } = await tweetAPI.getReply({id})
+        const { data, statusText } = await tweetAPI.getReply({ id });
 
-        if (statusText !== 'OK') {
-          throw new Error(statusText)
+        if (statusText !== "OK") {
+          throw new Error(statusText);
         }
-        const { Replies } = data
+        const { Replies } = data;
 
-        this.tweet = data
-        this.user = data.User
-        this.replies = Replies
+        this.tweet = data;
+        this.user = data.User;
+        this.replies = Replies;
 
-        // console.log(data.User)
+        console.log(data.User);
         // console.log(Replies)
       } catch (error) {
-        console.log(error)
+        console.log(error);
         Toast.fire({
-          icon: 'error',
-          title: '暫時無法取得推文'
-        })
+          icon: "error",
+          title: "暫時無法取得推文",
+        });
       }
     },
     replyModal() {
       this.dNoneReplyModal = !this.dNoneReplyModal;
     },
+    handleCloseBtn() {
+      this.dNoneReplyModal = !this.dNoneReplyModal;
+      this.textReply = "";
+    },
+  },
+  computed: {
+    ...mapState(['currentUser'])
   }
-}
+};
 </script>
 
 <style lang="scss" scoped>
@@ -245,12 +317,49 @@ export default {
     background-color: $scrollbar;
   }
 }
-.reply-tag{
-    @extend %tweet-account;
-    margin-bottom: 8px;
-    span{
-      color: $orange;
-      font-family: $number-font;
-    }
+.reply-tag {
+  @extend %tweet-account;
+  margin-bottom: 8px;
+  span {
+    color: $orange;
+    font-family: $number-font;
   }
+}
+
+// modal
+.modal {
+  background-color: $modal-background;
+  position: fixed;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+}
+.modal-content {
+  background-color: $white;
+  border-radius: 14px;
+  margin: auto;
+  margin-top: 56px;
+  padding: 0;
+  box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.25);
+  &-cancel {
+    width: 100%;
+    border-bottom: 1px solid $border-grey;
+  }
+  &-cancel img {
+    width: 24px;
+    height: 24px;
+    margin: 16px;
+  }
+  .avatar {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+  }
+}
+.modal-tweet {
+  @extend %button-orange;
+  min-width: 76px;
+  height: 40px;
+}
 </style>
