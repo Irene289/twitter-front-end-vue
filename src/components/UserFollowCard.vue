@@ -35,6 +35,7 @@ export default {
     .avatar{
         width: 50px;
         height: 50px;
+        border-radius: 50%;
     }
     &__item:nth-child(2){
       padding-left: 10px;

@@ -8,17 +8,17 @@
         <img class="avatar" :src="reply.img" alt="">
       </template>
        <template v-slot:name>
-         {{reply.name}}
+         {{reply.User.name}}
       </template>
        <template v-slot:id>
-         {{reply.account}}
+         {{reply.User.account}}
       </template>
        <template v-slot:post-time>
-         {{reply.createTime | fromNow}}
+         {{reply.created_at | fromNow}}
       </template>
        <template v-slot:text>
          <div class="reply-tag">回覆 <span>@{{reply.to}}</span></div>
-         {{reply.text}}
+         {{reply.comment}}
       </template>   
     </UserTweetCard>  
   </div>
@@ -26,6 +26,8 @@
 <script>
 import UserTweetCard from '../components/UserTweetCard.vue'
 import { fromNowFilter } from './../utils/mixins'
+import userAPI from '../apis/user'
+import {Toast} from '../utils/helpers'
 
 export default {
   mixins: [fromNowFilter],
@@ -34,45 +36,29 @@ export default {
   },
   data(){
     return{
-       replies:[
-         {
-           id: 1,
-           name: 'John Doe',
-           img: require('../assets/static/images/noImage@2x.png'),
-           account: '@johndoe',
-           text:'The point of using Lorem Ipsum is that it has a more-or-less normal distribution of letters, as opposed to.',
-           likeNum: 50,
-           replyNum: 30,
-           createTime: 3,
-           to: 'apple' 
-         },
-          {
-           id: 1,
-           name: 'John Doe',
-           img: require('../assets/static/images/noImage@2x.png'),
-           account: '@johndoe',
-           text:'The point of using Lorem Ipsum is that it has a more-or-less normal distribution of letters, as opposed to using making it look like readable English.',
-           likeNum: 50,
-           replyNum: 30,
-           createTime: 3,
-           to: 'apple' 
-         },
-          {
-           id: 1,
-           name: 'John Doe',
-           img: require('../assets/static/images/noImage@2x.png'),
-           account: '@johndoe',
-           text:'The point of using Lorem Ipsum is that it has a more-or-less normal distribution of letters, as opposed to using making it look like readable English.',
-           likeNum: 50,
-           replyNum: 30,
-           createTime: 3,
-           to: 'apple' 
-         }
-       ]
-
-    
+       replies:[]    
+    } 
+  },
+  methods:{
+    //TODO:缺用戶avatar和回覆對象帳號，待補
+    async fetchUserReplies(id){
+      try{
+        const {data, statusText} = await userAPI.getReplies({id})
+        this.replies = data
+        if(statusText !== 'OK'){
+          throw new Error (statusText)
+        }
+      }catch(error){
+        Toast.fire({
+          icon:'error',
+          title: '無法載入使用者回覆，請稍後再試'
+        })
+      }
     }
-   
+  },
+  created(){
+    const {id} = this.$route.params
+    this.fetchUserReplies(id)
   }
 }
 </script>

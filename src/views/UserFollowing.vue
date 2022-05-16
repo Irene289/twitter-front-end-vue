@@ -1,26 +1,28 @@
 <template>
   <div class="follower-container">
     <UserFollowCard
-      v-for="user in users"
-      :key="user.id"
+      v-for="following in followings"
+      :key="following.id"
     >
        <template v-slot:avatar>
-        <img class="avatar" :src="user.img" alt="">
+        <img 
+          @click.stop.prevent="visit(following.id,'user-tweets')"
+          class="avatar" :src="following.avatarImg" alt="">
       </template>
        <template v-slot:name>
-         {{user.name}}
+         {{following.name}}
       </template>
        <template v-slot:id>
-         {{user.account}}
+         {{following.account}}
       </template>
        <template v-slot:btn>
         <div class="btn-group">
-          <button v-show="!user.isFollowing" class="follow">跟隨</button>
-          <button v-show="user.isFollowing" class="following">正在跟隨</button>
+          <button v-show="!following.is_following" class="follow">跟隨</button>
+          <button v-show="following.is_following" class="following">正在跟隨</button>
         </div>       
       </template>
        <template v-slot:text>
-         {{user.text}}
+         {{following.bio | textFilter}}
       </template>
     </UserFollowCard>
   </div>
@@ -28,43 +30,46 @@
 </template>
 <script>
 import UserFollowCard from '../components/UserFollowCard.vue'
+import {visitPage} from '../utils/mixins'
+import {textFilter} from '../utils/mixins'
+import userAPI from '../apis/user'
+import {Toast} from '../utils/helpers'
 export default {
+  name:'UserFollowing',
   components:{
     UserFollowCard
-  },
+  }, 
+  mixins: [textFilter, visitPage],
   data(){
     return{
-      users:[
-         {
-           id: 1,
-           name: 'John Doe',
-           img: require('../assets/static/images/noImage@2x.png'),
-           text:'The point of using Lorem Ipsum is that it has a more-or-less normal distribution of letters, as opposed to using making it look like readable English.',
-           isFollowing: true
-         },
-          {
-           id: 2,
-           name: 'John Doe',
-           img: require('../assets/static/images/noImage@2x.png'),
-           text:'The point of using Lorem Ipsum is that it has a more-or-less normal distribution of letters, as opposed to using making it look like readable English.',
-           isFollowing: true   
-         },
-          {
-           id: 1,
-           name: 'John Doe',
-           img: require('../assets/static/images/noImage@2x.png'),
-           text:'The point of using Lorem Ipsum is that it has a more-or-less normal distribution of letters, as opposed to using making it look like readable English.',
-           isFollowing: true
-         },
-          {
-           id: 2,
-           name: 'John Doe',
-           img: require('../assets/static/images/noImage@2x.png'),
-           text:'The point of using Lorem Ipsum is that it has a more-or-less normal distribution of letters, as opposed to using making it look like readable English.',
-           isFollowing: true   
-         }
-       ]
+      followings:[]
     }
+  },
+  methods:{
+    async fetchUserFollowings(id){
+      try{
+        const {data, statusText} = await userAPI.get({id})
+        const followings = data.Following
+        this.followings = followings
+        if(statusText !== 'OK'){
+          throw new Error(statusText)
+        }
+      }catch(error){
+        Toast.fire({
+          icon:'error',
+          title: '無法取得追蹤中用戶資料，請稍後再試'
+        })
+      }
+    },
+    visit(id,pathName){
+      //使用mixins裡的函式
+      this.visitUserPage(id,pathName)
+    }
+  },  
+  created(){
+    const {id} = this.$route.params
+    console.log(id)
+    this.fetchUserFollowings(id)
   }
 }
 </script>
