@@ -1,31 +1,31 @@
 <template>
-  <main :class="{'d-none': dNone}">
+<!-- TODO: delete .vue -->
+  <main :class="{ 'd-none': dNone }">
     <div class="container">
       <div class="modal row">
-        <form 
-          class="modal-content col-6" 
-          action=""
-        >
+        <form class="modal-content col-6" action="">
           <div class="modal-content-cancel">
             <button class="btn" @click.stop.prevent="handleCloseBtn">
-              <img src="../assets/static/images/orangeClose@2x.png" alt="">
+              <img src="../assets/static/images/orangeClose@2x.png" alt="" />
             </button>
           </div>
-          <img class="modal-content-avatar" src="../assets/static/images/noImage@2x.png" alt="">
-          <textarea 
-            v-model="text"
-            class="scrollbar"
-            name="tweet"  
-            placeholder="有什麼新鮮事？" 
-          >
-          </textarea>
-          <p class="modal-alert">字數不可超過 140 字</p>
-          <button 
-            class="btn modal-tweet"
-            @click.stop.prevent
-          >
-            推文
-          </button>
+          <slot name="avatarImg">
+            <img
+              class="modal-content-avatar" src="" alt=""
+            />
+          </slot>
+          <slot name="text">
+            <textarea
+              class="scrollbar"
+            >
+            </textarea>
+          </slot>
+          <slot name="alert">
+            <p class="modal-alert"></p>
+          </slot>
+          <slot name="btn">
+            <button class="btn modal-tweet"></button>
+          </slot>
         </form>
       </div>
     </div>
@@ -34,38 +34,38 @@
 
 <script>
 export default {
-name: 'TweetModal',
-props: {
-  dNone: {
-    type: Boolean,
-    default: true
-  }
-},
-data () {
-  return {
-    text: ''
-  }
-},
-methods: {
-  handleCloseBtn() {
-    this.$emit('tweet-modal')
-    this.text = ''
-  }
-}
-}
+  name: "TweetModal",
+  props: {
+    dNone: {
+      type: Boolean,
+      default: true,
+    },
+  },
+  data() {
+    return {
+      text: "",
+    };
+  },
+  methods: {
+    handleCloseBtn() {
+      this.$emit("tweet-modal");
+      this.text = "";
+    },
+  },
+};
 </script>
 
 
 <style lang="scss" scoped>
 @import "../assets/scss/basic.scss";
 
-main{
+main {
   max-width: 1140px;
-  margin: 0 auto;    
+  margin: 0 auto;
 }
 
 .modal {
-  background-color: $modal-background; 
+  background-color: $modal-background;
   position: fixed;
   top: 0;
   right: 0;
@@ -82,7 +82,7 @@ main{
   margin-top: 56px;
   position: relative;
   box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.25);
-  
+
   &-cancel {
     width: 100%;
     border-bottom: 1px solid $border-grey;
@@ -108,7 +108,7 @@ textarea {
   width: calc(100% - 110px);
   height: calc(243px - 40px - 48px);
   border: none;
-  resize : none;
+  resize: none;
   color: $font-black;
   font-weight: 400;
   font-size: 16px;
@@ -116,7 +116,7 @@ textarea {
   overflow-y: scroll;
   position: absolute;
   top: 83px;
-  right: 27p  x;
+  right: 27p x;
   left: 83px;
   &::placeholder {
     color: $font-small;
@@ -128,7 +128,7 @@ textarea {
     width: 2px;
   }
   &::-webkit-scrollbar-track {
-    box-shadow: inset 0 0 1px $scrollbar; 
+    box-shadow: inset 0 0 1px $scrollbar;
     border-radius: 4px;
   }
   &::-webkit-scrollbar-thumb {

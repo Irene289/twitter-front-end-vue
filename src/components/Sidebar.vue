@@ -1,6 +1,66 @@
 <template>
   <nav id="sidebar">  
-    <TweetModal :d-none="dNone" @tweet-modal="tweetModal" />
+
+    <!-- modal -->
+    <div 
+      class="container" 
+      :class="{'d-none': dNoneReplyModal}"
+    >
+      <div class="modal row">
+        <form class="modal-content col-6" action="">
+          <div class="modal-content-cancel">
+            <button class="btn" @click.stop.prevent="handleCloseBtn">
+              <img src="../assets/static/images/orangeClose@2x.png" alt="" />
+            </button>
+          </div>
+
+          <ReplyModal>
+            <!--   推文 -->
+            <template 
+              v-slot:isReplyModel
+              v-show="false"
+            >
+              <div class="tweet-div">
+              </div>
+            </template>  
+            <!-- <template v-slot:replytoAvatarImg>
+              <img class="avatar" :src="user.avatarImg" alt="" />
+            </template>
+            <template v-slot:replyto>
+              <p class="content-info-name">{{ tweets.description }}</p>
+              <p class="content-info-account">@{{ user.account }}</p>
+              <p class="content-info-time">{{ tweets.createdAt }}</p>
+            </template>
+            <template v-slot:replytoAccount> @{{ user.account }} </template> -->
+
+            <!-- 回覆 -->
+            <template v-slot:avatarImg>
+              <img class="modal-content-avatar" :src="user.avatarImg" alt="" />
+            </template>
+            <template v-slot:text>
+              <textarea
+                v-model="textReply"
+                name="tweet"
+                placeholder="有什麼新鮮事？"
+              >
+              </textarea>
+            </template>
+            <template v-slot:alert>
+              <p class="modal-alert">
+                字數不可超過 140 字</p>
+            </template>
+          </ReplyModal>
+
+          <button
+            class="modal-tweet"
+          >
+            推文
+          </button>
+        </form>
+      </div>
+    </div>
+    <!-- <TweetModal :d-none="dNone" @tweet-modal="tweetModal" /> -->
+
     <ul class="nav__list">
       <img class="logo" src="../assets/static/images/navLogo@2x.png" alt="">
       <template v-if="!isAdmin">
@@ -76,12 +136,14 @@
   </nav>
 </template>
 <script>
-import TweetModal from "../components/TweetModal";
+// import TweetModal from "../components/TweetModal";
+import ReplyModal from '../components/ReplyModal'
 
 export default {
   name:'Sidebar',
   components: {
-    TweetModal
+    // TweetModal
+    ReplyModal
   },
   data(){
     return{
@@ -103,7 +165,8 @@ export default {
           path:'/admin/users'        
         }
       ],
-      dNone: true,
+      // dNone: true,
+      dNoneReplyModal: true,
     }
   },
   methods:{
@@ -121,7 +184,7 @@ export default {
       this.$router.push('/signin')
     },
     tweetModal() {
-      this.dNone = !this.dNone;
+      this.dNoneReplyModal = !this.dNoneReplyModal;
     },
   },
   created(){
@@ -187,5 +250,42 @@ export default {
       left: 13px;
     }
   }
+  // modal
+.modal {
+  background-color: $modal-background; 
+  position: fixed;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  z-index: 1000;
+  .modal-content {
+  background-color: $white;
+  border-radius: 14px;
+  margin: auto;
+  margin-top: 56px;
+  padding: 0;
+  box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.25);
+  &-cancel {
+    width: 100%;
+    border-bottom: 1px solid $border-grey;
+  }
+  &-cancel img {
+    width: 24px;
+    height: 24px;
+    margin: 16px;
+  }
+  .avatar {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+  }
+}
+.modal-tweet {
+  @extend %button-orange;
+  min-width: 76px;
+  height: 40px;
+}
+}
 
 </style>

@@ -1,76 +1,81 @@
 <template>
-  <main :class="{'d-none': dNoneReplyModal}">
-    <div class="container">
+  <main>
+    <!-- <div class="container">
       <div class="modal row">
-        <form class="modal-content col-6" action="">
-          <div class="modal-content-cancel">
-            <button class="btn" @click.stop.prevent="handleCloseBtn">
-              <img src="../assets/static/images/orangeClose@2x.png" alt="">
-            </button>  
-          </div>
+        <form class="modal-content col-6" action=""> -->
+          <!-- <div class="modal-content-cancel"> -->
+            <!-- <slot name="closeBtn"> -->
+              <!-- <button class="btn">
+                <img src="" alt="">
+              </button>   -->
+            <!-- </slot> -->
+          <!-- </div> -->
+
           <!-- 推文 -->
-          <div class="tweet-div">
-            <div class="tweet-div-avatar">
-              <img class="avatar" src="../assets/static/images/noImage@2x.png" alt="">
+          <slot name="isReplyModel">
+            <div class="tweet-div">
+            
+              <div class="tweet-div-avatar">
+                <slot name="replytoAvatarImg">
+                  <img class="avatar" src="" alt="">
+                </slot>
+              </div>
+              <div class="tweet-div-content">
+                <div class="content-info">
+                  <slot name="replyto">
+                    <p class="content-info-name">Apple</p>
+                    <p class="content-info-account">@apple</p>
+                    <p class="content-info-time">3 小時</p>
+                  </slot>
+                </div>
+                <div class="content-text">
+                  <p></p>
+                </div>
+                <div class="content-replyto">
+                  回覆給 <span><slot name="replytoAccount">
+                    </slot></span>
+                </div>
+              </div>
             </div>
-            <div class="tweet-div-content">
-              <div class="content-info">
-                <p class="content-info-name">Apple</p>
-                <p class="content-info-account">@apple</p>
-                <p class="content-info-time">3 小時</p>
-              </div>
-              <div class="content-text">
-                <p>Nulla Lorem mollit cupidatat irure. Laborum magna nulla duis ullamco cillum dolorla Lorem mollit cupidatat irure. Laborum magna nulla duis ullamco cillum dolor. Voluptate exercitation incididunt aliquip deserunt reprehenderit elit laborum. </p>
-              </div>
-              <div class="content-replyto">
-                回覆給 <span>@apple</span>
-              </div>
-            </div>
-          </div>
+          </slot>
           <!-- 回覆 -->
           <div class="reply-div">
-            <img class="avatar" src="../assets/static/images/noImage@2x.png" alt="">
-            <textarea 
-              v-model="text"
-              class="scrollbar"
-              name="tweet"  
-              placeholder="推你的回覆" 
-            >
-            </textarea>
-            <p class="modal-alert">內容不可空白</p>
-            <button 
+            <slot name="avatarImg">
+              <img
+                class="modal-content-avatar" src="" alt=""
+              />
+            </slot>
+            <slot name="text">
+              <textarea
+                class="scrollbar"
+                name="tweet"
+              >
+              </textarea>
+            </slot>
+            <slot name="alert">
+              <p class="modal-alert"></p>
+            </slot>
+            <!-- <button 
               class="btn modal-tweet"
-              @click.stop.prevent
             >
               回覆
-            </button>
+            </button> -->
           </div>
-        </form>
+        <!-- </form>
       </div>
-    </div>
+    </div> -->
   </main>
 </template>
 
 <script>
 export default {
 name: 'ReplyModal',
-props: {
-  dNoneReplyModal: {
-    type: Boolean,
-    default: true
-  }
-},
-data () {
-  return {
-    text: '',
-  }
-},
-methods: {
-  handleCloseBtn() {
-    this.$emit('reply-modal')
-    this.text = ''
-  }
-}
+// props: {
+//   dNoneReplyModal: {
+//     type: Boolean,
+//     default: true
+//   }
+// },
 }
 </script>
 
@@ -83,41 +88,41 @@ main{
   margin: 0 auto;    
 }
 
-.modal {
-  background-color: $modal-background; 
-  position: fixed;
-  top: 0;
-  right: 0;
-  bottom: 0;
-  left: 0;
-}
-.modal-content {
-  background-color: $white;
-  border-radius: 14px;
-  margin: auto;
-  margin-top: 56px;
-  padding: 0;
-  box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.25);
-  &-cancel {
-    width: 100%;
-    border-bottom: 1px solid $border-grey;
-  }
-  &-cancel img {
-    width: 24px;
-    height: 24px;
-    margin: 16px;
-  }
-  .avatar {
-    width: 50px;
-    height: 50px;
-    border-radius: 50%;
-  }
-}
+// .modal {
+//   background-color: $modal-background; 
+//   position: fixed;
+//   top: 0;
+//   right: 0;
+//   bottom: 0;
+//   left: 0;
+// }
+// .modal-content {
+//   background-color: $white;
+//   border-radius: 14px;
+//   margin: auto;
+//   margin-top: 56px;
+//   padding: 0;
+//   box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.25);
+//   &-cancel {
+//     width: 100%;
+//     border-bottom: 1px solid $border-grey;
+//   }
+//   &-cancel img {
+//     width: 24px;
+//     height: 24px;
+//     margin: 16px;
+//   }
+//   .avatar {
+//     width: 50px;
+//     height: 50px;
+//     border-radius: 50%;
+//   }
+// }
 // 推文
 .tweet-div {
   width: 100%;
   display: flex;
-  padding: 16px;
+  // padding: 16px;
   
   &-avatar {
     margin-right: 8px;
@@ -129,10 +134,14 @@ main{
       height: calc(100% - 4*16px);
       background: $form-input-placeholder;
       position: absolute;
-      top: calc(50px + 16px);
+      top: calc(50px + 32px);
       bottom: calc(0);
-      left: 25px;
+      left: 50px;
     }
+  }
+  &-content {
+    margin-top: 16px;
+    margin-left: 82px;
   }
   .content-info {
     display: flex;
@@ -171,8 +180,16 @@ main{
 .reply-div {
   display: flex;
   align-items: flex-start;
-  padding: 0 16px 16px 16px;
+  // padding: 0 16px 16px 16px;
+  margin: 0 16px 16px 16px;
   position: relative;
+   .modal-content-avatar {
+      width: 50px;
+      height: 50px;
+      border-radius: 50%;
+      margin-top: 32px;
+      margin-left: 8px;
+   }
 }
 textarea {
   width: calc(100%);
@@ -184,7 +201,8 @@ textarea {
   font-size: 16px;
   line-height: 26px;
   overflow-y: scroll;
-  margin: 8px;
+  margin-top: 44px;
+  margin-left: 8px;
   &::placeholder {
     color: $font-small;
   }
@@ -203,12 +221,12 @@ textarea {
 //     background-color: $scrollbar;
 //   }
 // }
-.modal-tweet {
-  @extend %button-orange;
-  min-width: 76px;
-  height: 40px;
-  align-self: flex-end;
-}
+// .modal-tweet {
+//   @extend %button-orange;
+//   min-width: 76px;
+//   height: 40px;
+//   align-self: flex-end;
+// }
 .modal-alert {
   color: $modal-alert;
   font-weight: 500;
