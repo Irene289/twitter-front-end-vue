@@ -85,7 +85,7 @@
             </button>
           </div>
 
-          <ReplyModal>
+          <TweetModal>
             <!--   推文 -->
             <template v-slot:isReplyModel>
               <div v-show="true" class="tweet-div"></div>
@@ -122,7 +122,7 @@
             <template v-slot:alert>
               <p class="modal-alert">內容不可空白</p>
             </template>
-          </ReplyModal>
+          </TweetModal>
 
           <button class="btn modal-tweet">回覆</button>
         </form>
@@ -138,7 +138,7 @@
 
 <script>
 import UserTweetCard from "../components/UserTweetCard.vue";
-import ReplyModal from "../components/ReplyModal";
+import TweetModal from "../components/TweetModal";
 import { fromNowFilter } from "./../utils/mixins";
 import tweetAPI from "../apis/tweet";
 import { Toast } from "../utils/helpers";
@@ -148,7 +148,7 @@ export default {
   mixins: [fromNowFilter],
   components: {
     UserTweetCard,
-    ReplyModal,
+    TweetModal
   },
   data() {
     return {

@@ -14,7 +14,7 @@
             </button>
           </div>
 
-          <ReplyModal>
+          <TweetModal>
             <!--   推文 -->
             <template 
               v-slot:isReplyModel
@@ -49,7 +49,7 @@
               <p class="modal-alert">
                 字數不可超過 140 字</p>
             </template>
-          </ReplyModal>
+          </TweetModal>
 
           <button
             class="modal-tweet"
@@ -136,14 +136,12 @@
   </nav>
 </template>
 <script>
-// import TweetModal from "../components/TweetModal";
-import ReplyModal from '../components/ReplyModal'
+import TweetModal from "../components/TweetModal"
 
 export default {
   name:'Sidebar',
   components: {
-    // TweetModal
-    ReplyModal
+    TweetModal
   },
   data(){
     return{

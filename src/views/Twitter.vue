@@ -71,7 +71,7 @@
             </button>
           </div>
 
-          <ReplyModal>
+          <TweetModal>
             <!--   推文 -->
             <template 
               v-slot:isReplyModel
@@ -106,7 +106,7 @@
               <p class="modal-alert">
                 {{ isReplyModel ? "內容不可空白" : "字數不可超過 140 字" }}</p>
             </template>
-          </ReplyModal>
+          </TweetModal>
 
           <button 
             v-if="isReplyModel"
@@ -149,8 +149,7 @@
 
 <script>
 import UserTweetCard from "../components/UserTweetCard";
-// import TweetModal from "../components/TweetModal";
-import ReplyModal from "../components/ReplyModal";
+import TweetModal from "../components/TweetModal";
 import { fromNowFilter } from "./../utils/mixins";
 import tweetAPI from "../apis/tweet";
 import { Toast } from "../utils/helpers";
@@ -284,8 +283,7 @@ export default {
   mixins: [fromNowFilter],
   components: {
     UserTweetCard,
-    // TweetModal,
-    ReplyModal,
+    TweetModal,
   },
   data() {
     return {
