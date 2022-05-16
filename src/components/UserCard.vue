@@ -39,12 +39,12 @@
       </div>
       <div class="user__container__info">
         <p class="name">{{user.name}}</p>
-        <p class="id">{{user.account}}</p>
+        <p class="id">@{{user.account}}</p>
         <p class="intro">{{user.bio}}</p>
         <div class="user__follow">
           <router-link
             :to="{
-              name:'follower',
+              name:'following',
               params: {id: user.id}
             }"
           >
@@ -54,7 +54,7 @@
           </router-link>
           <router-link
            :to="{
-              name:'following',
+              name:'follower',
               params: {id: user.id}
             }"
           >
@@ -74,6 +74,7 @@
   </div> 
 </template>
 <script>
+import {mapState} from 'vuex'
 import userAPI from '../apis/user'
 import {Toast} from '../utils/helpers'
 import Modal from '../components/EditModal.vue'
@@ -95,8 +96,7 @@ export default {
         is_following:'',
         followerCount:'',
         followingCount:'',
-      },      
-      currentUserId:8      
+      }  
     }
     },
     methods:{
@@ -127,7 +127,7 @@ export default {
             followingCount: following.length,
             followerCount: follower.length
           }
-          if(this.user.id === this.currentUserId){
+          if(this.user.id === this.currentUser.id){
             this.isCurrentUser = true
           }else{
             this.isCurrentUser = false
@@ -159,9 +159,26 @@ export default {
 
       }   
     },
+    beforeRouteUpdate(to, from, next){
+      const {id} = to.params    
+      this.fetchUser(id)
+      next()
+    },
+    computed:{
+      ...mapState(['currentUser'])
+    },
+    watch:{
+      //TODO:修bug待測
+      // nowRoute(newValue){
+      //   this.router = newValue
+      //   console.log(newValue)
+      //   this.fetchUser(newValue) 
+      // }
+    },
     created(){
       const {id} = this.$route.params
-      this.fetchUser(id)
+      console.log(id)
+      this.fetchUser(id)     
     }
 }
 </script>
@@ -243,6 +260,10 @@ export default {
       }
       .id{
         @extend %tweet-account;
+        font-family: $number-font;
+        vertical-align: middle;
+        // display:flex;
+        // align-items: center;
       }
       .intro{
         @extend %tweet-text;

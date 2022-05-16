@@ -7,12 +7,15 @@
         </div>
         <div class="col-7 content-container">
           <div class="title">
-            <img 
+            <img
+              @click.stop.prevent="visit(userId, 'user-tweets')" 
               class="title__item " 
               src="../assets/static/images/leftArrow@2x.png" 
               alt=""
             >
-            <div class= "title__item user">
+            <div 
+              @click.stop.prevent="visit(userId, 'user-tweets')"
+              class= "title__item user">
               <p class= "name">{{userName}}</p>
               <p class= "tweet-num">45推文</p>
             </div>          
@@ -55,6 +58,7 @@
   </main>
 </template>
 <script>
+  import {visitPage} from '../utils/mixins'
   import userAPI from '../apis/user'
   import {Toast} from '../utils/helpers'
   import Popular from '../components/Popular.vue'
@@ -62,6 +66,7 @@
   import NavTab from './../components/NavTab.vue'
   export default {
     name: 'User',
+    mixins:[visitPage],
     components:{
       Popular,
       Sidebar,
@@ -86,6 +91,10 @@
       }
     },
     methods:{
+      visit(id,pathName){
+        console.log(id)
+        this.visitUserPage(id,pathName)
+      },
        async fetchUser(userId){
         try{
           const {data, statusText} = await userAPI.get({id:userId})   
@@ -118,6 +127,7 @@
   
 }
 .title{
+  cursor:pointer;
   padding-left: 28px;
   height: 75px;
   display: flex;

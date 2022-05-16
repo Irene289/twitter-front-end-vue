@@ -65,13 +65,18 @@ export default {
     visit(id,pathName){
       //使用mixins裡的函式
       this.visitUserPage(id, pathName)
-    }
-    
+    }   
   },
   created(){
     const {id} = this.$route.params
     this.fetchUserFollowers(id)
-  }
+  },
+  beforeRouteUpdate(to, from, next){
+    const {id} = to.params
+    console.log('card',to,from)
+    this.fetchUserFollowers(id)
+    next()
+  },
 }
 </script>
 <style lang="scss" scoped>

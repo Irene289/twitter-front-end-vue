@@ -62,7 +62,7 @@ export const visitPage ={
       console.log('click')
       this.$router.push({
         name: pathName,
-        params: id
+        params: {id:id}
       })
     }  
   }

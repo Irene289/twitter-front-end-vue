@@ -29,7 +29,6 @@ export default {
   @import "../assets/scss/_basic.scss";
    .follow__card{
     display: flex;
-    max-height:168px;
     padding: 16px;
     border-bottom: 1px solid $border-grey;
     .avatar{
