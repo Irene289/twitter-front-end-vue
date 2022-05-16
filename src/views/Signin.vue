@@ -1,4 +1,5 @@
 <template>
+<!-- TODO: delete this .vue -->
   <div class="container">
     <form 
       class="signin-form"
@@ -123,7 +124,7 @@ export default {
         if(!user.is_admin){
           // token
         localStorage.setItem('token', data.data.token)
-        this.$router.push('/twitter')
+        // this.$router.push('/twitter')
         }else if(user.is_admin === true){
           this.isProcessing = false
           console.log('isadmin')

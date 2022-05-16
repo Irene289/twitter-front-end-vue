@@ -18,7 +18,13 @@ export default new Vuex.Store({
   getters: {
   },
   mutations: {
-    revokeAuthentication(state){
+    setCurrentUser(state, currentUser) {
+      state.currentUser = {
+        ...state.currentUser,
+        ...currentUser
+      }
+    },
+    revokeAuthentication (state) {
       //清空state
       state.currentUser = {}
       //通過驗證改為false
