@@ -18,12 +18,16 @@
       <!-- slot -->
       <UserTweetCard v-for="tweet in tweets" :key="tweet.id">
         <template v-slot:avatar>
-          <img
-            class="avatar"
-            :src="tweet.User.avatarImg"
-            alt=""
+          <router-link
+            :to="{name: 'user-tweets', params: { id: tweet.User.id }}"
             @click.stop.prevent="onClickAvatar"
-          />
+          >
+            <img
+              class="avatar"
+              :src="tweet.User.avatarImg"
+              alt=""
+            />
+          </router-link>
         </template>
         <template v-slot:name>
           {{ tweet.User.name }}
@@ -33,9 +37,13 @@
           {{ tweet.createdAt | fromNow}}
         </template>
         <template v-slot:text>
-          <p class="tweet-content-text" @click.stop.prevent="onClickText">
-            {{ tweet.description }}
-          </p>
+          <router-link
+            :to="{name: 'twitter-replies', params: { id: tweet.id }}"
+          >
+            <p class="tweet-content-text">
+              {{ tweet.description }}
+            </p>
+          </router-link>
           <div class="icons">
             <div class="icon-wrapper">
               <img
@@ -68,7 +76,7 @@ import UserTweetCard from "../components/UserTweetCard"
 import TweetModal from "../components/TweetModal"
 import ReplyModal from "../components/ReplyModal"
 import { fromNowFilter } from './../utils/mixins'
-import tweetsAPI from '../apis/Twitter'
+import tweetAPI from '../apis/tweet'
 import { Toast } from '../utils/helpers'
 
 export default {
@@ -93,7 +101,7 @@ export default {
   methods: {
     async fetchTweets () {
       try {
-        const response = await tweetsAPI.getTweets()
+        const response = await tweetAPI.getTweets()
 
         if (response.statusText !== 'OK') {
           throw new Error(response.statusText)
@@ -111,11 +119,11 @@ export default {
       }
     },
     onClickAvatar() {
-      this.$router.push("/users/:id");
+      console.log(this.tweets.User.id)
     },
-    onClickText() {
-      this.$router.push("/twitter/replies");
-    },
+    // onClickText() {
+    //   console.log(this.tweets.id)
+    // },
     tweetModal() {
       this.dNone = !this.dNone;
     },
