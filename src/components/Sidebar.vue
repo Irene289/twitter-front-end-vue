@@ -78,8 +78,7 @@
         <router-link 
           :to="{
             name:'user-tweets',
-            params:{id:currentUserId}
-            
+            params:{id:currentUser.id}           
             }">
           <div class="nav__list__item__wrapper">
             <img class="active" src="../assets/static/images/orangeUser@2x.png" alt="">
@@ -140,7 +139,6 @@
 <script>
 import TweetModal from "../components/TweetModal"
 import { mapState } from 'vuex'
-
 export default {
   name:'Sidebar',
   components: {
@@ -150,7 +148,6 @@ export default {
     return{
       route: 'user',
       isAdmin: false,
-      currentUserId:'8',
       navAdmin:[
          {
           title: '推文清單',
@@ -198,6 +195,9 @@ export default {
   created(){
     this.toggleNavList()
   },
+  computed:{
+    ...mapState(['currentUser'])
+  }
 }
 </script>
 

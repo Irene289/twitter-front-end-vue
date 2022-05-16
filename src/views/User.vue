@@ -6,17 +6,21 @@
       <Sidebar />
       </div>
       <div class="col-7 content-container">
-          <div class="title">
-            <img 
-              class="title__item " 
-              src="../assets/static/images/leftArrow@2x.png" 
-              alt=""
-            >
-            <div class= "title__item user">
-              <p class= "name">Jone Doe</p>
-              <p class= "tweet-num">45推文</p>
-            </div>          
-          </div>     
+         <router-link to="/twitter">
+            <div class="title">
+              <img 
+                class="title__item " 
+                src="../assets/static/images/leftArrow@2x.png" 
+                alt=""
+              >
+            
+                <div class= "title__item user">
+                  <p class= "name">{{user.name}}</p>
+                  <p class= "tweet-num">45推文</p>
+                </div> 
+                              
+            </div> 
+          </router-link>     
         <UserCard />
         <div class="nav-container">       
           <NavTab >
@@ -24,7 +28,7 @@
               <router-link
                 :to="{
                   name:'user-tweets',
-                  params:currentUserId
+                  params:user.id
                 }"
               >
               <p>推文</p> 
@@ -36,7 +40,7 @@
               <router-link
                :to="{
                   name:'user-replies',
-                  params:currentUserId
+                  params:user.id
                 }"
               >
               <p>回覆</p> 
@@ -48,7 +52,7 @@
               <router-link
                 :to="{
                   name:'user-like',
-                  params:currentUserId
+                  params:user.id
                 }"
               >
               <p>喜歡的內容</p> 
@@ -68,12 +72,15 @@
   </main>
 </template>
 <script>
+  import {mapState} from 'vuex' 
+  import {Toast} from '../utils/helpers'
+  import userAPI from '../apis/user'
   import Popular from '../components/Popular.vue'
   import Sidebar from '../components/Sidebar.vue'
   import UserCard from '../components/UserCard.vue'
   import NavTab from './../components/NavTab.vue'
   export default {
-    name: 'User',
+    name: 'User',   
     components:{
       Popular,
       Sidebar,
@@ -82,24 +89,44 @@
     },
     data(){
       return {
-        currentUserId:8,
-        navList:[
-          { id: 1,
-            title: '推文',
-            path: '/users/:id/tweets'
-          },
-          { 
-            id: 2,
-            title: '回覆',
-            path: '/users/:id/tweets/replies'
-          },
-           { 
-            id: 3,
-            title: '喜歡的內容',
-            path: '/users/:id/tweets/likes'
-          }
-        ]
+        user:{
+          id:'',
+          name:''
+        }  
       }
+    },
+    methods:{
+      
+      async fetchUser(userId){
+        try{
+          const {data, statusText} = await userAPI.get({id: userId})
+          const {id, name} = data
+          this.user= {
+            id,
+            name
+          }
+          if(statusText !== 'OK'){
+            throw new Error(statusText)
+          }
+        }catch(error){
+          Toast.fire({
+            icon:'error',
+            title: '無法取得追蹤中用戶資料，請稍後再試'
+          })
+        }
+      },
+    },
+    computed:{
+      ...mapState(['currentUser'])
+    },
+     beforeRouteUpdate(to, from, next){
+      const {id} = to.params
+      this.fetchUser(id)
+      next()
+    },
+    created(){
+      const {id} = this.$route.params
+      this.fetchUser(id)
     }      
   }
 </script>

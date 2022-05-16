@@ -37,6 +37,34 @@ export const fromNowFilter = {
     },
     fromNowHour(dataTime) {
       return dataTime ? moment(dataTime).fromNow() : '-'
+    }    
+  }
+}
+export const textFilter = {
+  filters: {
+    textFilter(text) {
+      let filteredText = ""
+      //有些bio是null，return走
+      if (!text){
+        return "用戶有點神秘，想多認識可以點擊頭像或追蹤他喔～"
+      }
+      if (text.length > 160) {
+        filteredText = text.slice(0, 160)
+        return filteredText
+      } else {
+        return text
+      }
     }
+  }  
+}
+export const visitPage ={
+  methods:{
+    visitUserPage: function (id, pathName) {
+      console.log('click')
+      this.$router.push({
+        name: pathName,
+        params: {id:id}
+      })
+    }  
   }
 }
