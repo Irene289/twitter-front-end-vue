@@ -36,7 +36,7 @@ const routes = [
         component: Twitter
       },
       {
-        path: 'replies',
+        path: ':id/replies',
         name: 'twitter-replies',
         component: () => import('../views/TwitterReply.vue')
       }

@@ -1,3 +1,5 @@
+// TODO: delete file
+
 import { apiHelper } from './../utils/helpers'
 const getToken = () => localStorage.getItem('token')
 
