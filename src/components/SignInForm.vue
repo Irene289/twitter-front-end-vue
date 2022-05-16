@@ -5,13 +5,19 @@
       action="">
        <div class="signin-form__div signin-form__input-account">
         <label for="">帳號</label>
-        <input v-model="account" type="text" placeholder="請輸入帳號" />
+        <input 
+          :class="{warning:!isValid}"
+          v-model="account" 
+          type="text" placeholder="請輸入帳號" />
         <p v-if="!isValid" :class="{invalid:!isValid}">此帳號不存在</p>
       </div>
 
       <div class="signin-form__div signin-form__input-password">
         <label for="">密碼</label>
-        <input v-model="password" type="password" placeholder="請輸入密碼" />
+        <input 
+          :class="{warning:!isValid}"
+          v-model="password" type="password" 
+          placeholder="請輸入密碼" />
         <p v-if="!isValid" :class="{invalid:!isValid}">此帳號不存在</p>
       </div>
 
@@ -69,11 +75,13 @@ export default {
        if(isAdmin && route === 'admin'){
          // token
         localStorage.setItem('token', data.data.token)
+        this.$store.commit('setCurrentUserToken', user)
         this.$router.push('/admin/tweets')
         return
         } 
       else if(!isAdmin && route === 'sign-in'){
         localStorage.setItem('token', data.data.token)
+        this.$store.commit('setCurrentUser',user )
         this.$router.push('/twitter')
         return
       } else {
@@ -102,8 +110,8 @@ export default {
 
   .invalid{
     color:#FC5A5A;
-
   }
+  
   .signin-form__div {
     @extend %input-block;
     display: flex;
@@ -115,6 +123,9 @@ export default {
       @extend %form-input;
       border: none;
       background: $form-input-grey;
+      &.warning {
+      border-bottom: 2px red solid;
+    }
     }
     input::placeholder {
       color: $form-input-placeholder;
@@ -123,6 +134,7 @@ export default {
       content: "";
       @extend %input-bottom;
     }
+    
   }
   .btn {
     @extend %button-orange;
