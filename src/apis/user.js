@@ -6,5 +6,8 @@ export default {
   },
   getTweets({id}){
     return apiHelper.get(`/users/${id}/tweets`)
+  },
+  getCurrentUser(){
+    return apiHelper.get('/current_user')
   }
 }

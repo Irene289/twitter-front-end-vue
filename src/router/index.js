@@ -1,5 +1,6 @@
 import Vue from 'vue'
 import VueRouter from 'vue-router'
+import store from '../store'
 //TODO:Signin頁面元件確定要刪除的話，把AdminSignin的名字改成Signin
 // import Signin from '../views/Signin.vue'
 import NotFound from '../views/NotFound.vue'
@@ -121,5 +122,30 @@ const routes = [
 const router = new VueRouter({
   routes
 })
+
+router.beforeEach( async(from, to, next)=>{
+  const storageToken = localStorage.getItem('token')
+  const stateToken = store.state.token
+  let isAuthenticated = store.state.isAuthenticated
+  console.log(isAuthenticated)
+  // const noNeedAuthenticated = ['signin', 'regist', 'admin']
+
+
+  if(storageToken && storageToken!==stateToken) {
+    isAuthenticated = await store.dispatch('fetchCurrentUser')
+  }
+  //TODO:未登入訪問頁面導向signin ;已登入訪問signin, sign up頁面導向twitter 或 adminTweet
+  // if (!isAuthenticated && !noNeedAuthenticated.includes(to.name)){
+  //   next('/signin')
+  //   return
+  // }
+  // if (isAuthenticated && noNeedAuthenticated.includes(to.name)){
+  //   next('/twitter')
+  //   return
+  // }
+  next()
+})
+
+
 
 export default router
