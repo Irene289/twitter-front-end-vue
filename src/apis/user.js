@@ -6,6 +6,5 @@ export default {
   },
   getTweets({id}){
     return apiHelper.get(`/users/${id}/tweets`)
-
   }
 }
