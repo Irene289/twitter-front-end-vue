@@ -134,7 +134,6 @@ export default {
       content: "";
       @extend %input-bottom;
     }
-    
   }
   .btn {
     @extend %button-orange;
