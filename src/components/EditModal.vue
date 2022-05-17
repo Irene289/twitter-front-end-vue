@@ -71,7 +71,7 @@
   </div>
 </template>
 <script>
-// import {Toast} from '../utils/helpers'
+
 export default {
   props:{
     initialUserEdit:{
@@ -128,10 +128,12 @@ export default {
       const form = e.target
       const formData = new FormData(form)
       //test
-      for (let [name,value] of formData){
-        console.log(name,":", value)
-      }
+      // for (let [name,value] of formData){
+      //   console.log(name,":", value)
+      // }
+      this.$emit('after-submit',formData)
       this.closeModal()
+     
     },
     warning(){
       const name = this.user.name

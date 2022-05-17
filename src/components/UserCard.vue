@@ -76,6 +76,7 @@
     <template v-if="isEditing">
       <Modal
       :initial-user-edit="user"
+      @after-submit="afterSubmit"
       @close-modal="closeModal"
       />
     </template>       
@@ -128,8 +129,7 @@ export default {
           icon:'warning',
           title: '私訊功能開發中'
         })
-      }
-      ,
+      },
       async fetchUser(userId){
           // TODO:篩除非user的用戶
         try{
@@ -152,7 +152,6 @@ export default {
             followingCount: following.length,
             followerCount: follower.length
           }
-          console.log('user',this.user.id)
           if(this.user.id === this.currentUser.id){
             this.isCurrentUser = true
           }else{
@@ -203,6 +202,34 @@ export default {
             title:'無法取消追蹤此用戶，請稍後再試'
           })
         }       
+      },
+      async afterSubmit(formData){    
+        try{
+          const {data, statusText} = await userAPI.update({
+            userId: this.currentUser.id,
+            formData
+          })
+          const {name, introduction, avatarImg, coverImg} = data
+          console.log('responseData Intro:',introduction)
+          this.user = {
+            ...this.user,
+            name,
+            introduction,
+            avatarImg,
+            coverImg
+          }
+          if(statusText !== "OK"){
+            throw new Error (statusText)
+          }
+        }catch(error){
+          Toast.fire({
+            icon:'error',
+            title: '無法儲存編輯，請稍後再試'
+          })
+        }
+          for (let [name,value] of formData){
+          console.log(name,":", value)
+        }
       }   
     },
     beforeRouteUpdate(to, from, next){
@@ -223,7 +250,6 @@ export default {
     },
     created(){
       const {id} = this.$route.params
-      console.log(id)
       this.fetchUser(id)     
     }
 }

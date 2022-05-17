@@ -50,7 +50,6 @@ export default {
       try{
         const {data, statusText} = await userAPI.getReplies({id})
         this.replies = data
-        console.log(data)
         if(statusText !== 'OK'){
           throw new Error (statusText)
         }

@@ -12,19 +12,30 @@
           <p class="name">{{user.name}}</p>
           <p class="id">{{'@'+ user.account}}</p>
         </div>
-        <button 
+        <div v-if="user.id !== currentUser.id">
+           <button 
+          v-if="user.is_following" 
           @click.stop.prevent="unfollow(user.id)"
           class="following">正在跟隨
-        </button>
-        <button 
-          @click.stop.prevent="follow(user.id)"
-          class="follow">跟隨
+          </button>
+          <button
+            v-else-if="!user.is_following"
+            @click.stop.prevent="follow(user.id)"
+            class="follow">跟隨
+          </button>
+        </div>
+        <button
+          v-else
+          disabled
+          class="following">
+          用戶本人
         </button>
       </div>
     </div> 
   </div>
 </template>
 <script>
+import {mapState} from 'vuex'
 import followShipAPI from '../apis/followShip'
 import {visitPage} from '../utils/mixins'
 import userAPI from '../apis/user'
@@ -48,7 +59,6 @@ export default {
         if(statusText !== "OK"){
           throw new Error(statusText)
         }
-
       }catch(error){
         Toast.fire({
           icon: 'error',
@@ -57,16 +67,22 @@ export default {
       }
     },
     async follow(id){
-      //TODO:待後端補isFollowing資料
         try{
           const {statusText} = await followShipAPI.follow({id})
           if(statusText !=='OK'){
             throw new Error(statusText)
           }
-          // this.user = {
-          // ...this.user,
-          // isFollowing: true
-          // }
+          this.topUsers = this.topUsers.map(user => {
+            if(user.id !== id) {
+              return user
+            }
+            if(user.id === id) {
+              return{
+                ...user,
+                is_following: true
+              }
+            }
+          })
         }catch(error){
           Toast.fire({
             icon:'error',
@@ -74,28 +90,46 @@ export default {
           })
         }       
       },
-      async unfollow(id){
-        //TODO:待後端補isFollowing資料
-        try{
-          const {statusText} = await followShipAPI.unFollow({id})
-          if(statusText !== 'OK'){
-            throw new Error (statusText)
+    async unfollow(id){  
+      try{
+        const {statusText} = await followShipAPI.unFollow({id})
+        if(statusText !== 'OK'){
+          throw new Error (statusText)
+        }
+        this.topUsers = this.topUsers.map(user => {
+          if(user.id !== id) {
+            return user
           }
-          // this.user = {
-          // ...this.user,
-          // isFollowing: false
-          // }
-        }catch(error){
-           Toast.fire({
-            icon:'error',
-            title:'無法取消追蹤此用戶，請稍後再試'
-          })
-        }       
-      }   
+          if(user.id === id) {
+            return{
+              ...user,
+              is_following: false
+            }
+          }
+        })
+      }catch(error){
+          Toast.fire({
+          icon:'error',
+          title:'無法取消追蹤此用戶，請稍後再試'
+        })
+      }       
+    }   
   },
   created(){
     this.fetchTopUsers(10)
+  },
+  computed:{
+    ...mapState(['currentUser'])
+  },
+  watch:{
+    topUsers:{
+      deep: true,
+      handler:function(){
+        this.fetchTopUsers(10)
+      }
+    }
   }
+  //TODO:個人資料編輯後topUsers名稱沒有同步，
 }
 </script>
 <style lang="scss" scoped>
@@ -148,7 +182,6 @@ export default {
     }
     .follow{
       @extend %follow;
-      display: none;
       margin-left:28px;
     }
   }
