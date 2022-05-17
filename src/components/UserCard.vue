@@ -40,7 +40,7 @@
       <div class="user__container__info">
         <p class="name">{{user.name}}</p>
         <p class="id">@{{user.account}}</p>
-        <p class="intro">{{user.bio}}</p>
+        <p class="intro">{{user.introduction}}</p>
         <div class="user__follow">
           <router-link
             :to="{
@@ -90,6 +90,7 @@ export default {
       user:{
         name: '',
         id:'',
+        introduction:'',
         account:'',
         avatarImg:'',
         coverImg:'',
@@ -107,14 +108,15 @@ export default {
         this.isEditing = true
       },
       async fetchUser(userId){
+          // TODO:篩除非user的用戶
         try{
           const {data, statusText} = await userAPI.get({id:userId})   
-          const {id,name, account ,coverImg, avatarImg, bio, is_following:isFollowing, Following: following, Follower: follower} = data
-          let newBio = ''
-          if(bio.length > 160){
-            newBio = bio.slice(0,160) 
+          const {id,name, account ,coverImg, avatarImg, introduction, is_following:isFollowing, Following: following, Follower: follower} = data
+          let newIntro = ''
+          if(introduction.length > 160){
+            newIntro = introduction.slice(0,160) 
           }else{
-            newBio = bio
+            newIntro = introduction
           }
           this.user = {
             id,
@@ -122,7 +124,7 @@ export default {
             account,
             coverImg,
             avatarImg,
-            bio: newBio,
+            introduction: newIntro,
             isFollowing,
             followingCount: following.length,
             followerCount: follower.length
