@@ -95,8 +95,7 @@
         }  
       }
     },
-    methods:{
-      
+    methods:{     
       async fetchUser(userId){
         try{
           const {data, statusText} = await userAPI.get({id: userId})
