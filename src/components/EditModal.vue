@@ -59,11 +59,11 @@
         <div class="info-item">
           <label for="intro">自我介紹</label>
           <textarea 
-            v-model="user.bio" :class="{red:!introIsValid}"
+            v-model="user.introduction" :class="{red:!introIsValid}"
             name="intro" class="intro" cols="30" rows="10" ></textarea>
           <div class="hint-group">
             <p :class="{hidden:introIsValid}" class="warning" >字數超出上限</p>
-            <p class="length">{{user.bio.length}}/160</p>
+            <p class="length">{{user.introduction.length}}/160</p>
           </div>
         </div>        
       </div>     
@@ -82,7 +82,7 @@ export default {
           name:'',
           coverImg: '',
           avatarImg: require('../assets/static/images/noImage@2x.png'),
-          bio: ''
+          introduction: ''
         }       
       }  
     }
@@ -103,7 +103,7 @@ export default {
     handleAvatarChange(e){
       const file = e.target.files
       if(file.length === 0) {
-      // 沒有選取相片使用原本預設的舊照片，如果每有設定if(file.length===0) 在下一步window.URL.createObjectURL(file[0])時會因為取不到資料而報錯
+      // 沒有選取相片使用原本預設的舊照片，如果沒有設定if(file.length===0) return，在下一步window.URL.createObjectURL(file[0])時會因為取不到資料而報錯
       this.user.coverImg = this.initialCover
       return
       }  
@@ -111,10 +111,9 @@ export default {
       this.user.avatarImg = imgUrl
     },
     handleCoverChange(e){
-      //TODO: bug:取消再選擇時無法崇福選擇同一張，一定要先選別張，才能再選原本那張，推斷元印是因為change，由於取消後file裡面的檔案是一樣的，再次選擇同一張時，因為沒有改變故無法觸發change
+      //TODO: bug:取消再選擇時無法重複選擇同一張，一定要先選別張，才能再選原本那張，推斷原因是因為change，由於取消後file裡面的檔案是一樣的，再次選擇同一張時，因為沒有改變故無法觸發change
       let file = e.target.files
       if(file.length === 0) {
-      // 沒有選取相片使用原本預設的舊照片，如果每有設定if(file.length===0) 在下一步window.URL.createObjectURL(file[0])時會因為取不到資料而報錯
       this.user.coverImg = this.initialCover
       return
       }
@@ -136,7 +135,7 @@ export default {
     },
     warning(){
       const name = this.user.name
-      const intro = this.user.bio
+      const intro = this.user.introduction
       if(name.length > 50){
         this.nameIsValid = false
       } 

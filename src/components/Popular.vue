@@ -12,13 +12,20 @@
           <p class="name">{{user.name}}</p>
           <p class="id">{{'@'+ user.account}}</p>
         </div>
-        <button class="following">正在跟隨</button>
-        <button class="follow">跟隨</button>
+        <button 
+          @click.stop.prevent="unfollow(user.id)"
+          class="following">正在跟隨
+        </button>
+        <button 
+          @click.stop.prevent="follow(user.id)"
+          class="follow">跟隨
+        </button>
       </div>
     </div> 
   </div>
 </template>
 <script>
+import followShipAPI from '../apis/followShip'
 import {visitPage} from '../utils/mixins'
 import userAPI from '../apis/user'
 import {Toast} from '../utils/helpers'
@@ -36,10 +43,8 @@ export default {
     },
     async fetchTopUsers(rank){
       try{
-        console.log(rank)
         const {data, statusText} = await userAPI.getTopUsers({rank})
         this.topUsers = data
-        console.log(data)
         if(statusText !== "OK"){
           throw new Error(statusText)
         }
@@ -50,7 +55,43 @@ export default {
           title: '無法取得人氣用戶，請稍後再試'
         })
       }
-    }
+    },
+    async follow(id){
+      //TODO:待後端補isFollowing資料
+        try{
+          const {statusText} = await followShipAPI.follow({id})
+          if(statusText !=='OK'){
+            throw new Error(statusText)
+          }
+          // this.user = {
+          // ...this.user,
+          // isFollowing: true
+          // }
+        }catch(error){
+          Toast.fire({
+            icon:'error',
+            title:'無法追蹤此用戶，請稍後再試'
+          })
+        }       
+      },
+      async unfollow(id){
+        //TODO:待後端補isFollowing資料
+        try{
+          const {statusText} = await followShipAPI.unFollow({id})
+          if(statusText !== 'OK'){
+            throw new Error (statusText)
+          }
+          // this.user = {
+          // ...this.user,
+          // isFollowing: false
+          // }
+        }catch(error){
+           Toast.fire({
+            icon:'error',
+            title:'無法取消追蹤此用戶，請稍後再試'
+          })
+        }       
+      }   
   },
   created(){
     this.fetchTopUsers(10)

@@ -13,19 +13,27 @@
         <div class="user__btn__group__list">
           <template v-if="!isCurrentUser">
             <div class="group-item">
-            <img src="../assets/static/images/msg@2x.png" alt="">          
+            <img 
+              @click.stop.prevent="sendDm"
+              src="../assets/static/images/msg@2x.png" alt="">          
             </div>
             <div class="group-item">
-              <img v-if="!isSubscribe" class="notify" src="../assets/static/images/notfi@2x.png" alt="">
-              <img v-else class="notified" src="../assets/static/images/notfied@2x.png" alt="">
+              <img 
+                v-if="!isSubscribe"
+                @click.stop.prevent="toggleSub" 
+                class="notify" src="../assets/static/images/notfi@2x.png" alt=""
+              >
+              <img v-else 
+                 @click.stop.prevent="toggleSub" 
+                class="notified" src="../assets/static/images/notfied@2x.png" alt="">
             </div>
             <div v-if="!user.isFollowing" class="group-item follow">
               <button 
-                @click.stop.prevent="follow"
+                @click.stop.prevent="follow(user.id)"
                 class="follow">跟隨</button>
             </div>
             <div v-else 
-              @click.stop.prevent="unfollow"
+              @click.stop.prevent="unfollow(user.id)"
               class="group-item">           
                 <button class="following">正在跟隨</button>           
             </div>
@@ -74,6 +82,7 @@
   </div> 
 </template>
 <script>
+import followShipAPI from '../apis/followShip'
 import {mapState} from 'vuex'
 import userAPI from '../apis/user'
 import {Toast} from '../utils/helpers'
@@ -107,6 +116,20 @@ export default {
       openModal(){
         this.isEditing = true
       },
+      toggleSub(){
+        if(this.isSubscribe === false){
+           this.isSubscribe = true
+        } else {
+          this.isSubscribe = false
+        }       
+      },
+      sendDm(){
+        Toast.fire({
+          icon:'warning',
+          title: '私訊功能開發中'
+        })
+      }
+      ,
       async fetchUser(userId){
           // TODO:篩除非user的用戶
         try{
@@ -129,6 +152,7 @@ export default {
             followingCount: following.length,
             followerCount: follower.length
           }
+          console.log('user',this.user.id)
           if(this.user.id === this.currentUser.id){
             this.isCurrentUser = true
           }else{
@@ -145,20 +169,40 @@ export default {
           })
         }       
       },
-      follow(){
-        //TODO: 串 /followships
-        this.user = {
+      async follow(id){
+        console.log(id)
+        try{
+          const {statusText} = await followShipAPI.follow({id})
+          if(statusText !=='OK'){
+            throw new Error(statusText)
+          }
+          this.user = {
           ...this.user,
           isFollowing: true
         }
+        }catch(error){
+          Toast.fire({
+            icon:'error',
+            title:'無法追蹤此用戶，請稍後再試'
+          })
+        }       
       },
-      unfollow(){
-         //TODO: 串 /followships/:followingId
-       this.user = {
+      async unfollow(id){
+        try{
+          const {statusText} = await followShipAPI.unFollow({id})
+          if(statusText !== 'OK'){
+            throw new Error (statusText)
+          }
+          this.user = {
           ...this.user,
           isFollowing: false
         }
-
+        }catch(error){
+           Toast.fire({
+            icon:'error',
+            title:'無法取消追蹤此用戶，請稍後再試'
+          })
+        }       
       }   
     },
     beforeRouteUpdate(to, from, next){

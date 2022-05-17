@@ -60,7 +60,6 @@ export const textFilter = {
 export const visitPage ={
   methods:{
     visitUserPage: function (id, pathName) {
-      console.log('click')
       this.$router.push({
         name: pathName,
         params: {id:id}
