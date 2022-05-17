@@ -114,7 +114,6 @@ export default {
       //TODO: bug:取消再選擇時無法崇福選擇同一張，一定要先選別張，才能再選原本那張，推斷元印是因為change，由於取消後file裡面的檔案是一樣的，再次選擇同一張時，因為沒有改變故無法觸發change
       let file = e.target.files
       if(file.length === 0) {
-      // 沒有選取相片使用原本預設的舊照片，如果每有設定if(file.length===0) 在下一步window.URL.createObjectURL(file[0])時會因為取不到資料而報錯
       this.user.coverImg = this.initialCover
       return
       }
