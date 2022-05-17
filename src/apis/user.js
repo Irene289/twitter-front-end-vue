@@ -21,11 +21,5 @@ export default {
   },
   getTopUsers({rank}){
     return apiHelper.get(`/users/top?limit=${rank}`)
-  },
-  follow(){
-    return apiHelper.post('/followships')
-  }
-  unFollow({id}) {
-    return apiHelper.delete(`/followships/${id}`)
   }
 }
