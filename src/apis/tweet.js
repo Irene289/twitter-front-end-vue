@@ -11,8 +11,14 @@ export default{
   //   return apiHelper.post('/tweets', { id, description, UserId, createdAt })
   // },
 
+  // 發推文
   createTweet({ description, UserId }) {
     return apiHelper.post('/tweets', { description, UserId })
+  },
+  // 回覆推文
+  createReply({ TweetId, comment, UserId }) {
+    return apiHelper.post(`tweets/${TweetId
+}/replies`, { comment, UserId})
   },
   // 拿到單一推文跟他的所有回覆
   getReply({ id }) {

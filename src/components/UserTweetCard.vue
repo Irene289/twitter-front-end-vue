@@ -24,7 +24,7 @@ export default {};
 @import "../assets/scss/_basic.scss";
 .tweet__card {
   display: flex;
-  padding: 16px;
+  padding: 16px 25px;
   border-bottom: 1px solid $border-grey;
   .avatar {
     width: 50px;
@@ -52,6 +52,9 @@ export default {};
         @extend %tweet-account;
         font-size: 14px;
       }
+    }
+    .text {
+      word-break: break-all;
     }
     .icons {
       display: flex;

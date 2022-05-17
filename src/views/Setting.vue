@@ -8,8 +8,8 @@
         </div>
 
         <!-- form -->
-        <form 
-          class="col-7 content-container setting-forms" 
+        <form
+          class="col-7 content-container setting-forms"
           action=""
           @submit.stop.prevent="handleSubmit"
         >
@@ -19,43 +19,43 @@
 
           <div class="setting-form setting-form__input-account">
             <label for="">帳號</label>
-            <input 
+            <input
               v-model="user.account"
-              type="text" 
-              name="account" 
+              type="text"
+              name="account"
               placeholder="請輸入帳號"
-              required 
+              required
             />
           </div>
 
           <div class="setting-form setting-form__input-name">
             <label for="">名稱</label>
-            <input 
+            <input
               v-model="user.name"
-              type="text" 
-              name="name" 
+              type="text"
+              name="name"
               placeholder="請輸入使用者名稱"
-              required 
+              required
             />
           </div>
 
           <div class="setting-form setting-form__input-email">
             <label for="">Email</label>
-            <input 
+            <input
               v-model="user.email"
-              type="email" 
-              name="email" 
+              type="email"
+              name="email"
               placeholder="請輸入 Email"
-              required 
+              required
             />
           </div>
 
           <div class="setting-form setting-form__input-password">
             <label for="">密碼</label>
-            <input 
+            <input
               v-model="user.password"
-              type="password" 
-              name="password" 
+              type="password"
+              name="password"
               placeholder="請設定密碼"
               required
             />
@@ -89,118 +89,137 @@
 </template>
 
 <script>
-import Sidebar from '../components/Sidebar'
+import Sidebar from "../components/Sidebar"
 import userAPI from '../apis/user'
-import { Toast } from '../utils/helpers'
-import { mapState } from 'vuex'
+import { Toast } from "../utils/helpers"
+import { mapState } from "vuex"
 
 // const dummyData = {
-//   currentUser: {
-//     id: 1,
-//     account: "root",
-//     name: "root",
-//     email: "root@example.com",
-//     password: "$2a$10$lvYqyY7mfVRmhHlQSJjeMed8Yd3yNAsEYoY0TzurnyQzTmI90Sz4S",
-//     nickname: "root",
-//     coverImg: "https://picsum.photos/800/300",
-//     avatarImg: "https://i.pravatar.cc/300",
-//     bio: null,
-//   }
-// };
+//   id: 2,
+//   account: "user1",
+//   name: "test",
+//   email: "user1@example.com",
+//   nickname: "Howell",
+//   coverImg: "https://i.imgur.com/bn8Hy8n.png",
+//   avatarImg: "https://i.imgur.com/xNiJ22V.png",
+//   introduction: "test",
+//   role: "user",
+//   createdAt: "2022-05-17T06:04:56.000Z",
+//   updatedAt: "2022-05-17T10:15:43.476Z",
+// }
 
 export default {
   name: "Setting",
   components: {
     Sidebar,
   },
-  data () {
+  data() {
     return {
       user: {
         id: -1,
-        account: '',
-        name: '',
-        email: '',
-        password: '',
-        passwordCheck: ''
+        account: "",
+        name: "",
+        email: "",
+        password: "",
+        passwordCheck: "",
       },
-      isProcessing: false
+      allUser: [],
+      isProcessing: false,
     }
   },
   created() {
     if (this.currentUser.id === -1) return
     const { id } = this.$route.params
     this.setUser(id)
+
+    // let i = 0
+    // while( i < 10 ) {
+    //   this.fetchAllUser(i)
+    //   i++
+    // } 
   },
   methods: {
-    setUser () {
-      const { 
-        id,
-        account,
-        name,
-        email
-       } = this.currentUser
+    // async fetchAllUser(id) {
+    //   try {
+    //     const { data } = await userAPI.get({ id })
+    //     console.log(data)
+
+    //   } catch (error) {
+    //     console.log("Error", error)
+    //   }
+    // },
+    setUser() {
+      const { id, account, name, email } = this.currentUser;
 
       this.user = {
         id,
         account,
         name,
-        email
+        email,
       }
     },
-    async handleSubmit (e) {
-      try{
-        // TODO:API
+    async handleSubmit(e) {
+      try {
         this.isProcessing = true
 
         // 必填而未填處理
-        if ( 
-            !this.user.account || 
-            !this.user.name || 
-            !this.user.email || 
-            !this.user.password || 
-            !this.user.passwordCheck
+        if (
+          !this.user.account ||
+          !this.user.name ||
+          !this.user.email ||
+          !this.user.password ||
+          !this.user.passwordCheck
         ) {
           Toast.fire({
-            icon: 'warning',
-            title: '請輸入所有欄位'
-          })
-          this.isProcessing = false
-          return
-        } 
-        
+            icon: "warning",
+            title: "請輸入所有欄位",
+          });
+          this.isProcessing = false;
+          return;
+        }
+
         // 密碼錯誤處理
         if (this.user.password !== this.user.passwordCheck) {
-          alert('密碼不一致，請再次輸入')
+          Toast.fire({
+            icon: 'warning',
+            title: '密碼不一致，請再次輸入'
+          })
           this.isProcessing = false
         }
 
         const form = e.target
         const formData = new FormData(form)
-        console.log(formData)
+        // console.log(formData)
 
-        const { data } = await userAPI.update({ 
+        const { data } = await userAPI.update({
           userId: this.user.id,
-          formData
+          formData,
         })
 
+        if (data.status !== "success") {
+          throw new Error(data.message)
+        } else {
+          Toast.fire({
+            icon: 'success',
+            title: '修改完成'
+          })
+        }
         console.log(data)
-        
-
+        this.isProcessing = false
       } catch (error) {
         this.isProcessing = false
-
-        console.log('Error', error)
+        console.log("Error", error);
         Toast.fire({
-          icon: 'error',
-          title: '無法編輯，請稍後再試'
-        })
+          icon: "error",
+          title: "無法編輯，請稍後再試",
+        });
       }
-    }
+    },
   },
   computed: {
-    ...mapState(['currentUser'])
-  }
-}
+    ...mapState(["currentUser"]),
+  },
+};
 </script>
 
 <style lang="scss" scoped>

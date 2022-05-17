@@ -61,7 +61,7 @@
           {{ reply.User.account }}
         </template>
         <template v-slot:post-time>
-          {{ tweet.User.createdAt | fromNow }}
+          {{ reply.User.createdAt | fromNow }}
         </template>
         <template v-slot:text>
           <div class="reply-tag">
@@ -86,22 +86,21 @@
           </div>
 
           <TweetModal>
-            <!--   推文 -->
-            <template v-slot:isReplyModel>
-              <div v-show="true" class="tweet-div"></div>
-            </template>
+              <!-- 推文 -->
+            <!-- <template v-slot:isReplyModel>
+              <div class="tweet-div"></div>
+            </template> -->
             <template v-slot:replytoAvatarImg>
-              <img class="avatar" :src="currentUser.avatarImg" alt="" />
+              <img class="avatar" :src="user.avatarImg" alt="" />
             </template>
             <template v-slot:replyto>
               <p class="content-info-name">
                 {{ tweet.description }}
-                <!-- jdfhjdsahf -->
               </p>
-              <p class="content-info-account">@{{ currentUser.account }}</p>
-              <p class="content-info-time">{{ currentUser.createdAt }}</p>
+              <p class="content-info-account">@{{ user.account }}</p>
+              <p class="content-info-time">{{ tweet.createdAt | fromNow }}</p>
             </template>
-            <template v-slot:replytoAccount> @{{ currentUser.account }} </template>
+            <template v-slot:replytoAccount> @{{ user.account }} </template>
 
             <!-- 回覆 -->
             <template v-slot:avatarImg>
@@ -124,15 +123,16 @@
             </template>
           </TweetModal>
 
-          <button class="btn modal-tweet">回覆</button>
+          <button 
+            class="btn modal-tweet"
+            @click.stop.prevent="handleReply(tweet.id)"
+              :disabled="isProcessing"
+            >
+              {{ isProcessing ? "處理中" : "回覆" }}
+          </button>
         </form>
       </div>
     </div>
-
-    <!-- <ReplyModal 
-      :d-none-reply-modal="dNoneReplyModal"
-      @reply-modal="replyModal"
-    /> -->
   </div>
 </template>
 
@@ -166,6 +166,7 @@ export default {
       textReply: "",
       // isReplyModel: true,
       dNoneReplyModal: true,
+      isProcessing: false
     };
   },
   created() {
@@ -173,6 +174,7 @@ export default {
     this.fetchReplies(id);
   },
   methods: {
+    // 顯示推文跟所有回覆
     async fetchReplies(id) {
       try {
         const { data, statusText } = await tweetAPI.getReply({ id });
@@ -186,8 +188,9 @@ export default {
         this.user = data.User;
         this.replies = Replies;
 
-        console.log(data.User);
-        // console.log(Replies)
+        console.log(data)
+        console.log(data.User)
+        // console.log(this.user)
       } catch (error) {
         console.log(error);
         Toast.fire({
@@ -196,12 +199,65 @@ export default {
         });
       }
     },
+    // 開啟 Modal
     replyModal() {
       this.dNoneReplyModal = !this.dNoneReplyModal;
     },
+    // 關閉 Modal
     handleCloseBtn() {
       this.dNoneReplyModal = !this.dNoneReplyModal;
       this.textReply = "";
+    },
+    // 回覆一則推文
+    async handleReply(TweetId) {
+      try {
+        // 內容空白處理
+        if (!this.textReply) {
+          Toast.fire({
+            icon: "warning",
+            title: "內容不可空白",
+          })
+          this.isProcessing = false;
+          return
+        }
+        // console.log(this.currentUser)
+        console.log(TweetId)
+        // const { id, comment, UserId, TweetId, createdAt } = payload
+
+        const { data } = await tweetAPI.createReply({ 
+          TweetId: TweetId, 
+          comment: this.textReply, 
+          UserId: this.currentUser.id,
+          // TweetId,
+        })
+
+        // this.newReply = {
+        //   // id,
+        //   comment: this.textReply,
+        //   UserId,
+        //   TweetId,
+        //   createdAt,
+        // }
+
+        if (data.status !== "success") {
+          throw new Error(data.message)
+        } else {
+          Toast.fire({
+          icon: 'success',
+          title: "成功送出回覆",
+          })
+          this.textReply = ""
+          this.dNoneReplyModal = !this.dNoneReplyModal
+        }
+
+        // console.log(data)
+      } catch (error) {
+        console.log(error);
+        Toast.fire({
+          icon: "error",
+          title: "暫時無法回覆推文",
+        })
+      }
     },
   },
   computed: {
@@ -357,6 +413,7 @@ export default {
     border-radius: 50%;
   }
 }
+// 回覆按鈕
 .modal-tweet {
   @extend %button-orange;
   min-width: 76px;

@@ -53,14 +53,13 @@
 
           <button
             class="modal-tweet"
-            @click.stop.prevent="tweetModal"
+            @click.stop.prevent="createTweet"
           >
             推文
           </button>
         </form>
       </div>
     </div>
-    <!-- <TweetModal :d-none="dNone" @tweet-modal="tweetModal" /> -->
 
     <ul class="nav__list">
       <img class="logo" src="../assets/static/images/navLogo@2x.png" alt="">
@@ -138,7 +137,10 @@
 </template>
 <script>
 import TweetModal from "../components/TweetModal"
+import tweetAPI from "../apis/tweet"
+import { Toast } from "../utils/helpers"
 import { mapState } from 'vuex'
+
 export default {
   name:'Sidebar',
   components: {
@@ -163,9 +165,10 @@ export default {
           path:'/admin/users'        
         }
       ],
-      text: '',
-      dNoneReplyModal: true,
-      isReplyModel: true,
+      text: '',                // 推文
+      newTweet: {},            // 新增推文
+      dNoneReplyModal: true,   // 控制 Modal
+      isReplyModel: true,      // 控制 Modal
     }
   },
   methods:{
@@ -177,16 +180,59 @@ export default {
         this.isAdmin = false
       }
     },
-    handleCloseBtn () {
-      this.dNoneReplyModal = true
-    },
+    // 登出
     onClickLogout () {
       this.$store.commit('revokeAuthentication')
       localStorage.removeItem('token')
       this.$router.push('/signin')
     },
+    // 開啟 Modal
     tweetModal() {
       this.dNoneReplyModal = !this.dNoneReplyModal;
+    },
+    // 關閉 Modal
+    handleCloseBtn () {
+      this.dNoneReplyModal = true
+    },
+    // 推一則推文
+    async createTweet(payload) {
+      try {
+        // 內容空白處理
+        if (!this.text) {
+          Toast.fire({
+            icon: "warning",
+            title: "內容不可空白",
+          });
+          this.isProcessing = false;
+          return;
+        }
+
+        console.log(this.currentUser)
+
+        const { id, description, UserId, createdAt } = payload
+        const { data } = await tweetAPI.createTweet({
+          description: this.text,
+          UserId: this.currentUser.id,
+        })
+
+        this.newTweet = {
+          id,
+          description,
+          UserId,
+          createdAt,
+        }
+
+        if (data.status !== "success") {
+          throw new Error(data.message)
+        }
+        this.text = ""
+      } catch (error) {
+        console.log(error);
+        Toast.fire({
+          icon: "error",
+          title: "暫時無法推文",
+        });
+      }
     },
   },
   computed: {

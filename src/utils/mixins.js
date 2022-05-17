@@ -21,7 +21,7 @@ export const fromNowFilter = {
     format(datetime) {
       if (!datetime) return '-'
 
-      moment.updateLocale('zh-cn', {
+      moment.updateLocale('zh-tw', {
         meridiem: function (hour) {
           if (hour < 12) {
             return "上午"
@@ -40,8 +40,10 @@ export const fromNowFilter = {
     }    
   }
 }
+
 export const textFilter = {
   filters: {
+    // 自介上限 160 字
     textFilter(text) {
       let filteredText = ""
       //有些bio是null，return走
@@ -54,9 +56,21 @@ export const textFilter = {
       } else {
         return text
       }
+    },
+    // 推文上限 140 字
+    tweetFilter(text) {
+      let filteredText = ""
+
+      if (text.length > 140) {
+        filteredText = text.slice(0, 140)
+        return filteredText
+      } else {
+        return text
+      }
     }
   }  
 }
+
 export const visitPage ={
   methods:{
     visitUserPage: function (id, pathName) {

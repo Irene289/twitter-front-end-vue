@@ -9,7 +9,14 @@
         <label for=""></label>
         <textarea v-model="text" name="tweet" placeholder="有什麼新鮮事？">
         </textarea>
-        <button class="btn tweet-btn" @click.stop.prevent="createTweet">
+        <span class="text-length">{{text.length}}/140</span>
+        <span v-if="isEmpty" class="text-empty">內容不可空白</span>
+        <span v-if="isExceed" class="text-exceed">字數不可超過 140 字</span>
+        <button 
+          class="btn tweet-btn" 
+          @click.stop.prevent="createTweet"
+          :disabled="isEmpty || isExceed"
+        >
           推文
         </button>
       </form>
@@ -114,16 +121,18 @@
           <button
             v-if="isReplyModel"
             class="btn modal-tweet"
-            @click.stop.prevent="handleReply"
+            @click.stop.prevent="handleReply(tweet.id)"
+            :disabled="isProcessing"
           >
-            回覆
+            {{ isProcessing ? "處理中" : "回覆" }}
           </button>
           <button
             v-else
             class="btn modal-tweet"
-            @click.stop.prevent="createTweet"
+            @click.stop.prevent="createTweet2"
+            :disabled="isProcessing"
           >
-            推文
+            {{ isProcessing ? "處理中" : "推文" }}
           </button>
         </form>
       </div>
@@ -153,16 +162,17 @@
 </template>
 
 <script>
-import UserTweetCard from "../components/UserTweetCard";
-import TweetModal from "../components/TweetModal";
-import { fromNowFilter } from "./../utils/mixins";
-import tweetAPI from "../apis/tweet";
-import { Toast } from "../utils/helpers";
-import { mapState } from "vuex";
+import UserTweetCard from "../components/UserTweetCard"
+import TweetModal from "../components/TweetModal"
+import { fromNowFilter } from "./../utils/mixins"
+import { textFilter } from "./../utils/mixins"
+import tweetAPI from "../apis/tweet"
+import { Toast } from "../utils/helpers"
+import { mapState } from "vuex"
 
 export default {
   name: "Twitter",
-  mixins: [fromNowFilter],
+  mixins: [fromNowFilter, textFilter],
   components: {
     UserTweetCard,
     TweetModal,
@@ -172,11 +182,10 @@ export default {
       user: {
         avatarImg: ''
       },
-      text: "",         // 推文
-      textReply: "",    // 回覆
-      dNoneReplyModal: true,
-      tweets: [],       // 全部推文
-      tweet: {          // 單一推文
+      text: "",                // 推文
+      textReply: "",           // 回覆
+      tweets: [],              // 全部推文
+      tweet: {                 // 單一推文
         id: -1,
         description: "",
         createdAt: "",
@@ -186,18 +195,37 @@ export default {
           account: '',
         }
       }, 
-      newTweet: {},       // 新推文
-      isReplyModel: true,
-      placeholder: "",
-    };
+      newTweet: {},            // 新增推文
+      newReply: {},            // 新增推文回覆
+      dNoneReplyModal: true,   // 控制 Modal
+      isReplyModel: true,      // 控制 Modal
+      placeholder: "",         // 控制推文跟回覆的 placeholder
+      isProcessing: false,     // 按鈕送出
+      isEmpty: false,
+      isExceed: false 
+    }
   },
   watch: {
     newTweet(newVal) {
-      console.log(newVal)
-      this.tweets = {
-        ...this.tweets,
-        ...newVal
+      console.log('newVal: ', newVal)
+      if (newVal) {
+        const { id, description, User, createdAt } = newVal
+        const { UserId } = User
+
+        // this.tweets = [
+        //   ...this.tweets,
+        //   { id, description, User: {UserId}, createdAt }
+        // ]
+        // console.log(this.tweets)
+
+        this.tweets.push({ id, description, User: {UserId}, createdAt })
       }
+    },
+    text: {
+      handler: function() {
+        this.textWarning()
+      },
+      deep: true
     }
   },
   created() {
@@ -208,6 +236,7 @@ export default {
     fetchUser() {
       this.user = this.currentUser
     },
+    // 拿到全部推文
     async fetchTweets() {
       try {
         const { data, statusText } = await tweetAPI.getTweets()
@@ -216,7 +245,7 @@ export default {
         }
         // console.log(data)
         this.tweets = data
-        this.newTweet = data.description  // 新增
+        // this.newTweet = data.description  // 新增
       } catch (error) {
         console.log(error);
         Toast.fire({
@@ -225,28 +254,40 @@ export default {
         });
       }
     },
-    async createTweet(payload) {
+    textWarning() {
+      if (!this.text) {
+        this.isEmpty = true
+        this.isExceed = false
+        this.isProcessing = false
+      } else if (this.text.length > 140) {
+        this.isEmpty = false
+        this.isExceed = true
+        this.isProcessing = false
+      } else {
+        this.isEmpty = false
+        this.isExceed = false
+      }
+      return
+    },
+    // 推一則推文
+    async createTweet() {
       try {
-        // 內容空白處理
-        if (!this.text) {
-          Toast.fire({
-            icon: "warning",
-            title: "內容不可空白",
-          });
-          this.isProcessing = false;
-          return;
-        }
+        // 內容字數警告
+        this.textWarning()
 
-        const { id, description, UserId, createdAt } = payload
+        // const { id, description, UserId, createdAt } = payload
         const { data } = await tweetAPI.createTweet({
           description: this.text,
-          UserId: this.currentUser.id,
+          // User: { UserId: this.currentUser.id }
+          UserId: this.currentUser.id
         })
+
+        const { id, description, UserId, createdAt } = data.data
 
         this.newTweet = {
           id,
           description,
-          UserId,
+          User: { UserId },
           createdAt,
         }
 
@@ -262,22 +303,70 @@ export default {
         });
       }
     },
+    // 回覆一則推文
+    async handleReply(TweetId) {
+      try {
+        // 內容字數警告
+        this.textWarning()
+
+        // console.log(this.currentUser)
+        console.log(TweetId)
+        // const { id, comment, UserId, TweetId, createdAt } = payload
+
+        const { data } = await tweetAPI.createReply({ 
+          TweetId: TweetId, 
+          comment: this.textReply, 
+          UserId: this.currentUser.id,
+          // TweetId,
+        })
+
+        // this.newReply = {
+        //   // id,
+        //   comment: this.textReply,
+        //   UserId,
+        //   TweetId,
+        //   createdAt,
+        // }
+
+        if (data.status !== "success") {
+          throw new Error(data.message)
+        } else {
+          Toast.fire({
+          icon: 'success',
+          title: "成功送出回覆",
+          })
+          this.textReply = ""
+          this.dNoneReplyModal = !this.dNoneReplyModal
+        }
+
+        // console.log(data)
+      } catch (error) {
+        console.log(error);
+        Toast.fire({
+          icon: "error",
+          title: "暫時無法回覆推文",
+        })
+      }
+    },
+    // 點擊頭像瀏覽個人頁面
     onClickAvatar() {
       console.log(this.tweets.User.id);
     },
+    // 關閉 Modal
     handleCloseBtn() {
       this.dNoneReplyModal = !this.dNoneReplyModal;
       this.textReply = "";
     },
+    // 開啟推文 Modal
     tweetModal() {
       this.dNoneReplyModal = !this.dNoneReplyModal
       this.isReplyModel = false;
       this.placeholder = "有什麼新鮮事？";
     },
+    // 開啟回覆 Modal
     async replyModal(id) {
       try {
-        console.log(id);
-
+        // console.log(id)
         const { data, statusText } = await tweetAPI.getReply({ id });
         console.log(data);
 
@@ -298,10 +387,11 @@ export default {
       }
     },
   },
+  // 取得 currentUser
   computed: {
     ...mapState(["currentUser"]),
   },
-};
+}
 </script>
 
 <style lang="scss" scoped>
@@ -347,6 +437,19 @@ export default {
       font-weight: 700;
     }
   }
+  .text-length {
+    @extend %form-label;
+    position: absolute;
+    right: 16px;
+    top: 8px;
+  }
+  .text-empty,
+  .text-exceed {
+    @extend %tweet-text-warning;
+    position: absolute;
+    right: 101px;
+    bottom: 22px;
+  }
   .tweet-btn {
     @extend %button-orange;
     width: 64px;
@@ -354,6 +457,9 @@ export default {
     position: absolute;
     top: 80px;
     right: 25px;
+    &:disabled {
+      background: $form-input-placeholder;
+    }
   }
 }
 .tweet-content {

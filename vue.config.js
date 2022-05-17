@@ -5,3 +5,9 @@ module.exports = {
     ? '/twitter-front-end-vue/'
     : '/'
 }
+
+module.exports = {
+  configureWebpack: {
+    devtool: 'source-map'
+  }
+}

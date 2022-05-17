@@ -105,6 +105,12 @@
   line-height: 26px;
   color: $font-black;
 }
+%tweet-text-warning {
+  font-size: 15px;
+  font-weight: 500;
+  line-height: 15px;
+  color: $modal-alert;
+}
 %avatar {
   width: 50px;
   height: 50px;
