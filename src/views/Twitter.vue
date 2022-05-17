@@ -186,14 +186,23 @@ export default {
           account: '',
         }
       }, 
-      newTweet: [],     // 新推文
+      newTweet: {},       // 新推文
       isReplyModel: true,
       placeholder: "",
     };
   },
+  watch: {
+    newTweet(newVal) {
+      console.log(newVal)
+      this.tweets = {
+        ...this.tweets,
+        ...newVal
+      }
+    }
+  },
   created() {
-    this.fetchUser();
-    this.fetchTweets();
+    this.fetchUser()
+    this.fetchTweets()
   },
   methods: {
     fetchUser() {
@@ -201,16 +210,13 @@ export default {
     },
     async fetchTweets() {
       try {
-        const response = await tweetAPI.getTweets();
-
-        if (response.statusText !== "OK") {
-          throw new Error(response.statusText);
+        const { data, statusText } = await tweetAPI.getTweets()
+        if (statusText !== "OK") {
+          throw new Error(statusText)
         }
-
-        const { data } = response;
-        this.tweets = data;
         // console.log(data)
-        // this.newTweet = data.description;
+        this.tweets = data
+        this.newTweet = data.description  // 新增
       } catch (error) {
         console.log(error);
         Toast.fire({
@@ -219,7 +225,7 @@ export default {
         });
       }
     },
-    async createTweet() {
+    async createTweet(payload) {
       try {
         // 內容空白處理
         if (!this.text) {
@@ -231,22 +237,23 @@ export default {
           return;
         }
 
+        const { id, description, UserId, createdAt } = payload
         const { data } = await tweetAPI.createTweet({
-          text: this.text,
-        })
-
-        this.newTweet.push({
           description: this.text,
           UserId: this.currentUser.id,
-          createdAt: new Date(),
         })
 
-        console.log(data)
+        this.newTweet = {
+          id,
+          description,
+          UserId,
+          createdAt,
+        }
 
         if (data.status !== "success") {
-          throw new Error(data.message);
+          throw new Error(data.message)
         }
-        this.text = "";
+        this.text = ""
       } catch (error) {
         console.log(error);
         Toast.fire({
@@ -259,7 +266,6 @@ export default {
       console.log(this.tweets.User.id);
     },
     handleCloseBtn() {
-      // this.$emit('reply-modal')
       this.dNoneReplyModal = !this.dNoneReplyModal;
       this.textReply = "";
     },

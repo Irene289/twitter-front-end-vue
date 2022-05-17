@@ -195,6 +195,7 @@ export default {
   created(){
     this.toggleNavList()
   }
+
 }
 </script>
 

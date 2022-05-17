@@ -4,7 +4,7 @@ import store from '../store'
 //TODO:Signin頁面元件確定要刪除的話，把AdminSignin的名字改成Signin
 // import Signin from '../views/Signin.vue'
 import NotFound from '../views/NotFound.vue'
-import Twitter from '../views/Twitter.vue'
+// import Twitter from '../views/Twitter.vue'
 import TwitterMain from '../views/TwitterMain.vue'
 
 Vue.use(VueRouter)
@@ -34,7 +34,7 @@ const routes = [
       {
         path: '',
         name: 'twitter',
-        component: Twitter
+        component: () => import('../views/Twitter.vue')
       },
       {
         path: ':id/replies',
