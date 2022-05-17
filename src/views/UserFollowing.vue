@@ -17,11 +17,24 @@
       </template>
        <template v-slot:btn>
         <div class="btn-group">
-          <button v-show="!following.is_following" class="follow">跟隨</button>
-          <button v-show="following.is_following" class="following">正在跟隨</button>
+          <template>
+            
+          </template>  
+          <button 
+            @click.stop.prevent="follow(following.id)"
+            v-show="!following.is_following" class="follow">跟隨
+          </button>
+          <button 
+            @click.stop.prevent="unfollow(following.id)"
+            v-show="following.is_following" class="following">正在跟隨
+          </button>
+          <button 
+            v-if="following.is_following === currentUser.id" class="follow">
+            跟隨
+          </button>
         </div>       
       </template>
-       <template v-slot:text>
+      <template v-slot:text>
          {{following.introduction| textFilter}}
       </template>
     </UserFollowCard>
@@ -29,6 +42,8 @@
   
 </template>
 <script>
+import {mapState} from 'vuex'
+import followShipAPI from '../apis/followShip'
 import UserFollowCard from '../components/UserFollowCard.vue'
 import {visitPage} from '../utils/mixins'
 import {textFilter} from '../utils/mixins'
@@ -62,11 +77,62 @@ export default {
         })
       }
     },
+      async follow(id){
+      try{
+        const {statusText} = await followShipAPI.follow({id})
+        if(statusText !=='OK'){
+          throw new Error(statusText)
+        }
+        this.followings = this.followings.map(user => {
+          if(user.id !== id) {
+            return user
+          }
+          if(user.id === id) {
+            return{
+              ...user,
+              is_following: true
+            }
+          }
+        })
+      }catch(error){
+        Toast.fire({
+          icon:'error',
+          title:'無法追蹤此用戶，請稍後再試'
+        })
+      }       
+    },
+    async unfollow(id){  
+      try{
+        const {statusText} = await followShipAPI.unFollow({id})
+        if(statusText !== 'OK'){
+          throw new Error (statusText)
+        }
+        this.followings = this.followings.map(user => {
+          if(user.id !== id) {
+            return user
+          }
+          if(user.id === id) {
+            return{
+              ...user,
+              is_following: false
+            }
+          }
+        })
+      }catch(error){
+          Toast.fire({
+          icon:'error',
+          title:'無法取消追蹤此用戶，請稍後再試'
+        })
+      }       
+    },  
     visit(id,pathName){
       //使用mixins裡的函式
       this.visitUserPage(id,pathName)
     }
-  },  
+  }, 
+  computed:{
+    ...mapState(['currentUser'])
+  },
   created(){
     const {id} = this.$route.params
     console.log(id)

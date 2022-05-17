@@ -62,12 +62,9 @@ export default {
         try{
           const {data, statusText} = await userAPI.getLikes({id})
           this.likes = data
-          console.log(data)
-          
           if(statusText !== "OK"){
             throw new Error (statusText)
           }
-
         }catch(error){
           Toast({
             icon: 'error',
