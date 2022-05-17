@@ -2,27 +2,61 @@
   <div id="popular">
     <h1>跟隨誰</h1>
     <div class="popular__list">
-      <div class="popular__list__item">
-        <img src="../assets/static/images/noImage@2x.png" alt="">
+      <div 
+        v-for="user in topUsers"
+        :key="user.id"
+        @click.stop.prevent="visit(user.id, 'user-tweets')"
+        class="popular__list__item">
+        <img :src="user.avatar_img" alt="">
         <div class="item-account">
-          <p class="name">Pizza Hut</p>
-          <p class="id">@pizzahut</p>
+          <p class="name">{{user.name}}</p>
+          <p class="id">{{'@'+ user.account}}</p>
         </div>
         <button class="following">正在跟隨</button>
         <button class="follow">跟隨</button>
       </div>
-      <div class="popular__list__item">
-        <img src="../assets/static/images/noImage@2x.png" alt="">
-        <div class="item-account">
-          <p class="name">McDonaldlover</p>
-          <p class="id">@McDonaldlover</p>
-        </div>
-        <button class="following">正在跟隨</button>
-        <button class="follow">跟隨</button>
-      </div>    
     </div> 
   </div>
 </template>
+<script>
+import {visitPage} from '../utils/mixins'
+import userAPI from '../apis/user'
+import {Toast} from '../utils/helpers'
+export default {
+  name:'Popular',
+  mixins:[visitPage],
+  data(){
+    return{
+      topUsers:[]
+    }
+  },
+  methods:{
+    visit(id,pathName){
+      this.visitUserPage(id,pathName)
+    },
+    async fetchTopUsers(rank){
+      try{
+        console.log(rank)
+        const {data, statusText} = await userAPI.getTopUsers({rank})
+        this.topUsers = data
+        console.log(data)
+        if(statusText !== "OK"){
+          throw new Error(statusText)
+        }
+
+      }catch(error){
+        Toast.fire({
+          icon: 'error',
+          title: '無法取得人氣用戶，請稍後再試'
+        })
+      }
+    }
+  },
+  created(){
+    this.fetchTopUsers(10)
+  }
+}
+</script>
 <style lang="scss" scoped>
   @import "../assets/scss/_basic.scss";
   #popular{
@@ -34,6 +68,7 @@
     border-radius: 16px;
     img{
       width:50px;
+      border-radius: 50%;
     }
     h1{
       border-bottom: 1px solid #E6ECF0;
@@ -41,7 +76,8 @@
       font-family: $main-font;
       font-size: 24px;
     }
-    .popular__list__item{   
+    .popular__list__item{  
+      cursor:pointer; 
       display: flex;
       padding: 1rem; 
       .item-account{

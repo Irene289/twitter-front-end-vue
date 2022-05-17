@@ -41,6 +41,7 @@ export default {
   },
   methods:{
     //TODO:缺用戶avatar和回覆對象帳號，待補
+      // TODO:篩除非user的用戶
     async fetchUserReplies(id){
       try{
         const {data, statusText} = await userAPI.getReplies({id})

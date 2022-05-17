@@ -1,78 +1,94 @@
 <template>
   <div class="user-like scrollbar">
     <UserTweetCard 
-      v-for="reply in replies"
-      :key="reply.id"
+      v-for="like in likes"
+      :key="like.TweetId"
       >
       <template v-slot:avatar>
-        <img class="avatar" :src="reply.img" alt="">
+        <img 
+          @click.stop.prevent="visit(like.Tweet.User.id, 'user-tweets')"
+          class="avatar" :src="like.Tweet.User.avatar_img" alt="">
       </template>
        <template v-slot:name>
-         {{reply.name}}
+         <div @click.stop.prevent="visit(like.Tweet.User.id, 'user-tweets')">
+            {{like.Tweet.User.name}}
+         </div>       
       </template>
        <template v-slot:id>
-         {{reply.account}}
+         {{'@'+like.Tweet.User.account}}
       </template>
        <template v-slot:post-time>
-         {{reply.createTime | fromNow}}
+         {{like.Tweet.created_at | fromNow}}
       </template>
        <template v-slot:text>
-         {{reply.text}}
-         <div class="icons">
-        <div class="icon-wrapper">
-          <img src="../assets/static/images/reply@2x.png" alt="">
-          <p class="count">{{reply.replyNum}}</p>
+         {{like.Tweet.description}}
+        <div class="icons">
+          <div 
+            @click.stop.prevent="visit(like.TweetId, 'twitter-replies')"
+            class="icon-wrapper">
+            <img src="../assets/static/images/reply@2x.png" alt="">
+            <p class="count">{{like.Tweet.replyCount}}</p>
+          </div>
+          <div class="icon-wrapper">
+            <img src="../assets/static/images/like@2x.png" alt="">
+            <p class="count">{{like.Tweet.likeCount}}</p>
+          </div>     
         </div>
-        <div class="icon-wrapper">
-          <img src="../assets/static/images/like@2x.png" alt="">
-          <p class="count">{{reply.likeNum}}</p>
-        </div>     
-      </div>
       </template>
       
     </UserTweetCard>  
   </div>
 </template>
 <script>
+import {visitPage} from '../utils/mixins'
+import userAPI from '../apis/user'
+import {Toast} from '../utils/helpers'
 import { fromNowFilter } from './../utils/mixins'
 import UserTweetCard from '../components/UserTweetCard.vue'
 export default {
-  mixins: [fromNowFilter],
+  mixins: [fromNowFilter, visitPage],
   components:{
     UserTweetCard
   },
    data(){
     return{
-       replies:[
-         {
-           id: 1,
-           name: 'John Doe',
-           img: require('../assets/static/images/noImage@2x.png'),
-           account: '@johndoe',
-           text:'The point of using Lorem Ipsum is that it has a more-or-less normal distribution of letters, as opposed to using making it look like readable English.',
-           likeNum: 50,
-           replyNum: 30,
-           createTime: 3,
-           
-
-         },
-          {
-           id: 2,
-           name: 'John Doe',
-           img: require('../assets/static/images/noImage@2x.png'),
-           account: '@johndoe',
-           text:'The point of using Lorem Ipsum is that it has a more-or-less normal distribution of letters, as opposed to using making it look like readable English.',
-           likeNum: 50,
-           replyNum: 30,
-           createTime: 3,
-           
-         }
-       ]
-
-    
+       likes:[]   
     }
    
+  },
+  methods:{
+      // TODO:篩除非user的用戶
+      async fetchUserLikes(id){
+        try{
+          const {data, statusText} = await userAPI.getLikes({id})
+          this.likes = data
+          console.log(data)
+          
+          if(statusText !== "OK"){
+            throw new Error (statusText)
+          }
+
+        }catch(error){
+          Toast({
+            icon: 'error',
+            title: '無法取的用戶喜歡的推文，請稍後再試'
+          })
+        }
+      },
+      visit(id, pathName){
+         this.visitUserPage(id, pathName)
+      }
+  },
+  created(){
+    const {id} = this.$route.params
+    console.log('like',id)
+    this.fetchUserLikes(id)
   }
   
 }
 </script>
+<style lang="scss" scoped>
+  .icon-wrapper{
+    cursor: pointer;
+  }
+</style>

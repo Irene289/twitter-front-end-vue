@@ -45,22 +45,22 @@ const routes = [
   },
   // 前台使用者主頁
   {
-    path: '/users/:id',
+    path: '/users',
     // name: 'user-tweets',  
     component: () => import('../views/User.vue'),
     children:[
       {
-        path: 'tweets',
+        path: ':id/tweets',
         name: 'user-tweets',
         component: () => import('../views/UserTweets.vue')
       },
       {
-        path: 'replies',
+        path: ':id/replies',
         name: 'user-replies',
         component: () => import('../views/UserReply.vue')
       },
       {
-        path: 'likes',
+        path: ':id/likes',
         name: 'user-like',
         component: () => import('../views/UserLike.vue')
       },
@@ -69,17 +69,17 @@ const routes = [
   },
   // 前台使用者追蹤頁
   {
-    path: '/users/:id',
+    path: '/users',
     // name: 'user-follow',
     component: () => import('../views/UserFollow.vue'),
     children: [
       {
-        path: 'follower',
+        path: ':id/follower',
         name:'follower',
         component: () => import('../views/UserFollower.vue')
       },
       {
-        path: 'following',
+        path: ':id/following',
         name:'following',
         component: () => import('../views/UserFollowing.vue')
       }  
@@ -92,7 +92,7 @@ const routes = [
   },
   {
     path:'/users/:id',
-    redirect:{name: 'user-tweet'}
+    redirect:{name: 'user-tweets'}
   },
  
   // 後台
