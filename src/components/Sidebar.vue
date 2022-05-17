@@ -195,9 +195,6 @@ export default {
   created(){
     this.toggleNavList()
   },
-  computed:{
-    ...mapState(['currentUser'])
-  }
 }
 </script>
 
