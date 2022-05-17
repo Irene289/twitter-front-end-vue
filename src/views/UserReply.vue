@@ -5,7 +5,9 @@
       :key="reply.id"
       >
       <template v-slot:avatar>
-        <img class="avatar" :src="reply.img" alt="">
+        <img 
+          @click.prevent.stop="visit(reply.User.id, 'user-tweets')"
+          class="avatar" :src="reply.User.avatarImg" alt="">
       </template>
        <template v-slot:name>
          {{reply.User.name}}
@@ -17,20 +19,23 @@
          {{reply.created_at | fromNow}}
       </template>
        <template v-slot:text>
-         <div class="reply-tag">回覆 <span>@{{reply.to}}</span></div>
+         <div 
+          @click.prevent.stop="visit(reply.Tweet.id, 'twitter-replies')"
+          class="reply-tag">回覆 <span>@{{reply.Tweet.User.account}}</span></div>
          {{reply.comment}}
       </template>   
     </UserTweetCard>  
   </div>
 </template>
 <script>
+import {visitPage} from '../utils/mixins'
 import UserTweetCard from '../components/UserTweetCard.vue'
 import { fromNowFilter } from './../utils/mixins'
 import userAPI from '../apis/user'
 import {Toast} from '../utils/helpers'
 
 export default {
-  mixins: [fromNowFilter],
+  mixins: [fromNowFilter, visitPage],
   components:{
     UserTweetCard
   },
@@ -40,11 +45,12 @@ export default {
     } 
   },
   methods:{
-    //TODO:缺用戶avatar和回覆對象帳號，待補
+      // TODO:篩除非user的用戶
     async fetchUserReplies(id){
       try{
         const {data, statusText} = await userAPI.getReplies({id})
         this.replies = data
+        console.log(data)
         if(statusText !== 'OK'){
           throw new Error (statusText)
         }
@@ -54,6 +60,9 @@ export default {
           title: '無法載入使用者回覆，請稍後再試'
         })
       }
+    },
+    visit(id,pathName){
+      this.visitUserPage(id,pathName)
     }
   },
   created(){

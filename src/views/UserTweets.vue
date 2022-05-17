@@ -6,7 +6,9 @@
       :key="tweet.id"
       >
       <template v-slot:avatar>
-        <img class="avatar" :src="tweet.img" alt="">
+        <img 
+          @click.prevent.stop="visit(tweet.User.id, 'user-tweets')"
+          class="avatar" :src="tweet.User.avatarImg" alt="">
       </template>
        <template v-slot:name>
          {{tweet.User.name}}
@@ -18,13 +20,17 @@
          {{tweet.created_at | fromNow}}
       </template>
        <template v-slot:text>
-         {{tweet.description}}
-         <div class="icons">
-        <div class="icon-wrapper">
-          <img src="../assets/static/images/reply@2x.png" alt="">
+            {{tweet.description}}       
+        <div class="icons">
+        <div 
+          @click.prevent.stop="visit(tweet.id, 'twitter-replies')"
+          class="icon-wrapper">
+          <img class="link" src="../assets/static/images/reply@2x.png" alt="">
           <p class="count">{{tweet.Replies}}</p>
         </div>
-        <div class="icon-wrapper">
+        <div 
+          
+          class="icon-wrapper">
           <img src="../assets/static/images/like@2x.png" alt="">
           <p class="count">{{tweet.Likes}}</p>
         </div>     
@@ -36,24 +42,24 @@
   
 </template>
 <script>
+import {visitPage} from '../utils/mixins'
 import UserTweetCard from '../components/UserTweetCard.vue'
 import { fromNowFilter } from './../utils/mixins'
 import userAPI from '../apis/user'
 import {Toast} from '../utils/helpers'
 export default {
   name: 'UserTweets',
-  mixins: [fromNowFilter],
+  mixins: [fromNowFilter, visitPage],
   components:{
     UserTweetCard
   },
   data(){
     return{
-      currentUserId: 8,
       tweets:[]
     }
   },
   methods:{
-    //TODO:需要使用者圖片
+      // TODO:篩除非user的用戶
     async fetchUserTweets(id){
       try{
         const {data,statusText} = await userAPI.getTweets({id})
@@ -68,6 +74,9 @@ export default {
           title: '無法載入用戶推文，請稍後再試'
         })
       }
+    },
+    visit(id,pathName){
+      this.visitUserPage(id,pathName)
     }
   },
   created(){

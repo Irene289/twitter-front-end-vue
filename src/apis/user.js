@@ -15,5 +15,11 @@ export default {
   },
   update({ userId, formData }) {
     return apiHelper.put(`/users/${userId}`, formData)
+  },
+  getLikes({id}){
+    return apiHelper.get(`/users/${id}/likes`)
+  },
+  getTopUsers({rank}){
+    return apiHelper.get(`/users/top?limit=${rank}`)
   }
 }

@@ -13,19 +13,27 @@
         <div class="user__btn__group__list">
           <template v-if="!isCurrentUser">
             <div class="group-item">
-            <img src="../assets/static/images/msg@2x.png" alt="">          
+            <img 
+              @click.stop.prevent="sendDm"
+              src="../assets/static/images/msg@2x.png" alt="">          
             </div>
             <div class="group-item">
-              <img v-if="!isSubscribe" class="notify" src="../assets/static/images/notfi@2x.png" alt="">
-              <img v-else class="notified" src="../assets/static/images/notfied@2x.png" alt="">
+              <img 
+                v-if="!isSubscribe"
+                @click.stop.prevent="toggleSub" 
+                class="notify" src="../assets/static/images/notfi@2x.png" alt=""
+              >
+              <img v-else 
+                 @click.stop.prevent="toggleSub" 
+                class="notified" src="../assets/static/images/notfied@2x.png" alt="">
             </div>
             <div v-if="!user.isFollowing" class="group-item follow">
               <button 
-                @click.stop.prevent="follow"
+                @click.stop.prevent="follow(user.id)"
                 class="follow">跟隨</button>
             </div>
             <div v-else 
-              @click.stop.prevent="unfollow"
+              @click.stop.prevent="unfollow(user.id)"
               class="group-item">           
                 <button class="following">正在跟隨</button>           
             </div>
@@ -40,7 +48,7 @@
       <div class="user__container__info">
         <p class="name">{{user.name}}</p>
         <p class="id">@{{user.account}}</p>
-        <p class="intro">{{user.bio}}</p>
+        <p class="intro">{{user.introduction}}</p>
         <div class="user__follow">
           <router-link
             :to="{
@@ -74,6 +82,7 @@
   </div> 
 </template>
 <script>
+import followShipAPI from '../apis/followShip'
 import {mapState} from 'vuex'
 import userAPI from '../apis/user'
 import {Toast} from '../utils/helpers'
@@ -90,6 +99,7 @@ export default {
       user:{
         name: '',
         id:'',
+        introduction:'',
         account:'',
         avatarImg:'',
         coverImg:'',
@@ -106,15 +116,30 @@ export default {
       openModal(){
         this.isEditing = true
       },
+      toggleSub(){
+        if(this.isSubscribe === false){
+           this.isSubscribe = true
+        } else {
+          this.isSubscribe = false
+        }       
+      },
+      sendDm(){
+        Toast.fire({
+          icon:'warning',
+          title: '私訊功能開發中'
+        })
+      }
+      ,
       async fetchUser(userId){
+          // TODO:篩除非user的用戶
         try{
           const {data, statusText} = await userAPI.get({id:userId})   
-          const {id,name, account ,coverImg, avatarImg, bio, is_following:isFollowing, Following: following, Follower: follower} = data
-          let newBio = ''
-          if(bio.length > 160){
-            newBio = bio.slice(0,160) 
+          const {id,name, account ,coverImg, avatarImg, introduction, is_following:isFollowing, Following: following, Follower: follower} = data
+          let newIntro = ''
+          if(introduction.length > 160){
+            newIntro = introduction.slice(0,160) 
           }else{
-            newBio = bio
+            newIntro = introduction
           }
           this.user = {
             id,
@@ -122,11 +147,12 @@ export default {
             account,
             coverImg,
             avatarImg,
-            bio: newBio,
+            introduction: newIntro,
             isFollowing,
             followingCount: following.length,
             followerCount: follower.length
           }
+          console.log('user',this.user.id)
           if(this.user.id === this.currentUser.id){
             this.isCurrentUser = true
           }else{
@@ -143,20 +169,40 @@ export default {
           })
         }       
       },
-      follow(){
-        //TODO: 串 /followships
-        this.user = {
+      async follow(id){
+        console.log(id)
+        try{
+          const {statusText} = await followShipAPI.follow({id})
+          if(statusText !=='OK'){
+            throw new Error(statusText)
+          }
+          this.user = {
           ...this.user,
           isFollowing: true
         }
+        }catch(error){
+          Toast.fire({
+            icon:'error',
+            title:'無法追蹤此用戶，請稍後再試'
+          })
+        }       
       },
-      unfollow(){
-         //TODO: 串 /followships/:followingId
-       this.user = {
+      async unfollow(id){
+        try{
+          const {statusText} = await followShipAPI.unFollow({id})
+          if(statusText !== 'OK'){
+            throw new Error (statusText)
+          }
+          this.user = {
           ...this.user,
           isFollowing: false
         }
-
+        }catch(error){
+           Toast.fire({
+            icon:'error',
+            title:'無法取消追蹤此用戶，請稍後再試'
+          })
+        }       
       }   
     },
     beforeRouteUpdate(to, from, next){
