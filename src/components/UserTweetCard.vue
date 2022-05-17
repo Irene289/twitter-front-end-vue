@@ -27,6 +27,7 @@ export default {};
   padding: 16px;
   border-bottom: 1px solid $border-grey;
   .avatar {
+    cursor: pointer;
     width: 50px;
     height: 50px;
     border-radius: 50%;
