@@ -56,11 +56,9 @@ export default {
       try{
         const {data, statusText} = await userAPI.getTopUsers({rank})
         this.topUsers = data
-        console.log(data)
         if(statusText !== "OK"){
           throw new Error(statusText)
         }
-
       }catch(error){
         Toast.fire({
           icon: 'error',
@@ -122,6 +120,14 @@ export default {
   },
   computed:{
     ...mapState(['currentUser'])
+  },
+  watch:{
+    topUsers:{
+      deep: true,
+      handler:function(){
+        this.fetchTopUsers(10)
+      }
+    }
   }
   //TODO:個人資料編輯後topUsers名稱沒有同步，
 }

@@ -152,7 +152,6 @@ export default {
             followingCount: following.length,
             followerCount: follower.length
           }
-          console.log('user',this.user.id)
           if(this.user.id === this.currentUser.id){
             this.isCurrentUser = true
           }else{
@@ -219,7 +218,6 @@ export default {
             avatarImg,
             coverImg
           }
-          console.log(data)
           if(statusText !== "OK"){
             throw new Error (statusText)
           }
@@ -252,7 +250,6 @@ export default {
     },
     created(){
       const {id} = this.$route.params
-      console.log(id)
       this.fetchUser(id)     
     }
 }

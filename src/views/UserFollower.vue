@@ -69,7 +69,7 @@ export default {
     async fetchUserFollowers(id){
       try{
         const {data, statusText} = await userAPI.get({id})
-        const followers = data.Follower
+        const followers = data.Following
         this.followers = followers
         if(statusText !== 'OK'){
           throw new Error(statusText)

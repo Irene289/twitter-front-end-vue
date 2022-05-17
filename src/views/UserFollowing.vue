@@ -17,20 +17,23 @@
       </template>
        <template v-slot:btn>
         <div class="btn-group">
-          <template>
-            
-          </template>  
-          <button 
+          <template  
+            v-if="following.id !== currentUser.id" 
+          >
+            <button 
             @click.stop.prevent="follow(following.id)"
             v-show="!following.is_following" class="follow">跟隨
-          </button>
+            </button>
+            <button 
+              @click.stop.prevent="unfollow(following.id)"
+              v-show="following.is_following" class="following">正在跟隨
+            </button>
+          </template>            
           <button 
-            @click.stop.prevent="unfollow(following.id)"
-            v-show="following.is_following" class="following">正在跟隨
-          </button>
-          <button 
-            v-if="following.is_following === currentUser.id" class="follow">
-            跟隨
+            v-else
+            disabled
+            class="following">
+            用戶本人
           </button>
         </div>       
       </template>
@@ -65,7 +68,7 @@ export default {
     async fetchUserFollowings(id){
       try{
         const {data, statusText} = await userAPI.get({id})
-        const followings = data.Following
+        const followings = data.Follower
         this.followings = followings
         if(statusText !== 'OK'){
           throw new Error(statusText)
@@ -128,6 +131,15 @@ export default {
     visit(id,pathName){
       //使用mixins裡的函式
       this.visitUserPage(id,pathName)
+    }
+  },
+  watch:{
+    followings:{
+      deep: true,
+      handler:function(){
+        const {id} = this.$route.params
+        this.fetchUserFollowings(id)
+      }
     }
   }, 
   computed:{
