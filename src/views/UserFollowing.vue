@@ -22,7 +22,7 @@
         </div>       
       </template>
        <template v-slot:text>
-         {{following.bio | textFilter}}
+         {{following.introduction| textFilter}}
       </template>
     </UserFollowCard>
   </div>
@@ -46,6 +46,7 @@ export default {
     }
   },
   methods:{
+      // TODO:篩除非user的用戶
     async fetchUserFollowings(id){
       try{
         const {data, statusText} = await userAPI.get({id})

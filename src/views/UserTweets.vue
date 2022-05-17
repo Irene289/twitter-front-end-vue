@@ -54,6 +54,7 @@ export default {
   },
   methods:{
     //TODO:需要使用者圖片
+      // TODO:篩除非user的用戶
     async fetchUserTweets(id){
       try{
         const {data,statusText} = await userAPI.getTweets({id})

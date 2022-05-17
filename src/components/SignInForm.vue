@@ -75,7 +75,7 @@ export default {
        if(isAdmin && route === 'admin'){
          // token
         localStorage.setItem('token', data.data.token)
-        this.$store.commit('setCurrentUserToken', user)
+        
         this.$router.push('/admin/tweets')
         return
         } 

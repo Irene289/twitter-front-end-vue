@@ -76,23 +76,10 @@
       return {
         userId:8,
         userName:'',
-        navList:[
-          
-          { id: 1,
-            title: '追蹤者',
-            path: '/users/:id/follow'
-          },
-          { 
-            id: 2,
-            title: '正在追隨',
-            path: '/users/:id/follow/following'
-          }
-        ]       
       }
     },
     methods:{
       visit(id,pathName){
-        console.log(id)
         this.visitUserPage(id,pathName)
       },
        async fetchUser(userId){
