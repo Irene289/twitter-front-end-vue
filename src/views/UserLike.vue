@@ -30,7 +30,14 @@
             <p class="count">{{like.Tweet.replyCount}}</p>
           </div>
           <div class="icon-wrapper">
-            <img src="../assets/static/images/like@2x.png" alt="">
+            <img 
+              @click.stop.prevent="unlikeTweet(like.TweetId)"
+              v-show="like.likeUnlike" 
+              src="../assets/static/images/redHeart@2x.png" alt="">
+            <img
+              @click.stop.prevent="likeTweet(like.TweetId)" 
+              v-show="!like.likeUnlike" 
+              src="../assets/static/images/like@2x.png" alt="">
             <p class="count">{{like.Tweet.likeCount}}</p>
           </div>     
         </div>
@@ -40,6 +47,7 @@
   </div>
 </template>
 <script>
+import tweetAPI from '../apis/tweet'
 import {visitPage} from '../utils/mixins'
 import userAPI from '../apis/user'
 import {Toast} from '../utils/helpers'
@@ -62,6 +70,7 @@ export default {
         try{
           const {data, statusText} = await userAPI.getLikes({id})
           this.likes = data
+          console.log(data)
           if(statusText !== "OK"){
             throw new Error (statusText)
           }
@@ -72,13 +81,56 @@ export default {
           })
         }
       },
+      async likeTweet(id){
+        try{
+          const {data} = await tweetAPI.likeTweet({id})
+          console.log(data)
+          this.likes = this.likes.map(tweet => {
+           if(tweet.TweetId !== id){
+             return tweet
+           } else if (tweet.TweetId === id){
+              console.log()
+              return {
+              ...tweet,
+              likeUnlike: true,
+                
+              }
+            }            
+          })
+        }catch(error){
+          Toast.fire({
+            icon: 'error',
+            title: '無法對推文點讚，請稍後再試'
+          })
+        }
+      },
+      async unlikeTweet(id){
+        try{
+          const response = await tweetAPI.unlikeTweet({id})
+          console.log(response)
+          this.likes = this.likes.map(tweet => {
+           if(tweet.TweetId !== id){
+             return tweet
+           } else if (tweet.TweetId === id){
+              return {
+              ...tweet,
+              likeUnlike: false
+              }
+            }            
+          })
+        }catch(error){
+          Toast.fire({
+            icon: 'error',
+            title: '無法對推文點讚，請稍後再試'
+          })
+        }
+      },
       visit(id, pathName){
          this.visitUserPage(id, pathName)
       }
   },
   created(){
     const {id} = this.$route.params
-    console.log('like',id)
     this.fetchUserLikes(id)
   }
   

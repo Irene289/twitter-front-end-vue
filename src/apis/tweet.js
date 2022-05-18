@@ -23,6 +23,12 @@ export default{
   // 拿到單一推文跟他的所有回覆
   getReply({ id }) {
     return apiHelper.get(`/tweets/${id}`)
+  },
+  likeTweet({id}){
+    return apiHelper.post(`/tweets/${id}/like`)
+  },
+   unlikeTweet({ id }) {
+    return apiHelper.post(`/tweets/${id}/unlike`)
   }
 }
 
