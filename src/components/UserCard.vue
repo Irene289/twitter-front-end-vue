@@ -208,7 +208,7 @@ export default {
       async afterSubmit(formData){    
         try{
           this.isProcessing = true
-          const {data, statusText} = await userAPI.update({
+          const {data, statusText} = await userAPI.updateProfile({
             userId: this.currentUser.id,
             formData
           })
@@ -225,7 +225,7 @@ export default {
           }
           Toast.fire({
             icon:'success',
-            title: '以儲存更新'
+            title: '已儲存更新'
           })
           this.isProcessing = false
         }catch(error){

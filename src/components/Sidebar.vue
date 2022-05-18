@@ -46,7 +46,9 @@
               </textarea>
             </template>
             <template v-slot:alert>
-              <p class="modal-alert">
+              <p 
+                v-show="isLimit"
+                class="modal-alert">
                 字數不可超過 140 字</p>
             </template>
           </TweetModal>
@@ -87,7 +89,7 @@
         </router-link>     
       </li>
        <li class="nav__list__item ">
-        <router-link :to="{name: 'user-setting', params: {id: currentUser.id}}">
+        <router-link :to="{ name:'user-setting', params:{id: currentUser.id}}">
           <div class="nav__list__item__wrapper">
             <img class="active" src="../assets/static/images/orangeSet@2x.png" alt="">
             <img class="inactive" src="../assets/static/images/setIcon@2x.png" alt="">
@@ -169,6 +171,7 @@ export default {
       newTweet: {},            // 新增推文
       dNoneReplyModal: true,   // 控制 Modal
       isReplyModel: true,      // 控制 Modal
+      isLimit:false 
     }
   },
   methods:{
@@ -206,6 +209,10 @@ export default {
           this.isProcessing = false;
           return;
         }
+        if(this.text.length > 140) {
+          this.isLimit = true
+          return
+        } 
 
         console.log(this.currentUser)
 
@@ -234,9 +241,17 @@ export default {
         });
       }
     },
+    overLimit(){
+      this.isLimit = true
+    }
   },
   computed: {
     ...mapState(['currentUser'])
+  },
+  watch:{
+    text(){
+      this.overLimit()
+    }
   },
   created(){
     this.toggleNavList()
@@ -312,16 +327,17 @@ export default {
   left: 0;
   z-index: 1000;
   .modal-content {
-  background-color: $white;
-  border-radius: 14px;
-  margin: auto;
-  margin-top: 56px;
-  padding: 0;
-  box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.25);
-  &-cancel {
-    width: 100%;
-    border-bottom: 1px solid $border-grey;
-  }
+    position: relative;
+    background-color: $white;
+    border-radius: 14px;
+    margin: auto;
+    margin-top: 56px;
+    padding: 0;
+    box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.25);
+    &-cancel {
+      width: 100%;
+      border-bottom: 1px solid $border-grey;
+    }
   &-cancel img {
     width: 24px;
     height: 24px;
@@ -333,8 +349,14 @@ export default {
     border-radius: 50%;
   }
 }
+.modal-alert{
+  bottom: 10px;
+}
 .modal-tweet {
   @extend %button-orange;
+  position:absolute;
+  right: 1rem;
+  bottom: 1rem;
   min-width: 76px;
   height: 40px;
 }

@@ -228,7 +228,7 @@ textarea {
   font-size: 15px;
   line-height: 15px;
   position: absolute;
-  bottom: 27px;
+  bottom: 10px;
   right: 108px;
 }
 </style>
