@@ -5,7 +5,7 @@
     </div>
     <div class="tweet-div">
       <form action="">
-        <img :src="user.avatarImg" alt="" />
+        <img :src="currentUser.avatarImg" alt="" />
         <label for=""></label>
         <textarea v-model="text" name="tweet" placeholder="有什麼新鮮事？" @blur="onBlur" >
         </textarea>
@@ -99,7 +99,7 @@
             <template v-slot:avatarImg>
               <img
                 class="modal-content-avatar"
-                :src="user.avatarImg"
+                :src="currentUser.avatarImg"
                 alt=""
               />
             </template>
@@ -158,9 +158,6 @@ export default {
   },
   data() {
     return {
-      user: {
-        avatarImg: ''
-      },
       text: "",                // 推文
       textReply: "",           // 回覆
       tweets: {},              // 全部推文
@@ -206,13 +203,13 @@ export default {
     }
   },
   created() {
-    this.fetchUser()
+    // this.fetchUser()
     this.fetchTweets()
   },
   methods: {
-    fetchUser() {
-      this.user = this.currentUser
-    },
+    // fetchUser() {
+    //   this.user = this.currentUser
+    // },
     // 拿到全部推文
     async fetchTweets() {
       try {
@@ -306,25 +303,13 @@ export default {
         // 內容字數警告
         this.textWarning()
 
-        // const { id, comment, UserId, TweetId, createdAt } = payload
-
         const { data } = await tweetAPI.createReply({ 
           TweetId, 
           comment: this.textReply, 
           UserId: this.currentUser.id,
         })
 
-        const { id, comment, UserId, createdAt } = data.data
-
-        this.newReply = {
-          id,
-          comment,
-          User: {
-            id: UserId,
-            createdAt
-          },
-        }
-
+        // tweets 是全部推文，Array => map
         // this.tweets = this.tweets.map( tweets => {
         //   if ( tweets.id !== TweetId ) {
         //     return
@@ -335,20 +320,28 @@ export default {
         //     }
         //   }
         // })
+        
 
+        const { id, comment, UserId, createdAt } = data.data
+        this.newReply = {
+          id,
+          comment,
+          User: {
+            id: UserId,
+            createdAt
+          },
+        }
+
+        // tweet 是單一推文跟他的回覆，Obj
         this.tweet = {
           Replies: [
             {...this.newReply},
             ...this.tweet.Replies
           ],
-          // replyTotal: replyTotal + 1
+          replyTotal: this.tweet.replyTotal + 1
         }
-        
-        // this.tweet.replyTotal = this.tweet.replyTotal + 1
-        // this.tweets.Replies = this.tweet.replyTotal
 
-        console.log(TweetId)
-        console.log(this.tweet.id)
+        console.log(this.tweet.replyTotal)
 
         if (data.status !== "success") {
           throw new Error(data.message)
@@ -358,10 +351,9 @@ export default {
           title: "成功送出回覆",
           })
           this.textReply = ""
-          this.dNoneReplyModal = !this.dNoneReplyModal
+          this.dNoneReplyModal = true
         }
 
-        // console.log(data)
       } catch (error) {
         console.log(error);
         Toast.fire({
