@@ -27,7 +27,7 @@
           </div>
           <input 
             @change.stop.prevent="handleCoverChange"
-            type="file" id="background-update" name="backgroundImage" accept="image/*">
+            type="file" id="background-update" name="cover_img" accept="image/*">
         </div>
         <div class="user__image__form-item item__avatar">
           <div class="avatar-wrapper">
@@ -40,7 +40,7 @@
           </label>
           <input
             @change.stop.prevent="handleAvatarChange"
-            type="file" id="avatar-update" name="avatar" accept="image/*">
+            type="file" id="avatar-update" name="avatar_img" accept="image/*">
         </div>
       </div>
       <div class="user__info">
@@ -54,13 +54,12 @@
             <p :class="{hidden:nameIsValid}" class="warning">字數超出上限</p>
             <p class="length">{{user.name.length}}/50</p>
           </div>
-         <!-- maxlength="50" -->
         </div>
         <div class="info-item">
-          <label for="intro">自我介紹</label>
+          <label for="introduction">自我介紹</label>
           <textarea 
             v-model="user.introduction" :class="{red:!introIsValid}"
-            name="intro" class="intro" cols="30" rows="10" ></textarea>
+            name="introduction" class="intro" cols="30" rows="10" ></textarea>
           <div class="hint-group">
             <p :class="{hidden:introIsValid}" class="warning" >字數超出上限</p>
             <p class="length">{{user.introduction.length}}/160</p>
@@ -124,13 +123,11 @@ export default {
       this.user.coverImg = this.initialCover
     },
     handleSubmit(e){
-      this.warning()
+      if(this.user.name.length > 50 || this.user.introduction.length > 160) {
+         return
+      } 
       const form = e.target
       const formData = new FormData(form)
-      //test
-      // for (let [name,value] of formData){
-      //   console.log(name,":", value)
-      // }
       this.$emit('after-submit',formData)
       this.closeModal()
      
@@ -186,16 +183,16 @@ export default {
     color:#FC5A5A;
   }
   .modal {
-  position: fixed;
-  z-index: 1; 
-  padding-top: 100px; 
-  left: 0;
-  top: 0;
-  width: 100%; 
-  height: 100%; 
-  overflow: auto; 
-  background-color: rgb(0, 0, 0); 
-  background-color: rgba(0, 0, 0, 0.4);
+    position: fixed;
+    z-index: 1; 
+    padding-top: 100px; 
+    left: 0;
+    top: 0;
+    width: 100%; 
+    height: 100%; 
+    overflow: auto; 
+    background-color: rgb(0, 0, 0); 
+    background-color: rgba(0, 0, 0, 0.4);
   }
   .form {
     position: fixed;

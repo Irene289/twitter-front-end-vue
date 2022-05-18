@@ -189,14 +189,16 @@ export default {
 
         const form = e.target
         const formData = new FormData(form)
-        // console.log(formData)
+        for (let [name,value] of formData){
+          console.log(name,":", value)
+        }
 
-        const { data } = await userAPI.update({
+        const {data, statusText} = await userAPI.update({
           userId: this.user.id,
           formData,
         })
-
-        if (data.status !== "success") {
+        // console.log(response)
+        if (statusText !== "OK") {
           throw new Error(data.message)
         } else {
           Toast.fire({

@@ -40,6 +40,7 @@
           </template>         
           <div v-else class="group-item">
             <button 
+              :disabled="isProcessing"
               @click="openModal"
               class="edit">編輯個人資料</button>
           </div>
@@ -97,6 +98,7 @@ export default {
       isEditing: false,
       isCurrentUser: true,
       isSubscribe: false,
+      isProcessing: false,
       user:{
         name: '',
         id:'',
@@ -205,12 +207,12 @@ export default {
       },
       async afterSubmit(formData){    
         try{
+          this.isProcessing = true
           const {data, statusText} = await userAPI.update({
             userId: this.currentUser.id,
             formData
           })
           const {name, introduction, avatarImg, coverImg} = data
-          console.log('responseData Intro:',introduction)
           this.user = {
             ...this.user,
             name,
@@ -221,14 +223,17 @@ export default {
           if(statusText !== "OK"){
             throw new Error (statusText)
           }
+          Toast.fire({
+            icon:'success',
+            title: '以儲存更新'
+          })
+          this.isProcessing = false
         }catch(error){
+          this.isProcessing = false
           Toast.fire({
             icon:'error',
             title: '無法儲存編輯，請稍後再試'
           })
-        }
-          for (let [name,value] of formData){
-          console.log(name,":", value)
         }
       }   
     },
@@ -264,8 +269,11 @@ export default {
       position: relative;
       .background-wrapper{
         width: 100%;
+        height: 200px;
+        overflow: hidden;
         img{
           width: 100%;
+          object-fit: cover;
         }
       }
       .avatar-wrapper{
@@ -278,6 +286,8 @@ export default {
         border-radius: 50%;
         img{
           width:100%;
+          height:100%;
+          object-fit: cover;
           border-radius: 50%;
         }
       }
@@ -334,8 +344,6 @@ export default {
         @extend %tweet-account;
         font-family: $number-font;
         vertical-align: middle;
-        // display:flex;
-        // align-items: center;
       }
       .intro{
         @extend %tweet-text;
