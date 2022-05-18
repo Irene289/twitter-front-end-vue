@@ -37,6 +37,9 @@
               placeholder="請輸入使用者名稱"
               required
             />
+            <div class="text-length" :class="{ waring: isExceed}">
+              {{textWarning(user.name.length)}}
+              {{user.name.length}}/50</div>
           </div>
 
           <div class="setting-form setting-form__input-email">
@@ -75,9 +78,9 @@
           <button
             class="btn btn-setting"
             type="submit"
-            :disabled="isProcessing"
+            :disabled="isProcessing || isExceed"
           >
-            {{ isProcessing ? "處理中..." : "儲存" }}
+            {{ isProcessing ? "處理中" : "儲存" }}
           </button>
         </form>
 
@@ -94,20 +97,6 @@ import userAPI from '../apis/user'
 import { Toast } from "../utils/helpers"
 import { mapState } from "vuex"
 
-// const dummyData = {
-//   id: 2,
-//   account: "user1",
-//   name: "test",
-//   email: "user1@example.com",
-//   nickname: "Howell",
-//   coverImg: "https://i.imgur.com/bn8Hy8n.png",
-//   avatarImg: "https://i.imgur.com/xNiJ22V.png",
-//   introduction: "test",
-//   role: "user",
-//   createdAt: "2022-05-17T06:04:56.000Z",
-//   updatedAt: "2022-05-17T10:15:43.476Z",
-// }
-
 export default {
   name: "Setting",
   components: {
@@ -123,31 +112,24 @@ export default {
         password: "",
         passwordCheck: "",
       },
-      allUser: [],
       isProcessing: false,
+      isExceed: false
     }
   },
+  // watch: {
+  //   user: {
+  //     handler: function() {
+  //       this.textWarning()
+  //     },
+  //     deep: true
+  //   }
+  // },
   created() {
     if (this.currentUser.id === -1) return
     const { id } = this.$route.params
     this.setUser(id)
-
-    // let i = 0
-    // while( i < 10 ) {
-    //   this.fetchAllUser(i)
-    //   i++
-    // } 
   },
   methods: {
-    // async fetchAllUser(id) {
-    //   try {
-    //     const { data } = await userAPI.get({ id })
-    //     console.log(data)
-
-    //   } catch (error) {
-    //     console.log("Error", error)
-    //   }
-    // },
     setUser() {
       const { id, account, name, email } = this.currentUser;
 
@@ -157,6 +139,14 @@ export default {
         name,
         email,
       }
+    },
+    textWarning(length) {
+      if (!length) {
+        this.isExceed = false
+      } else if (length > 50) {
+        this.isExceed = true
+        length = length.toString().slice(0, 50)
+      } 
     },
     async handleSubmit(e) {
       try {
@@ -175,7 +165,6 @@ export default {
             title: "請輸入所有欄位",
           });
           this.isProcessing = false;
-          return;
         }
 
         // 密碼錯誤處理
@@ -189,12 +178,13 @@ export default {
 
         const form = e.target
         const formData = new FormData(form)
-        // console.log(formData)
+        console.log(formData)
 
         const { data } = await userAPI.update({
           userId: this.user.id,
           formData,
         })
+        console.log(data)
 
         if (data.status !== "success") {
           throw new Error(data.message)
@@ -204,7 +194,7 @@ export default {
             title: '修改完成'
           })
         }
-        console.log(data)
+        
         this.isProcessing = false
       } catch (error) {
         this.isProcessing = false
@@ -272,6 +262,13 @@ main {
     width: 100%;
   }
 }
+.text-length {
+  @extend %form-label;
+  align-self: flex-end;
+}
+.waring {
+  color: #FC5A5A;
+}
 .btn {
   @extend %button-orange;
   width: 88px;
@@ -279,5 +276,8 @@ main {
   margin: 32px 24px auto auto;
   font-size: 20px;
   line-height: 30px;
+  &:disabled {
+    background: $form-input-placeholder;
+  }
 }
 </style>
