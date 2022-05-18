@@ -65,6 +65,8 @@ export default new Vuex.Store({
           icon: 'error',
           title: '無法取得當前用戶，請稍後再試'
         })
+        console.error('can not fetch user information')
+        commit('revokeAuthentication')
         return false
       }
       

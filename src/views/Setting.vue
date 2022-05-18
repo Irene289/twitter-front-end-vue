@@ -177,10 +177,16 @@ export default {
         }
         const form = e.target
         const formData = new FormData(form)
-        const {data, statusText} = await userAPI.update({
+
+        
+
+        const { data, statusText } = await userAPI.update({
           userId: this.user.id,
           formData,
         })
+
+        console.log(data)
+
         if (statusText !== "OK") {
           throw new Error(data.message)
         } else {

@@ -3,65 +3,59 @@
     <!-- <div class="container">
       <div class="modal row">
         <form class="modal-content col-6" action=""> -->
-          <!-- <div class="modal-content-cancel"> -->
-            <!-- <slot name="closeBtn"> -->
-              <!-- <button class="btn">
+    <!-- <div class="modal-content-cancel"> -->
+    <!-- <slot name="closeBtn"> -->
+    <!-- <button class="btn">
                 <img src="" alt="">
               </button>   -->
-            <!-- </slot> -->
-          <!-- </div> -->
+    <!-- </slot> -->
+    <!-- </div> -->
 
-          <!-- 推文 -->
-          <slot name="isReplyModel">
-            <div class="tweet-div">
-            
-              <div class="tweet-div-avatar">
-                <slot name="replytoAvatarImg">
-                  <img class="avatar" src="" alt="">
-                </slot>
-              </div>
-              <div class="tweet-div-content">
-                <div class="content-info">
-                  <slot name="replyto">
-                    <p class="content-info-name">Apple</p>
-                    <p class="content-info-account">@apple</p>
-                    <p class="content-info-time">3 小時</p>
-                  </slot>
-                </div>
-                <div class="content-text">
-                  <p><slot name="replytoText"></slot></p>
-                </div>
-                <div class="content-replyto">
-                  回覆給 <span><slot name="replytoAccount">
-                    </slot></span>
-                </div>
-              </div>
-            </div>
+    <!-- 推文 -->
+    <slot name="isReplyModel">
+      <div class="tweet-div">
+        <div class="tweet-div-avatar">
+          <slot name="replytoAvatarImg">
+            <img class="avatar" src="" alt="" />
           </slot>
-          <!-- 回覆 -->
-          <div class="reply-div">
-            <slot name="avatarImg">
-              <img
-                class="modal-content-avatar" src="" alt=""
-              />
+        </div>
+        <div class="tweet-div-content">
+          <div class="content-info">
+            <slot name="replyto">
+              <p class="content-info-name">Apple</p>
+              <p class="content-info-account">@apple</p>
+              <p class="content-info-time">3 小時</p>
             </slot>
-            <slot name="text">
-              <textarea
-                class="scrollbar"
-                name="tweet"
-              >
-              </textarea>
-            </slot>
-            <slot name="alert">
-              <p class="modal-alert"></p>
-            </slot>
-            <!-- <button 
+          </div>
+          <div class="content-text">
+            <p><slot name="replytoText"></slot></p>
+          </div>
+          <div class="content-replyto">
+            回覆給 <span><slot name="replytoAccount"> </slot></span>
+          </div>
+        </div>
+      </div>
+    </slot>
+    <!-- 回覆 -->
+    <div class="reply-div">
+      <slot name="avatarImg">
+        <img class="modal-content-avatar" src="" alt="" />
+      </slot>
+      <slot name="text">
+        <textarea class="scrollbar" name="tweet"> </textarea>
+      </slot>
+      <slot name="alert">
+        <span class="text-length"></span>
+        <span class="text-empty modal-alert"></span>
+        <span class="text-exceed modal-alert"></span>
+      </slot>
+      <!-- <button 
               class="btn modal-tweet"
             >
               回覆
             </button> -->
-          </div>
-        <!-- </form>
+    </div>
+    <!-- </form>
       </div>
     </div> -->
   </main>
@@ -69,27 +63,27 @@
 
 <script>
 export default {
-name: 'TweetModal',
-// props: {
-//   dNoneReplyModal: {
-//     type: Boolean,
-//     default: true
-//   }
-// },
-}
+  name: "TweetModal",
+  // props: {
+  //   dNoneReplyModal: {
+  //     type: Boolean,
+  //     default: true
+  //   }
+  // },
+};
 </script>
 
 
 <style lang="scss" scoped>
 @import "../assets/scss/basic.scss";
 
-main{
+main {
   max-width: 1140px;
-  margin: 0 auto;    
+  margin: 0 auto;
 }
 
 // .modal {
-//   background-color: $modal-background; 
+//   background-color: $modal-background;
 //   position: fixed;
 //   top: 0;
 //   right: 0;
@@ -123,15 +117,15 @@ main{
   width: 100%;
   display: flex;
   // padding: 16px;
-  
+
   &-avatar {
     margin-right: 8px;
     position: relative;
     &::after {
-      content: '';
+      content: "";
       display: block;
       width: 2px;
-      height: calc(100% - 4*16px);
+      height: calc(100% - 4 * 16px);
       background: $form-input-placeholder;
       position: absolute;
       top: calc(50px + 32px);
@@ -151,11 +145,12 @@ main{
       @extend %tweet-name;
       margin-right: 8px;
     }
-    &-account, &-time {
+    &-account,
+    &-time {
       @extend %tweet-account;
     }
     &-account::after {
-      content: '・';
+      content: "・";
       font-weight: 700;
     }
   }
@@ -183,19 +178,19 @@ main{
   // padding: 0 16px 16px 16px;
   margin: 0 16px 16px 16px;
   position: relative;
-   .modal-content-avatar {
-      width: 50px;
-      height: 50px;
-      border-radius: 50%;
-      margin-top: 32px;
-      margin-left: 8px;
-   }
+  .modal-content-avatar {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    margin-top: 32px;
+    margin-left: 8px;
+  }
 }
 textarea {
   width: calc(100%);
   height: 250px;
   border: none;
-  resize : none;
+  resize: none;
   color: $font-black;
   font-weight: 400;
   font-size: 16px;
@@ -213,7 +208,7 @@ textarea {
 //     width: 2px;
 //   }
 //   &::-webkit-scrollbar-track {
-//     box-shadow: inset 0 0 1px $scrollbar; 
+//     box-shadow: inset 0 0 1px $scrollbar;
 //     border-radius: 4px;
 //   }
 //   &::-webkit-scrollbar-thumb {
