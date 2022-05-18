@@ -91,6 +91,7 @@ export default {
         
       }catch(error){
         this.isProcessing = false
+        console.log(error.toJSON() )
         if(error.response.status === 500){
           Toast.fire({
             icon:'warning',

@@ -210,6 +210,7 @@ export default {
   computed: {
     ...mapState(["currentUser"]),
   },
+ 
 };
 </script>
 
