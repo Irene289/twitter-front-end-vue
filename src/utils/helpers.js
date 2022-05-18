@@ -6,8 +6,10 @@ import Swal from 'sweetalert2'
 
 
 const axiosInstance = axios.create({
-  baseURL: process.env.VUE_APP_BASEURL
+  // baseURL: process.env.VUE_APP_BASEURL
+  baseURL: 'https://cryptic-castle-05556.herokuapp.com/api/'
 })
+
 axiosInstance.interceptors.request.use(config => {
   const token = localStorage.getItem('token')
   if(token){
