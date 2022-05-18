@@ -7,7 +7,7 @@
       <form action="">
         <img :src="user.avatarImg" alt="" />
         <label for=""></label>
-        <textarea v-model="text" name="tweet" placeholder="有什麼新鮮事？">
+        <textarea v-model="text" name="tweet" placeholder="有什麼新鮮事？" @blur="onBlur" >
         </textarea>
         <span class="text-length">{{text.length}}/140</span>
         <span v-if="isEmpty" class="text-empty">內容不可空白</span>
@@ -112,9 +112,9 @@
               </textarea>
             </template>
             <template v-slot:alert>
-              <p class="modal-alert">
-                {{ isReplyModel ? "內容不可空白" : "字數不可超過 140 字" }}
-              </p>
+              <span class="text-length">{{ isReplyModel ? textReply.length : text.length }}/140</span>
+              <span v-if="isModalEmpty" class="text-empty modal-alert">內容不可空白</span>
+              <span v-if="isModalExceed" class="text-exceed modal-alert">字數不可超過 140 字</span>
             </template>
           </TweetModal>
 
@@ -137,27 +137,6 @@
         </form>
       </div>
     </div>
-
-    <!-- <TweetModal :d-none="dNone" @tweet-modal="tweetModal">
-      <template v-slot:avatarImg>
-        <img class="modal-content-avatar" :src="user.avatarImg" alt="" />
-      </template>
-      <template v-slot:text>
-        <textarea
-          v-model="textTweet"
-          class="scrollbar"
-          name="tweet"
-          placeholder="有什麼新鮮事？"
-        >
-        </textarea>
-      </template>
-      <template v-slot:alert>
-        <p class="modal-alert">字數不可超過 140 字</p>
-      </template>
-      <template v-slot:btn>
-        <button class="btn modal-tweet" @click.stop.prevent>推文</button>
-      </template>
-    </TweetModal> -->
   </div>
 </template>
 
@@ -184,7 +163,7 @@ export default {
       },
       text: "",                // 推文
       textReply: "",           // 回覆
-      tweets: [],              // 全部推文
+      tweets: {},              // 全部推文
       tweet: {                 // 單一推文
         id: -1,
         description: "",
@@ -193,7 +172,9 @@ export default {
           avatarImg: '',
           name: '',
           account: '',
-        }
+        },
+        Replies: [],
+        likeTotal: 0
       }, 
       newTweet: {},            // 新增推文
       newReply: {},            // 新增推文回覆
@@ -202,30 +183,26 @@ export default {
       placeholder: "",         // 控制推文跟回覆的 placeholder
       isProcessing: false,     // 按鈕送出
       isEmpty: false,
-      isExceed: false 
+      isExceed: false,
+      isSubmit: false,
+      isModalEmpty: false,
+      isModalExceed: false
     }
   },
   watch: {
-    newTweet(newVal) {
-      console.log('newVal: ', newVal)
-      if (newVal) {
-        const { id, description, User, createdAt } = newVal
-        const { UserId } = User
-
-        // this.tweets = [
-        //   ...this.tweets,
-        //   { id, description, User: {UserId}, createdAt }
-        // ]
-        // console.log(this.tweets)
-
-        this.tweets.push({ id, description, User: {UserId}, createdAt })
-      }
-    },
     text: {
       handler: function() {
         this.textWarning()
+        // this.isSubmit = false
       },
-      deep: true
+      // deep: true
+    },
+    textReply: {
+      handler: function() {
+        this.modalWarning()
+        // this.isSubmit = false
+      },
+      // deep: true
     }
   },
   created() {
@@ -263,22 +240,37 @@ export default {
         this.isEmpty = false
         this.isExceed = true
         this.isProcessing = false
-      } else {
+      } 
+      else {
         this.isEmpty = false
         this.isExceed = false
       }
       return
     },
+    modalWarning(){
+      if (!this.textReply) {
+        this.isModalEmpty = true
+        this.isModalExceed = false
+        this.isProcessing = false
+      } else if (this.textReply.length > 140) {
+        this.isModalEmpty = false
+        this.isModalExceed = true
+        this.isProcessing = false
+      } 
+      else {
+        this.isModalEmpty = false
+        this.isModalExceed = false
+      }
+      return
+    },
+    onBlur() {
+      this.isEmpty = false
+    },
     // 推一則推文
     async createTweet() {
       try {
-        // 內容字數警告
-        this.textWarning()
-
-        // const { id, description, UserId, createdAt } = payload
         const { data } = await tweetAPI.createTweet({
           description: this.text,
-          // User: { UserId: this.currentUser.id }
           UserId: this.currentUser.id
         })
 
@@ -287,20 +279,25 @@ export default {
         this.newTweet = {
           id,
           description,
-          User: { UserId },
+          User: { id: UserId },
           createdAt,
         }
+
+        this.tweets = [
+          {...this.newTweet},
+          ...this.tweets
+        ]
 
         if (data.status !== "success") {
           throw new Error(data.message)
         }
-        this.text = ""
+        this.text = "" 
       } catch (error) {
         console.log(error);
         Toast.fire({
           icon: "error",
           title: "暫時無法推文",
-        });
+        })
       }
     },
     // 回覆一則推文
@@ -309,24 +306,49 @@ export default {
         // 內容字數警告
         this.textWarning()
 
-        // console.log(this.currentUser)
-        console.log(TweetId)
         // const { id, comment, UserId, TweetId, createdAt } = payload
 
         const { data } = await tweetAPI.createReply({ 
-          TweetId: TweetId, 
+          TweetId, 
           comment: this.textReply, 
           UserId: this.currentUser.id,
-          // TweetId,
         })
 
-        // this.newReply = {
-        //   // id,
-        //   comment: this.textReply,
-        //   UserId,
-        //   TweetId,
-        //   createdAt,
-        // }
+        const { id, comment, UserId, createdAt } = data.data
+
+        this.newReply = {
+          id,
+          comment,
+          User: {
+            id: UserId,
+            createdAt
+          },
+        }
+
+        // this.tweets = this.tweets.map( tweets => {
+        //   if ( tweets.id !== TweetId ) {
+        //     return
+        //   } else {
+        //     return {
+        //       ...tweets,
+        //       Replies: tweets.Replies + 1
+        //     }
+        //   }
+        // })
+
+        this.tweet = {
+          Replies: [
+            {...this.newReply},
+            ...this.tweet.Replies
+          ],
+          replyTotal: replyTotal + 1
+        }
+        
+        // this.tweet.replyTotal = this.tweet.replyTotal + 1
+        // this.tweets.Replies = this.tweet.replyTotal
+
+        console.log(TweetId)
+        console.log(this.tweet.id)
 
         if (data.status !== "success") {
           throw new Error(data.message)
@@ -366,15 +388,17 @@ export default {
     // 開啟回覆 Modal
     async replyModal(id) {
       try {
+        this.modalWarning()
         // console.log(id)
-        const { data, statusText } = await tweetAPI.getReply({ id });
-        console.log(data);
+        const { data, statusText } = await tweetAPI.getReply({ id })
+        // console.log(data)
 
         if (statusText !== "OK") {
           throw new Error(statusText);
         }
 
         this.tweet = data;
+
         this.dNoneReplyModal = !this.dNoneReplyModal;
         this.isReplyModel = true;
         this.placeholder = "推你的回覆";
