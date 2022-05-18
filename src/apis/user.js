@@ -13,9 +13,9 @@ export default {
   getReplies({id}){
     return apiHelper.get(`/users/${id}/replied_tweets`)
   },
-  // update({ userId, formData }) {
-  //   return apiHelper.put(`/users/${userId}`, formData)
-  // },
+  updateProfile({ userId, formData }) {
+    return apiHelper.put(`/users/${userId}`, formData)
+  },
   update({ userId, formData }) {
     return apiHelper.put(`/users/${userId}/account`, formData)
   },
