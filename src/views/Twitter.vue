@@ -9,7 +9,7 @@
         <label for=""></label>
         <textarea v-model="text" name="tweet" placeholder="有什麼新鮮事？" @blur="onBlur" >
         </textarea>
-        <span class="text-length">{{text.length}}/140</span>
+        <!-- <span class="text-length">{{text.length}}/140</span> -->
         <span v-if="isEmpty" class="text-empty">內容不可空白</span>
         <span v-if="isExceed" class="text-exceed">字數不可超過 140 字</span>
         <button 
@@ -74,7 +74,6 @@
               <img src="../assets/static/images/orangeClose@2x.png" alt="" />
             </button>
           </div>
-
           <TweetModal>
             <!--   推文 -->
             <template v-slot:isReplyModel v-if="!isReplyModel">
@@ -112,15 +111,17 @@
               </textarea>
             </template>
             <template v-slot:alert>
-              <span class="text-length">{{ isReplyModel ? textReply.length : text.length }}/140</span>
-              <span v-if="isModalEmpty" class="text-empty modal-alert">內容不可空白</span>
-              <span v-if="isModalExceed" class="text-exceed modal-alert">字數不可超過 140 字</span>
+              <!-- <span class="text-length">{{ isReplyModel ? textReply.length : text.length }}/140</span> -->
+              <span v-show="isModalEmpty" class="text-empty modal-alert warning">內容不可空白</span>
+              <span v-show="isModalExceed" class="text-exceed modal-alert warning">字數不可超過 140 字</span>
             </template>
           </TweetModal>
-
+         
+          <div class="btn-group">
+          </div>
           <button
             v-if="isReplyModel"
-            class="btn modal-tweet"
+            class="btn modal-tweet button-reply"
             @click.stop.prevent="handleReply(tweet.id)"
             :disabled="isProcessing"
           >
@@ -132,7 +133,7 @@
             @click.stop.prevent="createTweet2"
             :disabled="isProcessing"
           >
-            {{ isProcessing ? "處理中" : "推文" }}
+            {{isProcessing ? "處理中" : "推文" }}
           </button>
         </form>
       </div>
@@ -187,20 +188,27 @@ export default {
     }
   },
   watch: {
-    text: {
-      handler: function() {
-        this.textWarning()
-        // this.isSubmit = false
-      },
-      // deep: true
+    text(){
+      this.textWarning()
     },
-    textReply: {
-      handler: function() {
-        this.modalWarning()
-        // this.isSubmit = false
-      },
-      // deep: true
-    }
+     textReply(){
+       this.modalWarning()
+     }
+    // text: {
+    //   handler: function() {
+    //     this.textWarning()
+    //     // this.isSubmit = false
+    //   },
+    //   // deep: true
+    // },
+    // textReply: {
+    //   handler: function() {
+    //     this.modalWarning()
+    //     // this.isSubmit = false
+    //   },
+    //   deep: true
+    // },
+    
   },
   created() {
     // this.fetchUser()
@@ -510,12 +518,13 @@ export default {
   left: 0;
 }
 .modal-content {
+  position: relative;
   background-color: $white;
   border-radius: 14px;
   margin: auto;
   margin-top: 56px;
   padding: 0;
-  box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.25);
+  // box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.25);
   &-cancel {
     width: 100%;
     border-bottom: 1px solid $border-grey;
@@ -535,5 +544,11 @@ export default {
   @extend %button-orange;
   min-width: 76px;
   height: 40px;
+  &.button-reply{
+    position: absolute;
+    right: 1rem;
+    bottom: 1rem;
+  }
+  
 }
 </style>

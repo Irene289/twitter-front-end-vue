@@ -208,7 +208,7 @@ export default {
       async afterSubmit(formData){    
         try{
           this.isProcessing = true
-          const {data, statusText} = await userAPI.update({
+          const {data, statusText} = await userAPI.updateProfile({
             userId: this.currentUser.id,
             formData
           })

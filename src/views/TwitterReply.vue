@@ -91,14 +91,20 @@
               <div class="tweet-div"></div>
             </template> -->
             <template v-slot:replytoAvatarImg>
-              <img class="avatar" :src="user.avatarImg" alt="" />
+              <img class="avatar top-avatar" :src="user.avatarImg" alt="" />
             </template>
             <template v-slot:replyto>
-              <p class="content-info-name">
+              <div class ="modal-topic-content"> 
+                <div class="modal-user-content">
+                  <p class="content-info-name">{{ user.name }}</p>
+                  <p class="content-info-account">@{{ user.account }}</p>
+                  <p class="content-info-time">{{ tweet.createdAt | fromNow }}</p>
+                </div>                             
+                <p class="content-info-description">
                 {{ tweet.description }}
-              </p>
-              <p class="content-info-account">@{{ user.account }}</p>
-              <p class="content-info-time">{{ tweet.createdAt | fromNow }}</p>
+                </p>
+              </div>
+             
             </template>
             <template v-slot:replytoAccount> @{{ user.account }} </template>
 
@@ -119,7 +125,7 @@
               </textarea>
             </template>
             <template v-slot:alert>
-              <p class="modal-alert">內容不可空白</p>
+              <p v-show="isEmpty" class="modal-alert">內容不可空白</p>
             </template>
           </TweetModal>
 
@@ -127,7 +133,7 @@
             class="btn modal-tweet"
             @click.stop.prevent="handleReply(tweet.id)"
               :disabled="isProcessing"
-            >
+            > 
               {{ isProcessing ? "處理中" : "回覆" }}
           </button>
         </form>
@@ -166,7 +172,8 @@ export default {
       textReply: "",
       // isReplyModel: true,
       dNoneReplyModal: true,
-      isProcessing: false
+      isProcessing: false,
+      isEmpty: false
     };
   },
   created() {
@@ -213,6 +220,7 @@ export default {
       try {
         // 內容空白處理
         if (!this.textReply) {
+          this.isEmpty = true
           Toast.fire({
             icon: "warning",
             title: "內容不可空白",
@@ -256,6 +264,30 @@ export default {
         Toast.fire({
           icon: "error",
           title: "暫時無法回覆推文",
+        })
+      }
+    },
+    //TODO:功能待後端補資料
+    async likeTweet(id){
+      try{
+        const {data} = await tweetAPI.likeTweet({id})
+        console.log(data)
+        this.likes = this.likes.map(tweet => {
+          if(tweet.TweetId !== id){
+            return tweet
+          } else if (tweet.TweetId === id){
+            console.log()
+            return {
+            ...tweet,
+            likeUnlike: true,
+              
+            }
+          }            
+        })
+      }catch(error){
+        Toast.fire({
+          icon: 'error',
+          title: '無法對推文點讚，請稍後再試'
         })
       }
     },
@@ -392,6 +424,7 @@ export default {
   left: 0;
 }
 .modal-content {
+  position: relative;
   background-color: $white;
   border-radius: 14px;
   margin: auto;
@@ -408,14 +441,33 @@ export default {
     margin: 16px;
   }
   .avatar {
+    position: absolute;
+    left: 24px;
     width: 50px;
     height: 50px;
     border-radius: 50%;
+    &.top-avatar{
+      margin-top: 16px;
+    }
+  }
+  .modal-topic-content{
+    display: flex;
+    flex-flow: column;
+  }
+  .modal-user-content{
+    display: flex;  
+  }
+  .content-info-description{
+    line-height: 26px;
+    margin-top: 8px;
   }
 }
 // 回覆按鈕
 .modal-tweet {
   @extend %button-orange;
+  position: absolute;
+  right:1rem;
+  bottom: 1rem;
   min-width: 76px;
   height: 40px;
 }

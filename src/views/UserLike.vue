@@ -1,7 +1,7 @@
 <template>
   <div class="user-like scrollbar">
     <UserTweetCard 
-      v-for="like in likes"
+      v-for="like in likeFilter"
       :key="like.TweetId"
       >
       <template v-slot:avatar>
@@ -128,6 +128,11 @@ export default {
       visit(id, pathName){
          this.visitUserPage(id, pathName)
       }
+  },
+  computed:{
+    likeFilter(){
+      return this.likes.filter(like => like.likeUnlike )
+    }
   },
   created(){
     const {id} = this.$route.params

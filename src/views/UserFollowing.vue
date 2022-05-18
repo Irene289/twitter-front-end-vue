@@ -1,7 +1,7 @@
 <template>
   <div class="follower-container">
     <UserFollowCard
-      v-for="following in followings"
+      v-for="following in followingFilter"
       :key="following.id"
     >
        <template v-slot:avatar>
@@ -134,11 +134,13 @@ export default {
     }
   },
   computed:{
-    ...mapState(['currentUser'])
+    ...mapState(['currentUser']),
+    followingFilter(){
+      return this.followings.filter(user => user.is_following)
+    }
   },
   created(){
     const {id} = this.$route.params
-    console.log(id)
     this.fetchUserFollowings(id)
   }
 }
