@@ -120,14 +120,6 @@ export default {
   },
   computed:{
     ...mapState(['currentUser'])
-  },
-  watch:{
-    topUsers:{
-      deep: true,
-      handler:function(){
-        this.fetchTopUsers(10)
-      }
-    }
   }
   //TODO:個人資料編輯後topUsers名稱沒有同步，
 }
