@@ -175,10 +175,8 @@ export default {
           })
           this.isProcessing = false
         }
-
         const form = e.target
         const formData = new FormData(form)
-        console.log(formData)
 
         const { data, statusText } = await userAPI.update({
           userId: this.user.id,

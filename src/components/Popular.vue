@@ -120,6 +120,7 @@ export default {
   },
   computed:{
     ...mapState(['currentUser'])
+<<<<<<< HEAD
   },
   
   // 不要用watch來呼叫api
@@ -131,6 +132,9 @@ export default {
   //     }
   //   }
   // }
+=======
+  }
+>>>>>>> d79f33f2215d7f44b5955e3308d5fda4e9c1a3d3
   //TODO:個人資料編輯後topUsers名稱沒有同步，
 }
 </script>

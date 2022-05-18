@@ -134,15 +134,6 @@ export default {
       this.visitUserPage(id, pathName)
     }   
   },
-  watch:{
-    followers:{
-      deep: true,
-      handler:function(){
-        const {id} = this.$route.params
-        this.fetchUserFollowers(id)
-      }
-    }
-  },
   computed:{
     ...mapState(['currentUser'])
   },
