@@ -1,6 +1,8 @@
 <template>
   <div class="container">
-    <form class="regist-form" action="">
+    <form 
+      @submit.stop.prevent="handleSubmit"
+      class="regist-form" action="">
       <div class="logo">
         <img
           class="regist-form__logo-img"
@@ -15,27 +17,27 @@
 
       <div class="regist-form__div regist-form__input-account">
         <label for="">帳號</label>
-        <input type="text" placeholder="請輸入帳號" />
+        <input v-model="account" type="text" name="account" placeholder="請輸入帳號" />
       </div>
 
       <div class="regist-form__div regist-form__input-name">
         <label for="">名稱</label>
-        <input type="text" placeholder="請輸入使用者名稱" />
+        <input v-model="name" name="name" type="text" placeholder="請輸入使用者名稱" />
       </div>
 
       <div class="regist-form__div regist-form__input-email">
         <label for="">Email</label>
-        <input type="text" placeholder="請輸入 Email" />
+        <input v-model="email" name="email" type="text" placeholder="請輸入 Email" />
       </div>
 
       <div class="regist-form__div regist-form__input-password">
         <label for="">密碼</label>
-        <input type="text" placeholder="請設定密碼" />
+        <input v-model="password" name="password" type="text" placeholder="請設定密碼" />
       </div>
 
       <div class="regist-form__div regist-form__input-password-check">
         <label for="">密碼確認</label>
-        <input type="text" placeholder="請再次輸入密碼" />
+        <input v-model="passwordCheck" type="passwordCheck" name="passwordCheck" placeholder="請再次輸入密碼" />
       </div>
 
       <button class="btn btn-regist" type="submit" :disabled="isProcessing">
@@ -54,7 +56,57 @@
 </template>
 
 <script>
-export default {};
+import authorizationAPI from '../apis/authorization'
+import {Toast} from '../utils/helpers' 
+export default {
+  name: 'Regist',
+  data(){
+    return{
+      isProcessing: false,
+      account: "",
+      name: "",
+      email: "",
+      password: "",
+      passwordCheck: "",
+    }
+  },
+  methods:{
+    async handleSubmit(){
+      try{
+        this.isProcessing = true
+        const {data} = await authorizationAPI.regist({
+          account: this.account,
+          name: this.name,
+          email: this.email,
+          password: this.password,
+          passwordCheck: this.passwordCheck
+        })
+        if(data.status !== 'success'){
+          throw new Error (data.data.status )
+        } 
+        //自動登入功能   
+        localStorage.setItem('token', data.data.token) 
+        // this.$store.commit('setToken')
+        this.$router.push('/signin')       
+        
+      }catch(error){
+        this.isProcessing = false
+        if(error.response.status === 500){
+          Toast.fire({
+            icon:'warning',
+            title:'此帳戶已重複註冊'
+          })
+        }else{
+          Toast.fire({
+            icon:'error',
+            title:'暫時無法註冊，請稍後再試'
+          })
+        }       
+      }
+    }
+  }
+
+};
 </script>
 
 <style lang="scss" scoped>
@@ -76,6 +128,9 @@ export default {};
   text-shadow: 0px 4px 4px rgba(0, 0, 0, 0.25);
   margin-top: 24px;
   margin-bottom: 8px;
+  &.warning{
+  color: red;
+  }
 }
 .regist-form__div {
   @extend %input-block;
@@ -96,6 +151,10 @@ export default {};
     content: "";
     @extend %input-bottom;
   }
+  &:hover::after{
+    background: transparent;
+    @extend %focus;
+  }
 }
 .btn {
   @extend %button-orange;
@@ -112,4 +171,5 @@ export default {};
   line-height: 24px;
   text-decoration: none;
 }
+
 </style>

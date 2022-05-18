@@ -124,6 +124,12 @@
   width: 30px;
   height: 30px;
 }
+%focus{
+  border-bottom: 2px solid #50B5FF;
+}
+%warning{
+  border-bottom: 2px solid #FC5A5A;
+}
 // scrollbar
 ::-webkit-scrollbar {
   width: 0px;

@@ -29,6 +29,10 @@ export default new Vuex.Store({
       state.token = localStorage.getItem('token'), 
       state.isAuthenticated = true
     },
+    //自動登入功能
+    // setToken(state) {
+    //   state.token = localStorage.getItem('token')
+    // },
     revokeAuthentication(state){
       //清空state
       state.currentUser = {}
@@ -54,7 +58,7 @@ export default new Vuex.Store({
           avatarImg,
           is_admin          
         })
-        // console.log('currentUser: ',this.state.currentUser)
+       
         return true
       }catch(error){
         Toast.fire({

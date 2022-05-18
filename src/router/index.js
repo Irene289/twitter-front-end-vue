@@ -127,9 +127,14 @@ router.beforeEach( async(from, to, next)=>{
   const storageToken = localStorage.getItem('token')
   const stateToken = store.state.token
   let isAuthenticated = store.state.isAuthenticated
-  console.log(isAuthenticated)
   // const noNeedAuthenticated = ['signin', 'regist', 'admin']
-
+  console.log(isAuthenticated)
+  //註冊完直接跳轉
+  // if(!store.state.currentUser.is_admin){
+  //   isAuthenticated = await store.dispatch('fetchCurrentUser')
+  //   console.log(isAuthenticated)
+    
+  // }
 
   if(storageToken && storageToken!==stateToken) {
     isAuthenticated = await store.dispatch('fetchCurrentUser')
