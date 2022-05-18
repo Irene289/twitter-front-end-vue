@@ -13,12 +13,12 @@ export default {
   getReplies({id}){
     return apiHelper.get(`/users/${id}/replied_tweets`)
   },
-  // update({ userId, formData }) {
-  //   return apiHelper.put(`/users/${userId}`, formData)
-  // },
   update({ userId, formData }) {
-    return apiHelper.put(`/users/${userId}/account`, formData)
+    return apiHelper.put(`/users/${userId}`, formData)
   },
+  // update({ userId }) {
+  //   return apiHelper.put(`/users/${userId}/account`)
+  // },
   getLikes({id}){
     return apiHelper.get(`/users/${id}/likes`)
   },

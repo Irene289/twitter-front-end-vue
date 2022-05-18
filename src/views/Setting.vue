@@ -20,7 +20,7 @@
           <div class="setting-form setting-form__input-account">
             <label for="">帳號</label>
             <input
-              v-model="user.account"
+              v-model="currentUser.account"
               type="text"
               name="account"
               placeholder="請輸入帳號"
@@ -31,7 +31,7 @@
           <div class="setting-form setting-form__input-name">
             <label for="">名稱</label>
             <input
-              v-model="user.name"
+              v-model="currentUser.name"
               type="text"
               name="name"
               placeholder="請輸入使用者名稱"
@@ -45,7 +45,7 @@
           <div class="setting-form setting-form__input-email">
             <label for="">Email</label>
             <input
-              v-model="user.email"
+              v-model="currentUser.email"
               type="email"
               name="email"
               placeholder="請輸入 Email"
@@ -56,7 +56,7 @@
           <div class="setting-form setting-form__input-password">
             <label for="">密碼</label>
             <input
-              v-model="user.password"
+              v-model="currentUser.password"
               type="password"
               name="password"
               placeholder="請設定密碼"
@@ -67,7 +67,7 @@
           <div class="setting-form setting-form__input-password-check">
             <label for="">密碼再確認</label>
             <input
-              v-model="user.passwordCheck"
+              v-model="currentUser.passwordCheck"
               type="password"
               name="passwordCheck"
               placeholder="請再次輸入密碼"
@@ -104,14 +104,7 @@ export default {
   },
   data() {
     return {
-      user: {
-        id: -1,
-        account: "",
-        name: "",
-        email: "",
-        password: "",
-        passwordCheck: "",
-      },
+      user: {},
       isProcessing: false,
       isExceed: false
     }
@@ -124,20 +117,37 @@ export default {
   //     deep: true
   //   }
   // },
+  watch: {
+    currentUser (user) {
+      if (user.id !== this.currentUser.id) return
+
+      const { id } = this.$route.params
+      this.setUser(id)
+    }
+  },
   created() {
     if (this.currentUser.id === -1) return
     const { id } = this.$route.params
     this.setUser(id)
   },
+  beforeRouteUpdate (to, from, next) {
+    if (this.currentUser.id === -1) return
+    // console.log({to, from})
+    const { id } = to.params
+    this.setUser(id)
+    next()
+  },
   methods: {
-    setUser() {
-      const { id, account, name, email } = this.currentUser;
-
+    setUser(userId) {
+      const { id, name, account } = this.currentUser
       this.user = {
         id,
-        account,
         name,
-        email,
+        account
+      }
+      if (userId.toString() !== id.toString()) {
+        this.$router.push({ name: 'not-fount' })
+        return
       }
     },
     textWarning(length) {
@@ -177,15 +187,17 @@ export default {
         }
         const form = e.target
         const formData = new FormData(form)
+        console.log(formData)
+        // for (let [name, value] of formData) {
+        //   console.log(name + ': ' + value)
+        // }
 
-        
+        console.log(this.user)
 
         const { data, statusText } = await userAPI.update({
           userId: this.user.id,
           formData,
         })
-
-        console.log(data)
 
         if (statusText !== "OK") {
           throw new Error(data.message)
@@ -199,11 +211,14 @@ export default {
         this.isProcessing = false
       } catch (error) {
         this.isProcessing = false
-        console.log("Error", error);
+        if(error.response.status === 500){
+          console.log(error)
+          console.log(error.response)
+        }
         Toast.fire({
           icon: "error",
           title: "無法編輯，請稍後再試",
-        });
+        })
       }
     },
   },
