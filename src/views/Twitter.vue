@@ -341,7 +341,7 @@ export default {
             {...this.newReply},
             ...this.tweet.Replies
           ],
-          replyTotal: replyTotal + 1
+          // replyTotal: replyTotal + 1
         }
         
         // this.tweet.replyTotal = this.tweet.replyTotal + 1
