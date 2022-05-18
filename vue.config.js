@@ -7,8 +7,13 @@ console.log(process.env.VUE_APP_BASEURL)
 // }
 
 module.exports = {
-  publicPath: '/'
+  publicPath: process.env.NODE_ENV === 'production'
+  ? './'
+  : '/'
+  
 }
+
+
 
 module.exports = {
   configureWebpack: {
