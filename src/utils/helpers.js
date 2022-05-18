@@ -6,8 +6,7 @@ import Swal from 'sweetalert2'
 
 
 const axiosInstance = axios.create({
-  // baseURL: process.env.VUE_APP_BASEURL
-  baseURL: 'https://cryptic-castle-05556.herokuapp.com/api/'
+  baseURL: process.env.VUE_APP_BASEURL
 })
 
 axiosInstance.interceptors.request.use(config => {
@@ -18,6 +17,18 @@ axiosInstance.interceptors.request.use(config => {
   return config
 }, error => {
   Promise.reject(error)
+})
+
+
+axiosInstance.interceptors.response.use( response => {
+  return response;
+}, function (error) {
+  if (error.response.status === 500) {
+    console.log('HI, here is helpers.js')
+    return error.response
+  } else {
+    return Promise.reject(error);
+  }
 })
 
 export const apiHelper = axiosInstance
