@@ -320,7 +320,7 @@ export default {
       }      
     }
     .user__container__info{   
-      margin-left: 1rem;  
+      margin: 0 1rem;  
       .user__follow{
         padding-top: 8px;
         display: flex;
@@ -349,6 +349,7 @@ export default {
         @extend %tweet-text;
         line-height: 22px;
         margin-top: 6px;
+        word-break: break-all;
       }
     }
   }

@@ -10,12 +10,12 @@
         <textarea v-model="text" name="tweet" placeholder="有什麼新鮮事？" @blur="onBlur" >
         </textarea>
         <!-- <span class="text-length">{{text.length}}/140</span> -->
-        <span v-if="isEmpty" class="text-empty">內容不可空白</span>
+        <span v-if="!isEmpty" class="text-empty">內容不可空白</span>
         <span v-if="isExceed" class="text-exceed">字數不可超過 140 字</span>
         <button 
           class="btn tweet-btn" 
           @click.stop.prevent="createTweet"
-          :disabled="isEmpty || isExceed"
+          :disabled="isExceed"
         >
           推文
         </button>
@@ -180,10 +180,10 @@ export default {
       isReplyModel: true,      // 控制 Modal
       placeholder: "",         // 控制推文跟回覆的 placeholder
       isProcessing: false,     // 按鈕送出
-      isEmpty: false,
+      isEmpty: true,
       isExceed: false,
-      isSubmit: false,
-      isModalEmpty: false,
+      // isSubmit: false,
+      isModalEmpty: true,
       isModalExceed: false
     }
   },
@@ -237,17 +237,19 @@ export default {
       }
     },
     textWarning() {
-      if (!this.text) {
-        this.isEmpty = true
-        this.isExceed = false
-        this.isProcessing = false
-      } else if (this.text.length > 140) {
-        this.isEmpty = false
+      // if (!this.text) {
+      //   this.isEmpty = true
+      //   this.isExceed = false
+      //   this.isProcessing = false
+      // } else 
+      
+      if (this.text.length > 140) {
+        // this.isEmpty = false
         this.isExceed = true
         this.isProcessing = false
       } 
       else {
-        this.isEmpty = false
+        this.isEmpty = true
         this.isExceed = false
       }
       return
@@ -274,6 +276,10 @@ export default {
     // 推一則推文
     async createTweet() {
       try {
+        if (!this.text) {
+          this.isEmpty = false
+        }
+
         const { data } = await tweetAPI.createTweet({
           description: this.text,
           UserId: this.currentUser.id

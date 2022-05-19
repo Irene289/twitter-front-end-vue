@@ -187,10 +187,10 @@ export default {
         }
         const form = e.target
         const formData = new FormData(form)
-        console.log(formData)
-        // for (let [name, value] of formData) {
-        //   console.log(name + ': ' + value)
-        // }
+        // console.log(formData)
+        for (let [name, value] of formData) {
+          console.log(name + ': ' + value)
+        }
 
         console.log(this.user)
 
@@ -214,11 +214,12 @@ export default {
         if(error.response.status === 500){
           console.log(error)
           console.log(error.response)
+        } else {
+          Toast.fire({
+            icon: "error",
+            title: "無法編輯，請稍後再試",
+          })
         }
-        Toast.fire({
-          icon: "error",
-          title: "無法編輯，請稍後再試",
-        })
       }
     },
   },
