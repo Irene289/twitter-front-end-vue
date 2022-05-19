@@ -18,7 +18,6 @@
             <!--   推文 -->
             <template 
               v-slot:isReplyModel
-              v-if="isReplyModel"
             >
               <div class="tweet-div">
               </div>
@@ -46,15 +45,14 @@
               </textarea>
             </template>
             <template v-slot:alert>
-              <p 
-                v-show="isLimit"
-                class="modal-alert">
-                字數不可超過 140 字</p>
+              <span v-if="!isModalEmpty" class="text-empty modal-alert warning">內容不可空白</span>
+              <span v-if="isModalExceed" class="text-exceed modal-alert warning">字數不可超過 140 字</span>
             </template>
           </TweetModal>
 
           <button
             class="modal-tweet"
+            :disabled="isProcessing || isModalExceed"
             @click.stop.prevent="createTweet"
           >
             推文
@@ -171,7 +169,10 @@ export default {
       newTweet: {},            // 新增推文
       dNoneReplyModal: true,   // 控制 Modal
       isReplyModel: true,      // 控制 Modal
-      isLimit:false 
+      isProcessing: false,     // 按鈕送出
+      // isLimit:false, 
+      isModalEmpty: true,
+      isModalExceed: false
     }
   },
   methods:{
@@ -197,22 +198,26 @@ export default {
     handleCloseBtn () {
       this.dNoneReplyModal = true
     },
+    // 字數警示
+    textWarning() {
+      if (this.text.length > 140) {
+        // this.isModalEmpty = false
+        this.isModalExceed = true
+        this.isProcessing = false
+      } 
+      else {
+        this.isModalEmpty = true
+        this.isModalExceed = false
+      }
+      return
+    },
     // 推一則推文
     async createTweet(payload) {
       try {
         // 內容空白處理
         if (!this.text) {
-          Toast.fire({
-            icon: "warning",
-            title: "內容不可空白",
-          });
-          this.isProcessing = false;
-          return;
+          this.isModalEmpty = false
         }
-        if(this.text.length > 140) {
-          this.isLimit = true
-          return
-        } 
 
         console.log(this.currentUser)
 
@@ -234,29 +239,29 @@ export default {
         }
         this.text = ""
       } catch (error) {
-        console.log(error);
-        Toast.fire({
-          icon: "error",
-          title: "暫時無法推文",
-        });
+        if (error.response.status === 500) {
+          return
+        } else {
+          console.log(error)
+          Toast.fire({
+            icon: "error",
+            title: "暫時無法推文",
+          })
+        }
       }
     },
-    overLimit(){
-      this.isLimit = true
-    }
   },
   computed: {
     ...mapState(['currentUser'])
   },
   watch:{
     text(){
-      this.overLimit()
-    }
+      this.textWarning()
+    },
   },
   created(){
     this.toggleNavList()
   }
-
 }
 </script>
 
@@ -338,28 +343,30 @@ export default {
       width: 100%;
       border-bottom: 1px solid $border-grey;
     }
-  &-cancel img {
-    width: 24px;
-    height: 24px;
-    margin: 16px;
+    &-cancel img {
+      width: 24px;
+      height: 24px;
+      margin: 16px;
+    }
+    .avatar {
+      width: 50px;
+      height: 50px;
+      border-radius: 50%;
+    }
   }
-  .avatar {
-    width: 50px;
-    height: 50px;
-    border-radius: 50%;
+  .modal-alert{
+    bottom: 10px;
+  }
+  .modal-tweet {
+    @extend %button-orange;
+    position:absolute;
+    right: 1rem;
+    bottom: 1rem;
+    min-width: 76px;
+    height: 40px;
+    &:disabled {
+      background: $form-input-placeholder;
+    }
   }
 }
-.modal-alert{
-  bottom: 10px;
-}
-.modal-tweet {
-  @extend %button-orange;
-  position:absolute;
-  right: 1rem;
-  bottom: 1rem;
-  min-width: 76px;
-  height: 40px;
-}
-}
-
 </style>

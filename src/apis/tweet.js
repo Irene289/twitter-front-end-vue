@@ -18,7 +18,7 @@ export default{
   // 回覆推文
   createReply({ TweetId, comment, UserId }) {
     return apiHelper.post(`tweets/${TweetId
-}/replies`, { comment, UserId})
+}/replies`, { comment, UserId })
   },
   // 拿到單一推文跟他的所有回覆
   getReply({ id }) {

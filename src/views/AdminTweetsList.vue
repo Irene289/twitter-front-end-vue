@@ -17,7 +17,7 @@
             <div class="content-info">
               <p class="content-info-name">{{tweet.User.name}}</p>
               <p class="content-info-account">@{{tweet.User.account}}</p>
-              <p class="content-info-time">{{tweet.createdAt | fromNowHour }}</p>
+              <p class="content-info-time">{{tweet.createdAt | fromNow }}</p>
             </div>
             <div class="content-text">
               <p>{{ ellipsisWords(tweet.description) }}</p>

@@ -74,7 +74,6 @@
               required
             />
           </div>
-
           <button
             class="btn btn-setting"
             type="submit"
@@ -105,6 +104,7 @@ export default {
   data() {
     return {
       user: {},
+      account: '@' + '',
       isProcessing: false,
       isExceed: false
     }

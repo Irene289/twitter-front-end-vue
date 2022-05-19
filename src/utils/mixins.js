@@ -6,10 +6,9 @@ export const fromNowFilter = {
       if (!datetime) return '-'
 
       const days = moment(datetime).fromNow()
-
-      let now = new Date().getFullYear() 
+      const now = new Date().getFullYear() 
       
-      if (moment().year() === now && days.includes('days')) {
+      if (moment().year() === now && days.includes('days' || 'day' || '天' || '天前')) {
         // console.log(days)
         return moment(datetime).format("MM月DD日")
       } else if (moment().year() !== now) {

@@ -52,7 +52,11 @@
       <!-- slot -->
       <UserTweetCard v-for="reply in replies" :key="reply.id">
         <template v-slot:avatar>
-          <img class="avatar" :src="reply.User.avatarImg" alt="" />
+          <router-link
+            :to="{ name: 'user-tweets', params: { id: reply.User.id } }"
+          >
+            <img class="avatar" :src="reply.User.avatarImg" alt="" />
+          </router-link>
         </template>
         <template v-slot:name>
           {{ reply.User.name }}
@@ -67,7 +71,7 @@
           <div class="reply-tag">
             回覆 <span>@{{ tweet.User.account }}</span>
           </div>
-          {{ reply.comment }}
+          {{ reply.comment | tweetFilter }}
         </template>
       </UserTweetCard>
     </div>
@@ -125,14 +129,15 @@
               </textarea>
             </template>
             <template v-slot:alert>
-              <p v-show="isEmpty" class="modal-alert">內容不可空白</p>
+              <span v-if="!isModalEmpty" class="text-empty modal-alert warning">內容不可空白</span>
+              <span v-if="isModalExceed" class="text-exceed modal-alert warning">字數不可超過 140 字</span>
             </template>
           </TweetModal>
 
           <button 
             class="btn modal-tweet"
             @click.stop.prevent="handleReply(tweet.id)"
-              :disabled="isProcessing"
+              :disabled="isModalExceed"
             > 
               {{ isProcessing ? "處理中" : "回覆" }}
           </button>
@@ -145,14 +150,14 @@
 <script>
 import UserTweetCard from "../components/UserTweetCard.vue";
 import TweetModal from "../components/TweetModal";
-import { fromNowFilter } from "./../utils/mixins";
+import { fromNowFilter, textFilter } from "./../utils/mixins"
 import tweetAPI from "../apis/tweet";
 import { Toast } from "../utils/helpers";
 import { mapState } from 'vuex'
 
 export default {
   name: "TwitterReply",
-  mixins: [fromNowFilter],
+  mixins: [fromNowFilter, textFilter],
   components: {
     UserTweetCard,
     TweetModal
@@ -173,8 +178,14 @@ export default {
       // isReplyModel: true,
       dNoneReplyModal: true,
       isProcessing: false,
-      isEmpty: false
+      isModalEmpty: true,
+      isModalExceed: false
     };
+  },
+  watch: {
+     textReply(){
+       this.modalWarning()
+     }
   },
   created() {
     const { id: id } = this.$route.params;
@@ -215,18 +226,24 @@ export default {
       this.dNoneReplyModal = !this.dNoneReplyModal;
       this.textReply = "";
     },
+    // 字數警示
+    modalWarning() {
+      if (this.textReply.length > 140) {
+        // this.isModalEmpty = false
+        this.isModalExceed = true
+        this.isProcessing = false
+      } else {
+        this.isModalEmpty = true
+        this.isModalExceed = false
+      }
+      return
+    },
     // 回覆一則推文
     async handleReply(TweetId) {
       try {
         // 內容空白處理
         if (!this.textReply) {
-          this.isEmpty = true
-          Toast.fire({
-            icon: "warning",
-            title: "內容不可空白",
-          })
-          this.isProcessing = false;
-          return
+          this.isModalEmpty = false
         }
         // console.log(this.currentUser)
         console.log(TweetId)
@@ -238,6 +255,10 @@ export default {
           UserId: this.currentUser.id,
           // TweetId,
         })
+
+        console.log(data)
+
+        // this.tweet = {}
 
         // this.newReply = {
         //   // id,
@@ -260,11 +281,15 @@ export default {
 
         // console.log(data)
       } catch (error) {
-        console.log(error);
-        Toast.fire({
-          icon: "error",
-          title: "暫時無法回覆推文",
-        })
+        if (error.response.status === 500) {
+          return
+        } else {
+          console.log(error);
+          Toast.fire({
+            icon: "error",
+            title: "暫時無法回覆推文",
+          })
+        }
       }
     },
     //TODO:功能待後端補資料
@@ -470,5 +495,8 @@ export default {
   bottom: 1rem;
   min-width: 76px;
   height: 40px;
+  &:disabled {
+    background: $form-input-placeholder;
+  }
 }
 </style>

@@ -27,7 +27,6 @@
         <template v-slot:avatar>
           <router-link
             :to="{ name: 'user-tweets', params: { id: tweet.User.id } }"
-            @click.stop.prevent="onClickAvatar"
           >
             <img class="avatar" :src="tweet.User.avatarImg" alt="" />
           </router-link>
@@ -44,7 +43,7 @@
             :to="{ name: 'twitter-replies', params: { id: tweet.id } }"
           >
             <p class="tweet-content-text">
-              {{ tweet.description }}
+              {{ tweet.description | tweetFilter }}
             </p>
           </router-link>
           <div class="icons">
@@ -76,9 +75,9 @@
           </div>
           <TweetModal>
             <!--   推文 -->
-            <template v-slot:isReplyModel v-if="!isReplyModel">
+            <!-- <template v-slot:isReplyModel v-if="!isReplyModel">
               <div class="tweet-div"></div>
-            </template>
+            </template> -->
             <template v-slot:replytoAvatarImg>
               <img class="avatar" :src="tweet.User.avatarImg" alt="" />
             </template>
@@ -91,7 +90,7 @@
               @{{ tweet.User.account }}
             </template>
             <template v-slot:replytoText>
-              {{tweet.description}}
+              {{tweet.description | tweetFilter }}
             </template>
 
             <!-- 回覆 -->
@@ -112,29 +111,29 @@
             </template>
             <template v-slot:alert>
               <!-- <span class="text-length">{{ isReplyModel ? textReply.length : text.length }}/140</span> -->
-              <span v-show="isModalEmpty" class="text-empty modal-alert warning">內容不可空白</span>
-              <span v-show="isModalExceed" class="text-exceed modal-alert warning">字數不可超過 140 字</span>
+              <span v-if="!isModalEmpty" class="text-empty modal-alert warning">內容不可空白</span>
+              <span v-if="isModalExceed" class="text-exceed modal-alert warning">字數不可超過 140 字</span>
             </template>
           </TweetModal>
          
           <div class="btn-group">
           </div>
           <button
-            v-if="isReplyModel"
+            
             class="btn modal-tweet button-reply"
             @click.stop.prevent="handleReply(tweet.id)"
-            :disabled="isProcessing"
+            :disabled="isProcessing || isModalExceed"
           >
             {{ isProcessing ? "處理中" : "回覆" }}
           </button>
-          <button
+          <!-- <button
             v-else
             class="btn modal-tweet"
             @click.stop.prevent="createTweet2"
             :disabled="isProcessing"
           >
             {{isProcessing ? "處理中" : "推文" }}
-          </button>
+          </button> -->
         </form>
       </div>
     </div>
@@ -144,8 +143,7 @@
 <script>
 import UserTweetCard from "../components/UserTweetCard"
 import TweetModal from "../components/TweetModal"
-import { fromNowFilter } from "./../utils/mixins"
-import { textFilter } from "./../utils/mixins"
+import { fromNowFilter, textFilter } from "./../utils/mixins"
 import tweetAPI from "../apis/tweet"
 import { Toast } from "../utils/helpers"
 import { mapState } from "vuex"
@@ -159,6 +157,7 @@ export default {
   },
   data() {
     return {
+      // avatarImg: '',
       text: "",                // 推文
       textReply: "",           // 回覆
       tweets: {},              // 全部推文
@@ -172,7 +171,8 @@ export default {
           account: '',
         },
         Replies: [],
-        likeTotal: 0
+        likeTotal: -1,
+        replyTotal: -1,
       }, 
       newTweet: {},            // 新增推文
       newReply: {},            // 新增推文回覆
@@ -255,23 +255,25 @@ export default {
       return
     },
     modalWarning(){
-      if (!this.textReply) {
-        this.isModalEmpty = true
-        this.isModalExceed = false
-        this.isProcessing = false
-      } else if (this.textReply.length > 140) {
-        this.isModalEmpty = false
+      // if (!this.textReply) {
+      //   this.isModalEmpty = true
+      //   this.isModalExceed = false
+      //   this.isProcessing = false
+      // } else 
+      
+      if (this.textReply.length > 140) {
+        // this.isModalEmpty = false
         this.isModalExceed = true
         this.isProcessing = false
       } 
       else {
-        this.isModalEmpty = false
+        this.isModalEmpty = true
         this.isModalExceed = false
       }
       return
     },
     onBlur() {
-      this.isEmpty = false
+      this.isEmpty = true
     },
     // 推一則推文
     async createTweet() {
@@ -302,20 +304,29 @@ export default {
         if (data.status !== "success") {
           throw new Error(data.message)
         }
-        this.text = "" 
+        this.text = ""
+        this.isEmpty = true
       } catch (error) {
-        console.log(error);
-        Toast.fire({
-          icon: "error",
-          title: "暫時無法推文",
-        })
+        if (error.response.status === 500) {
+          return
+        } else {
+          console.log(error)
+          Toast.fire({
+            icon: "error",
+            title: "暫時無法推文",
+          })
+        }
       }
     },
     // 回覆一則推文
     async handleReply(TweetId) {
       try {
         // 內容字數警告
-        this.textWarning()
+        // this.textWarning()
+
+        if (!this.textReply) {
+          this.isModalEmpty = false
+        }
 
         const { data } = await tweetAPI.createReply({ 
           TweetId, 
@@ -333,9 +344,9 @@ export default {
         //       Replies: tweets.Replies + 1
         //     }
         //   }
+
         // })
         
-
         const { id, comment, UserId, createdAt } = data.data
         this.newReply = {
           id,
@@ -345,7 +356,6 @@ export default {
             createdAt
           },
         }
-
         // tweet 是單一推文跟他的回覆，Obj
         this.tweet = {
           Replies: [
@@ -354,8 +364,6 @@ export default {
           ],
           replyTotal: this.tweet.replyTotal + 1
         }
-
-        console.log(this.tweet.replyTotal)
 
         if (data.status !== "success") {
           throw new Error(data.message)
@@ -367,18 +375,17 @@ export default {
           this.textReply = ""
           this.dNoneReplyModal = true
         }
-
       } catch (error) {
-        console.log(error);
-        Toast.fire({
-          icon: "error",
-          title: "暫時無法回覆推文",
-        })
+        if (error.response.status === 500) {
+          return
+        } else {
+          console.log(error);
+          Toast.fire({
+            icon: "error",
+            title: "暫時無法回覆推文",
+          })
+        }
       }
-    },
-    // 點擊頭像瀏覽個人頁面
-    onClickAvatar() {
-      console.log(this.tweets.User.id);
     },
     // 關閉 Modal
     handleCloseBtn() {
@@ -386,15 +393,15 @@ export default {
       this.textReply = "";
     },
     // 開啟推文 Modal
-    tweetModal() {
-      this.dNoneReplyModal = !this.dNoneReplyModal
-      this.isReplyModel = false;
-      this.placeholder = "有什麼新鮮事？";
-    },
+    // tweetModal() {
+    //   this.dNoneReplyModal = !this.dNoneReplyModal
+    //   this.isReplyModel = false;
+    //   this.placeholder = "有什麼新鮮事？";
+    // },
     // 開啟回覆 Modal
     async replyModal(id) {
       try {
-        this.modalWarning()
+        // this.modalWarning()
         // console.log(id)
         const { data, statusText } = await tweetAPI.getReply({ id })
         // console.log(data)
@@ -402,8 +409,35 @@ export default {
         if (statusText !== "OK") {
           throw new Error(statusText);
         }
+        this.tweet = data
+        // console.log(this.tweet)
 
-        this.tweet = data;
+        // const {
+        //   description,
+        //   createdAt,
+        //   User,
+        //   Replies,
+        //   likeTotal
+        // } = data
+
+        // const {
+        //   avatarImg,
+        //   name,
+        //   account
+        // } = User
+
+        // this.tweet = {
+        //   id,
+        //   description,
+        //   createdAt,
+        //   Replies,
+        //   likeTotal
+        // }
+        // this.User = {
+        //   avatarImg,
+        //   name,
+        //   account
+        // }
 
         this.dNoneReplyModal = !this.dNoneReplyModal;
         this.isReplyModel = true;
@@ -555,6 +589,8 @@ export default {
     right: 1rem;
     bottom: 1rem;
   }
-  
+  &:disabled {
+      background: $form-input-placeholder;
+    }
 }
 </style>
