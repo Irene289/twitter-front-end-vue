@@ -43,9 +43,18 @@
             @click.stop.prevent="replyModal"
           />
           <img
+            v-if="!isLike"
             class="content-response-like"
             src="../assets/static/images/like@2x.png"
             alt=""
+            @click.stop.prevent="likeTweet(tweet.id)"
+          />
+          <img
+            v-else
+            class="content-response-like"
+            src="../assets/static/images/redHeart@2x.png"
+            alt=""
+            @click.stop.prevent="unlikeTweet(tweet.id)"
           />
         </div>
       </div>
@@ -171,6 +180,7 @@ export default {
         name: "",
         account: "",
       },
+      isLike: false,
       // 回覆對象的其他回覆
       replies: [],
       avatarImg: "",
@@ -215,6 +225,48 @@ export default {
           icon: "error",
           title: "暫時無法取得推文",
         });
+      }
+    },
+    // 按讚
+    async likeTweet(id) {
+      try {
+        const { data } = await tweetAPI.likeTweet({id})
+
+        if (data.status !== "success") {
+            throw new Error(data.status)
+        }
+        this.isLike = true
+        this.tweet = {
+          ...this.tweet,
+          likeTotal: this.tweet.likeTotal + 1
+        }
+      } catch (error) {
+        console.log(error)
+        Toast.fire({
+          icon: 'error',
+          title: '無法點讚，請稍後再試'
+        })
+      }
+    },
+    // 取消讚
+    async unlikeTweet(id) {
+      try {
+        const { data } = await tweetAPI.unlikeTweet({id})
+
+        if (data.status !== "success") {
+            throw new Error(data.status)
+        }
+        this.isLike = false
+        this.tweet = {
+          ...this.tweet,
+          likeTotal: this.tweet.likeTotal - 1
+        }
+      } catch (error) {
+        console.log(error)
+        Toast.fire({
+          icon: 'error',
+          title: '無法取消讚，請稍後再試'
+        })
       }
     },
     // 開啟 Modal

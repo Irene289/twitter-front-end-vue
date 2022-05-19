@@ -11,7 +11,7 @@
         <form
           class="col-7 content-container setting-forms"
           action=""
-          @submit.stop.prevent="handleSubmit"
+          @submit.stop.prevent="handleSubmit()"
         >
           <div class="setting-form-title">
             <h1>帳戶設定</h1>
@@ -109,20 +109,18 @@ export default {
       isExceed: false
     }
   },
-  // watch: {
-  //   user: {
-  //     handler: function() {
-  //       this.textWarning()
-  //     },
-  //     deep: true
-  //   }
-  // },
   watch: {
     currentUser (user) {
       if (user.id !== this.currentUser.id) return
 
       const { id } = this.$route.params
       this.setUser(id)
+    },
+    user: {
+      handler: function() {
+        this.textWarning()
+      },
+      deep: true
     }
   },
   created() {
@@ -159,7 +157,7 @@ export default {
         length = length.toString().slice(0, 50)
       } 
     },
-    async handleSubmit(e) {
+    async handleSubmit() {
       try {
         this.isProcessing = true
 
@@ -186,20 +184,28 @@ export default {
           })
           this.isProcessing = false
         }
-        const form = e.target
-        const formData = new FormData(form)
+        // const form = e.target
+        // const formData = new FormData(form)
         // console.log(formData)
-        for (let [name, value] of formData) {
-          console.log(name + ': ' + value)
+        // for (let [name, value] of formData) {
+        //   console.log(name + ': ' + value)
+        // }
+
+        const formData = {
+          account: this.user.account,
+          name: this.user.name,
+          email: this.user.email,
+          password: this.user.password,
+          passwordCheck: this.user.passwordCheck,
         }
-
         console.log(this.user)
-
+        console.log(formData)
+        
         const { data, statusText } = await userAPI.update({
           userId: this.user.id,
           formData,
         })
-
+        
         if (statusText !== "OK") {
           throw new Error(data.message)
         } else {
