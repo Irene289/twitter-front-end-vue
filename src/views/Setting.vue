@@ -20,7 +20,7 @@
           <div class="setting-form setting-form__input-account">
             <label for="">帳號</label>
             <input
-              v-model="currentUser.account"
+              v-model="user.account"
               type="text"
               name="account"
               placeholder="請輸入帳號"
@@ -31,7 +31,7 @@
           <div class="setting-form setting-form__input-name">
             <label for="">名稱</label>
             <input
-              v-model="currentUser.name"
+              v-model="user.name"
               type="text"
               name="name"
               placeholder="請輸入使用者名稱"
@@ -45,7 +45,7 @@
           <div class="setting-form setting-form__input-email">
             <label for="">Email</label>
             <input
-              v-model="currentUser.email"
+              v-model="user.email"
               type="email"
               name="email"
               placeholder="請輸入 Email"
@@ -56,7 +56,7 @@
           <div class="setting-form setting-form__input-password">
             <label for="">密碼</label>
             <input
-              v-model="currentUser.password"
+              v-model="user.password"
               type="password"
               name="password"
               placeholder="請設定密碼"
@@ -67,7 +67,7 @@
           <div class="setting-form setting-form__input-password-check">
             <label for="">密碼再確認</label>
             <input
-              v-model="currentUser.passwordCheck"
+              v-model="user.passwordCheck"
               type="password"
               name="passwordCheck"
               placeholder="請再次輸入密碼"
@@ -139,11 +139,12 @@ export default {
   },
   methods: {
     setUser(userId) {
-      const { id, name, account } = this.currentUser
+      const { id, name, account, email } = this.currentUser
       this.user = {
         id,
         name,
-        account
+        account,
+        email
       }
       if (userId.toString() !== id.toString()) {
         this.$router.push({ name: 'not-fount' })
