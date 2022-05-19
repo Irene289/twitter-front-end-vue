@@ -76,9 +76,9 @@
     </div> 
     <template v-if="isEditing">
       <Modal
-      :initial-user-edit="user"
-      @after-submit="afterSubmit"
-      @close-modal="closeModal"
+        :initial-user-edit="user"
+        @after-submit="afterSubmit"
+        @close-modal="closeModal"
       />
     </template>       
   </div> 

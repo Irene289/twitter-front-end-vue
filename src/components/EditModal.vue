@@ -13,7 +13,7 @@
       <div class="user__image">
         <div class="user__image__form-item item-background">
           <div class="background-wrapper">
-            <img :src="user.coverImg" alt="" class="background">
+            <img :src="user.coverImg | coverFilter" alt="" class="background">
           </div>
           <div class="label-group">
             <label for="background-update">
@@ -31,7 +31,7 @@
         </div>
         <div class="user__image__form-item item__avatar">
           <div class="avatar-wrapper">
-            <img :src="user.avatarImg" alt="" class="avatar">
+            <img :src="user.avatarImg | avatarFilter" alt="" class="avatar">
           </div>
           <label
             
@@ -70,7 +70,7 @@
   </div>
 </template>
 <script>
-
+import {imgFilter} from '../utils/mixins'
 export default {
   props:{
     initialUserEdit:{
@@ -86,6 +86,7 @@ export default {
       }  
     }
   },
+  mixins:[imgFilter],
   data(){
     return{
       user:{...this.initialUserEdit},
@@ -147,6 +148,11 @@ export default {
       if(intro.length < 160){
        this.introIsValid = true
       }
+    }
+  },
+  computed:{
+    textLength(){
+      return this.user.introduction
     }
   },
   watch:{
@@ -254,6 +260,7 @@ export default {
       .background-wrapper {
         width: 100%;
         height: 200px;
+        
         img {
           width: 100%;
           height: 100%;

@@ -16,7 +16,7 @@
             
                 <div class= "title__item user">
                   <p class= "name">{{user.name}}</p>
-                  <p class= "tweet-num">45推文</p>
+                  <p class= "tweet-num">{{tweetNum+'推文'}}</p>
                 </div> 
                               
             </div> 
@@ -91,7 +91,7 @@
     },
     data(){
       return {
-        newRoute:this.$route.params.id,
+        tweetNum:0,
         user:{
           name: '',
           id:'',
@@ -116,10 +116,11 @@
             name,
             account,
             coverImg: coverImg? coverImg : "",
-            avatarImg: avatarImg? avatarImg : "",            introduction,
+            avatarImg: avatarImg? avatarImg : "",            
+            introduction: introduction? introduction: "",
             isFollowing,
-            followingCount: following.length? following.length : 0,
-            followerCount: follower.length? follower.length : 0,
+            followingCount: follower.length? follower.length : 0,
+            followerCount: following.length? following.length : 0,
           }
           if(statusText !== 'OK'){
             throw new Error(statusText)
@@ -132,6 +133,20 @@
           })
         }
       },
+      async fetchUserTweets(id){
+        try{
+          const {data,statusText} = await userAPI.getTweets({id})
+          this.tweetNum = data.length
+          if(statusText !== 'OK'){
+            throw new Error(statusText)
+          }
+        } catch(error){
+          if(error.response.status === 500){
+            this.tweetNum = 0
+            return
+          }       
+        }
+      },
     },
     computed:{
       ...mapState(['currentUser'])
@@ -140,11 +155,13 @@
       const {id} = to.params
       this.newRoute = id
       this.fetchUser(id)
+      this.fetchUserTweets(id)
       next()
     },
     created(){
       const {id} = this.$route.params
       this.fetchUser(id)
+      this.fetchUserTweets(id)
     }      
   }
 </script>
