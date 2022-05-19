@@ -1,46 +1,50 @@
 <template>
   <div class="follower-container">
-    <UserFollowCard
-      v-for="following in followingFilter"
-      :key="following.id"
-    >
-       <template v-slot:avatar>
-        <img 
-          @click.stop.prevent="visit(following.id,'user-tweets')"
-          class="avatar" :src="following.avatarImg" alt="">
-      </template>
-       <template v-slot:name>
-         {{following.name}}
-      </template>
-       <template v-slot:id>
-         {{following.account}}
-      </template>
-       <template v-slot:btn>
-        <div class="btn-group">
-          <template  
-            v-if="following.id !== currentUser.id" 
-          >
+    <!-- <h3 v-if="!noFollowings">我還沒開始追蹤其他用戶</h3> -->
+    <template>
+       <UserFollowCard
+        v-for="following in followingFilter"
+        :key="following.id"
+      >
+        <template v-slot:avatar>
+          <img 
+            @click.stop.prevent="visit(following.id,'user-tweets')"
+            class="avatar" :src="following.avatarImg" alt="">
+        </template>
+        <template v-slot:name>
+          {{following.name}}
+        </template>
+        <template v-slot:id>
+          {{following.account}}
+        </template>
+        <template v-slot:btn>
+          <div class="btn-group">
+            <template  
+              v-if="following.id !== currentUser.id" 
+            >
+              <button 
+              @click.stop.prevent="follow(following.id)"
+              v-show="!following.is_following" class="follow">跟隨
+              </button>
+              <button 
+                @click.stop.prevent="unfollow(following.id)"
+                v-show="following.is_following" class="following">正在跟隨
+              </button>
+            </template>            
             <button 
-            @click.stop.prevent="follow(following.id)"
-            v-show="!following.is_following" class="follow">跟隨
+              v-else
+              disabled
+              class="following">
+              用戶本人
             </button>
-            <button 
-              @click.stop.prevent="unfollow(following.id)"
-              v-show="following.is_following" class="following">正在跟隨
-            </button>
-          </template>            
-          <button 
-            v-else
-            disabled
-            class="following">
-            用戶本人
-          </button>
-        </div>       
-      </template>
-      <template v-slot:text>
-         {{following.introduction| textFilter}}
-      </template>
-    </UserFollowCard>
+          </div>       
+        </template>
+        <template v-slot:text>
+          {{following.introduction| textFilter}}
+        </template>
+      </UserFollowCard>
+    </template>
+   
   </div>
   
 </template>
@@ -60,7 +64,9 @@ export default {
   mixins: [textFilter, visitPage],
   data(){
     return{
-      followings:[]
+      followings:[],
+      // noFollowings: this.followings.length? false : true,
+      // followingNum: this.followings.length
     }
   },
   methods:{
@@ -69,7 +75,7 @@ export default {
       try{
         const {data, statusText} = await userAPI.get({id})
         const followings = data.Follower
-        this.followings = followings
+        this.followings = followings.length? followings : []
         if(statusText !== 'OK'){
           throw new Error(statusText)
         }
@@ -136,7 +142,7 @@ export default {
   computed:{
     ...mapState(['currentUser']),
     followingFilter(){
-      return this.followings.filter(user => user.is_following)
+      return this.followings.filter(user => user.is_following)    
     }
   },
   created(){
