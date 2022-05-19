@@ -59,10 +59,19 @@ export const textFilter = {
     // 推文上限 140 字
     tweetFilter(text) {
       let filteredText = ""
-
       if (text.length > 140) {
         filteredText = text.slice(0, 140)
         return filteredText
+      } else {
+        return text
+      }
+    },
+    //admin推文限制50字
+    adminTextFilter(text){
+      let filteredText = ""
+      if (text.length > 50) {
+        filteredText = text.slice(0, 50)
+        return filteredText+"..."
       } else {
         return text
       }
