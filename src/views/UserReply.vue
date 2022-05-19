@@ -23,12 +23,13 @@
          <div 
           @click.prevent.stop="visit(reply.Tweet.id, 'twitter-replies')"
           class="reply-tag">回覆 <span>@{{reply.Tweet.User.account}}</span></div>
-         {{reply.comment}}
+         {{reply.comment | tweetFilter}}
       </template>   
     </UserTweetCard>  
   </div>
 </template>
 <script>
+import {textFilter} from '../utils/mixins'
 import {visitPage} from '../utils/mixins'
 import UserTweetCard from '../components/UserTweetCard.vue'
 import { fromNowFilter } from './../utils/mixins'
@@ -36,7 +37,7 @@ import userAPI from '../apis/user'
 // import {Toast} from '../utils/helpers'
 
 export default {
-  mixins: [fromNowFilter, visitPage],
+  mixins: [fromNowFilter, visitPage,textFilter],
   components:{
     UserTweetCard
   },

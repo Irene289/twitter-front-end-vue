@@ -20,9 +20,10 @@
               <p class="content-info-time">{{tweet.createdAt | fromNow }}</p>
             </div>
             <div class="content-text">
-              <p>{{ ellipsisWords(tweet.description) }}</p>
+              <p>{{ tweet.description | adminTextFilter }}</p>
             </div>
-            <button 
+            <button
+              :disabled="isProcessing" 
               class="btn close-btn"
               @click.stop.prevent="deleteTweet(tweet.id)"
             >
@@ -37,6 +38,7 @@
 
 <script>
 //TODO:日期顯示待調整
+import {textFilter} from '../utils/mixins'
 import { fromNowFilter } from './../utils/mixins'
 import Sidebar from '../components/Sidebar.vue'
 import {Toast} from '../utils/helpers'
@@ -45,32 +47,26 @@ export default {
   components: { 
     Sidebar 
   },
-  mixins:[fromNowFilter],
+  mixins:[fromNowFilter, textFilter],
   data () {
     return {
       tweets:[],
       isAdmin: true,
+      isProcessing: false
     }
   },
   methods: {
-    ellipsisWords (text) {
-      const words = text
-      const word = words.split(' ')
-      const wordLength = word.length
-      if (wordLength > 50) {
-        let txt = word.slice(0, 50).join(' ') + '...'
-        return txt
-      }
-      return text
-    },
     async deleteTweet (id) {
       try{
+        this.isProcessing = true
         const {statusText} = await tweetAPI.deleteTweet({id})
         if(statusText !== 'OK'){
           throw new Error (statusText)
         }
         this.tweets = this.tweets.filter(tweet => tweet.id !== id)
+        this.isProcessing = false
       }catch(error){
+        this.isProcessing = false
         Toast.fire({
           icon: 'error',
           title: '無法刪除貼文，請稍後再試'

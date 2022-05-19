@@ -7,34 +7,27 @@
         :key="user.id"
         @click.stop.prevent="visit(user.id, 'user-tweets')"
         class="popular__list__item">
-        <img :src="user.avatar_img" alt="">
+        <img :src="user.avatar_img | avatarFilter" alt="">
         <div class="item-account">
           <p class="name">{{user.name}}</p>
           <p class="id">{{'@'+ user.account}}</p>
         </div>
-        <div v-if="user.id !== currentUser.id">
-           <button 
+        <button 
           v-if="user.is_following" 
           @click.stop.prevent="unfollow(user.id)"
           class="following">正在跟隨
-          </button>
-          <button
-            v-else-if="!user.is_following"
-            @click.stop.prevent="follow(user.id)"
-            class="follow">跟隨
-          </button>
-        </div>
+        </button>
         <button
-          v-else
-          disabled
-          class="following">
-          用戶本人
+          v-else-if="!user.is_following"
+          @click.stop.prevent="follow(user.id)"
+          class="follow">跟隨
         </button>
       </div>
     </div> 
   </div>
 </template>
 <script>
+import {imgFilter} from '../utils/mixins'
 import {mapState} from 'vuex'
 import followShipAPI from '../apis/followShip'
 import {visitPage} from '../utils/mixins'
@@ -42,7 +35,7 @@ import userAPI from '../apis/user'
 import {Toast} from '../utils/helpers'
 export default {
   name:'Popular',
-  mixins:[visitPage],
+  mixins:[visitPage, imgFilter],
   data(){
     return{
       topUsers:[]
@@ -55,7 +48,7 @@ export default {
     async fetchTopUsers(rank){
       try{
         const {data, statusText} = await userAPI.getTopUsers({rank})
-        this.topUsers = data
+        this.topUsers = data.filter(user => user.id !== this.currentUser.id)
         if(statusText !== "OK"){
           throw new Error(statusText)
         }

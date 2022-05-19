@@ -22,7 +22,7 @@
           {{tweet.created_at | fromNow}}
         </template>
         <template v-slot:text>
-              {{tweet.description}}       
+              {{tweet.description | tweetFilter}}       
           <div class="icons">
           <div 
             @click.prevent.stop="visit(tweet.id, 'twitter-replies')"
@@ -46,6 +46,7 @@
   
 </template>
 <script>
+import {textFilter} from '../utils/mixins'
 import {visitPage} from '../utils/mixins'
 import UserTweetCard from '../components/UserTweetCard.vue'
 import { fromNowFilter } from './../utils/mixins'
@@ -53,7 +54,7 @@ import userAPI from '../apis/user'
 // import {Toast} from '../utils/helpers'
 export default {
   name: 'UserTweets',
-  mixins: [fromNowFilter, visitPage],
+  mixins: [fromNowFilter, visitPage, textFilter],
   components:{
     UserTweetCard
   },
