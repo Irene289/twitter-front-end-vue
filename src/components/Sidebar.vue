@@ -219,7 +219,7 @@ export default {
           this.isModalEmpty = false
         }
 
-        console.log(this.currentUser)
+        // console.log(this.currentUser)
 
         const { id, description, UserId, createdAt } = payload
         const { data } = await tweetAPI.createTweet({
@@ -236,8 +236,14 @@ export default {
 
         if (data.status !== "success") {
           throw new Error(data.message)
+        } else {
+          Toast.fire({
+          icon: 'success',
+          title: "成功送出回覆",
+          })
+          this.text = ""
+          this.dNoneReplyModal = true
         }
-        this.text = ""
       } catch (error) {
         if (error.response.status === 500) {
           return

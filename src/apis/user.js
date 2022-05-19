@@ -16,12 +16,12 @@ export default {
   updateProfile({ userId, formData }) {
     return apiHelper.put(`/users/${userId}`, formData)
   },
-  update({ userId, formData }) {
-    return apiHelper.put(`/users/${userId}`, formData)
-  },
   // update({ userId, formData }) {
-  //   return apiHelper.put(`/users/${userId}/account`, formData)
+  //   return apiHelper.put(`/users/${userId}`, formData)
   // },
+  update({ userId, formData }) {
+    return apiHelper.put(`/users/${userId}/account`, formData)
+  },
   getLikes({id}){
     return apiHelper.get(`/users/${id}/likes`)
   },

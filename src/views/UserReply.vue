@@ -1,5 +1,5 @@
 <template>
-  <div class="user-reply scrollbar">
+  <div class="user-reply">
     <h3 v-if="noReplies">使用者尚無回覆</h3>
     <UserTweetCard 
       v-for="reply in replies"

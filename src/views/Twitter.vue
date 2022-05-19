@@ -7,7 +7,7 @@
       <form action="">
         <img :src="currentUser.avatarImg" alt="" />
         <label for=""></label>
-        <textarea v-model="text" name="tweet" placeholder="有什麼新鮮事？" @blur="onBlur" >
+        <textarea v-model="text" name="tweet" placeholder="有什麼新鮮事？">
         </textarea>
         <!-- <span class="text-length">{{text.length}}/140</span> -->
         <span v-if="!isEmpty" class="text-empty">內容不可空白</span>
@@ -53,11 +53,22 @@
                 alt=""
                 @click.stop.prevent="replyModal(tweet.id)"
               />
-              <p class="count">{{ tweet.Replies }}</p>
+              <p class="count">{{ tweet.Replies.replyTotal }}</p>
             </div>
             <div class="icon-wrapper">
-              <img src="../assets/static/images/like@2x.png" alt="" />
-              <p class="count">{{ tweet.Likes }}</p>
+              <img
+                v-if="!tweet.Likes.isLike"
+                src="../assets/static/images/like@2x.png" 
+                alt="" 
+                @click.stop.prevent="likeTweet(tweet.id)"
+              />
+              <img 
+                v-else
+                src="../assets/static/images/redHeart@2x.png" 
+                alt="" 
+                @click.stop.prevent="unlikeTweet(tweet.id)"
+              />
+              <p class="count">{{ tweet.Likes.likeTotal }}</p>
             </div>
           </div>
         </template>
@@ -173,7 +184,7 @@ export default {
         Replies: [],
         likeTotal: -1,
         replyTotal: -1,
-      }, 
+      },
       newTweet: {},            // 新增推文
       newReply: {},            // 新增推文回覆
       dNoneReplyModal: true,   // 控制 Modal
@@ -193,31 +204,12 @@ export default {
     },
      textReply(){
        this.modalWarning()
-     }
-    // text: {
-    //   handler: function() {
-    //     this.textWarning()
-    //     // this.isSubmit = false
-    //   },
-    //   // deep: true
-    // },
-    // textReply: {
-    //   handler: function() {
-    //     this.modalWarning()
-    //     // this.isSubmit = false
-    //   },
-    //   deep: true
-    // },
-    
+     },
   },
   created() {
-    // this.fetchUser()
     this.fetchTweets()
   },
   methods: {
-    // fetchUser() {
-    //   this.user = this.currentUser
-    // },
     // 拿到全部推文
     async fetchTweets() {
       try {
@@ -227,7 +219,14 @@ export default {
         }
         // console.log(data)
         this.tweets = data
-        // this.newTweet = data.description  // 新增
+        // this.tweets = data.map( data => {
+        //   id: data.id,
+        //   User: data.User,
+        //   Replies: data.Replies,
+        //   description: data.description,
+
+        // })
+
       } catch (error) {
         console.log(error);
         Toast.fire({
@@ -236,44 +235,86 @@ export default {
         });
       }
     },
+    // 按讚
+    async likeTweet(id) {
+      try {
+        const { data } = await tweetAPI.likeTweet({id})
+
+        if (data.status !== "success") {
+            throw new Error(data.status)
+        }
+
+        this.tweets = this.tweets.map( tweet => { 
+          if (tweet.id !== id) {
+            return tweet
+          } else {
+            return {
+              ...tweet,
+              Likes: {
+                isLike: true,
+                // TODO:問助教
+                likeTotal: parseInt(tweet.Likes.likeTotal) + 1
+              }
+            }
+          }
+        })
+      } catch (error) {
+        console.log(error)
+        Toast.fire({
+          icon: 'error',
+          title: '無法按讚，請稍後再試'
+        })
+      }
+    },
+    // 取消讚
+    async unlikeTweet(id) {
+      try {
+        const { data } = await tweetAPI.unlikeTweet({id})
+
+        if (data.status !== "success") {
+            throw new Error(data.status)
+        }
+
+        this.tweets = this.tweets.map( tweet => { 
+          if (tweet.id !== id) {
+            return tweet
+          } else {
+            return {
+              ...tweet,
+              Likes: {
+                isLike: false,
+                likeTotal: parseInt(tweet.Likes.likeTotal) - 1
+              }
+            }
+          }
+        })
+      } catch (error) {
+        console.log(error)
+        Toast.fire({
+          icon: 'error',
+          title: '無法取消讚，請稍後再試'
+        })
+      }
+    },
+    // 字數警示
     textWarning() {
-      // if (!this.text) {
-      //   this.isEmpty = true
-      //   this.isExceed = false
-      //   this.isProcessing = false
-      // } else 
-      
       if (this.text.length > 140) {
-        // this.isEmpty = false
         this.isExceed = true
         this.isProcessing = false
-      } 
-      else {
+      } else {
         this.isEmpty = true
         this.isExceed = false
-      }
-      return
+      } return
     },
+    // Modal 字數警示
     modalWarning(){
-      // if (!this.textReply) {
-      //   this.isModalEmpty = true
-      //   this.isModalExceed = false
-      //   this.isProcessing = false
-      // } else 
-      
       if (this.textReply.length > 140) {
-        // this.isModalEmpty = false
         this.isModalExceed = true
         this.isProcessing = false
-      } 
-      else {
+      } else {
         this.isModalEmpty = true
         this.isModalExceed = false
-      }
-      return
-    },
-    onBlur() {
-      this.isEmpty = true
+      } return
     },
     // 推一則推文
     async createTweet() {
@@ -322,8 +363,6 @@ export default {
     async handleReply(TweetId) {
       try {
         // 內容字數警告
-        // this.textWarning()
-
         if (!this.textReply) {
           this.isModalEmpty = false
         }
@@ -341,10 +380,11 @@ export default {
         //   } else {
         //     return {
         //       ...tweets,
-        //       Replies: tweets.Replies + 1
+        //       Replies: {
+        //         replyTotal: tweets.replyTotal + 1
+        //       }
         //     }
         //   }
-
         // })
         
         const { id, comment, UserId, createdAt } = data.data
@@ -401,10 +441,7 @@ export default {
     // 開啟回覆 Modal
     async replyModal(id) {
       try {
-        // this.modalWarning()
-        // console.log(id)
         const { data, statusText } = await tweetAPI.getReply({ id })
-        // console.log(data)
 
         if (statusText !== "OK") {
           throw new Error(statusText);

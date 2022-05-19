@@ -1,5 +1,5 @@
 <template>
-  <div class="user-like scrollbar">
+  <div class="user-like">
     <h3 v-if="noLikes">使用者尚無喜歡的貼文</h3>
     <UserTweetCard 
       v-for="like in likeFilter"
