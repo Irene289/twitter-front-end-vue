@@ -65,10 +65,9 @@ export default {
     },
     async deleteTweet (id) {
       try{
-        const {data} = await tweetAPI.deleteTweet({id})
-        console.log(data)
-        if(data.status !== 'success'){
-          throw new Error (data.status)
+        const {statusText} = await tweetAPI.deleteTweet({id})
+        if(statusText !== 'OK'){
+          throw new Error (statusText)
         }
         this.tweets = this.tweets.filter(tweet => tweet.id !== id)
       }catch(error){
@@ -77,7 +76,6 @@ export default {
           title: '無法刪除貼文，請稍後再試'
         })
       }
-      console.log('Delete')
     },
     async fetchTweets(){
       try{  
