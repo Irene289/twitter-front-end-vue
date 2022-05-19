@@ -30,7 +30,7 @@ const routes = [
   },
   // 前台首頁
   {
-    path: '/twitter',
+    path: '/twitter',  
     // name: 'twitter-main',
     component: TwitterMain,
     children: [
@@ -48,7 +48,7 @@ const routes = [
   },
   // 前台使用者主頁
   {
-    path: '/users',
+    path: '/users',  
     // name: 'user-tweets',  
     component: () => import('../views/User.vue'),
     children: [
@@ -73,6 +73,7 @@ const routes = [
   // 前台使用者追蹤頁
   {
     path: '/users',
+    
     // name: 'user-follow',
     component: () => import('../views/UserFollow.vue'),
     children: [
@@ -90,7 +91,7 @@ const routes = [
   },
   {
     path: '/users/:id/setting',
-    name: 'user-setting',
+    name: 'user-setting',    
     component: () => import('../views/Setting.vue')
   },
   {
@@ -101,17 +102,17 @@ const routes = [
   // 後台
   {
     path: '/admin',
-    name: 'admin',
+    name: 'admin',  
     component: () => import('../views/AdminSignin.vue')
   },
   {
     path: '/admin/tweets',
-    name: 'admin-tweets',
+    name: 'admin-tweets',    
     component: () => import('../views/AdminTweetsList.vue')
   },
   {
     path: '/admin/users',
-    name: 'admin-users',
+    name: 'admin-users',   
     component: () => import('../views/AdminUsers.vue')
   },
   // NotFound
