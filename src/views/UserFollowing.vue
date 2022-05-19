@@ -1,7 +1,7 @@
 <template>
   <div class="follower-container">
-    <!-- <h3 v-if="!noFollowings">我還沒開始追蹤其他用戶</h3> -->
-    <template>
+    <h3 v-if="noFollowings">尚未追蹤其他用戶</h3>
+    <template v-else>
        <UserFollowCard
         v-for="following in followingFilter"
         :key="following.id"
@@ -9,7 +9,7 @@
         <template v-slot:avatar>
           <img 
             @click.stop.prevent="visit(following.id,'user-tweets')"
-            class="avatar" :src="following.avatarImg" alt="">
+            class="avatar" :src="following.avatarImg | avatarFilter" alt="">
         </template>
         <template v-slot:name>
           {{following.name}}
@@ -49,6 +49,7 @@
   
 </template>
 <script>
+import {imgFilter} from '../utils/mixins'
 import {mapState} from 'vuex'
 import followShipAPI from '../apis/followShip'
 import UserFollowCard from '../components/UserFollowCard.vue'
@@ -61,12 +62,11 @@ export default {
   components:{
     UserFollowCard
   }, 
-  mixins: [textFilter, visitPage],
+  mixins: [textFilter, visitPage, imgFilter],
   data(){
     return{
       followings:[],
-      // noFollowings: this.followings.length? false : true,
-      // followingNum: this.followings.length
+      noFollowings: false
     }
   },
   methods:{
@@ -75,7 +75,12 @@ export default {
       try{
         const {data, statusText} = await userAPI.get({id})
         const followings = data.Follower
-        this.followings = followings.length? followings : []
+        if(followings.length === 0){
+          this.noFollowings = true
+        }else {
+          this.noFollowings = false
+        }
+        this.followings = followings
         if(statusText !== 'OK'){
           throw new Error(statusText)
         }
@@ -145,6 +150,11 @@ export default {
       return this.followings.filter(user => user.is_following)    
     }
   },
+  beforeRouteUpdate(to, from, next){
+    const {id} = to.params
+    this.fetchUserFollowings(id)
+    next()
+  },
   created(){
     const {id} = this.$route.params
     this.fetchUserFollowings(id)
@@ -167,6 +177,9 @@ export default {
     .following{
       @extend %following;
     }
-    
   }
+  h3{
+    text-align: center;
+    margin-top: 1rem;
+  }    
 </style>

@@ -1,51 +1,54 @@
 <template>
   <div class="follower-container">
-    <UserFollowCard
-      v-for="follower in followers"
-      :key="follower.id"
-    >
-      <template v-slot:avatar>
-        <img
-          @click.stop.prevent="visit(follower.id, 'user-tweets')"
-          class="avatar" :src="follower.avatarImg" alt="">
-        
-      </template>
-       <template v-slot:name>
-         {{follower.name}}
-      </template>
-       <template v-slot:id>
-         {{follower.account}}
-      </template>
-       <template v-slot:btn>
-        <div class="btn-group">
-          <div v-if="currentUser.id !== follower.id">
-            <button 
-            @click.stop.prevent="follow(follower.id)"
-            v-show="!follower.is_following" class="follow">
-            跟隨
-            </button>
-            <button 
-              @click.stop.prevent="unfollow(follower.id)"
-              v-show="follower.is_following" class="following">
-              正在跟隨
-            </button>
-          </div>
-           <button 
-            v-else
-            disabled
-            class="following">
-            用戶本人
-          </button>         
-        </div>       
-      </template>
-       <template v-slot:text>
-         {{follower.introduction | textFilter}}
-      </template>
-    </UserFollowCard>
+    <h3 v-if="noFollowers">尚無追蹤者</h3>
+    <template v-else>
+      <UserFollowCard
+        v-for="follower in followers"
+        :key="follower.id"
+      >
+        <template v-slot:avatar>
+          <img
+            @click.stop.prevent="visit(follower.id, 'user-tweets')"
+            class="avatar" :src="follower.avatarImg | avatarFilter" alt="">      
+        </template>
+        <template v-slot:name>
+          {{follower.name}}
+        </template>
+        <template v-slot:id>
+          {{follower.account}}
+        </template>
+        <template v-slot:btn>
+          <div class="btn-group">
+            <div v-if="currentUser.id !== follower.id">
+              <button 
+              @click.stop.prevent="follow(follower.id)"
+              v-show="!follower.is_following" class="follow">
+              跟隨
+              </button>
+              <button 
+                @click.stop.prevent="unfollow(follower.id)"
+                v-show="follower.is_following" class="following">
+                正在跟隨
+              </button>
+            </div>
+              <button 
+              v-else
+              disabled
+              class="following">
+              用戶本人
+            </button>         
+          </div>       
+        </template>
+        <template v-slot:text>
+          {{follower.introduction | textFilter}}
+        </template>
+      </UserFollowCard>
+    </template>
   </div>
   
 </template>
 <script>
+import {imgFilter} from '../utils/mixins'
 import {mapState} from 'vuex'
 import {textFilter} from '../utils/mixins'
 import followShipAPI from '../apis/followShip'
@@ -58,11 +61,11 @@ export default {
   components:{
     UserFollowCard
   },
-  mixins:[textFilter, visitPage],
+  mixins:[textFilter, visitPage, imgFilter],
   data(){
     return{
       followers:[],
-      // noFollowers:this.followers.length? false: true
+      noFollowers: false
     } 
   },
   methods:{
@@ -72,6 +75,12 @@ export default {
         const {data, statusText} = await userAPI.get({id})
         const followers = data.Following
         this.followers = followers
+        console.log(followers.length)
+        if(followers.length === 0) {
+          this.noFollowers = true
+        } else {
+          this.noFollowers = false
+        }
         if(statusText !== 'OK'){
           throw new Error(statusText)
         }
@@ -154,6 +163,10 @@ export default {
   .follower-container{
     position: relative;
   }
+  h3{
+    text-align: center;
+    margin-top: 1rem;
+  }
   .btn-group{
     position: absolute;
     right: 30px;
@@ -162,7 +175,6 @@ export default {
     }
     .following{
       @extend %following;
-    }
-    
+    }    
   }
 </style>

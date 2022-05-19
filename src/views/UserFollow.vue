@@ -17,7 +17,7 @@
               @click.stop.prevent="visit(userId, 'user-tweets')"
               class= "title__item user">
               <p class= "name">{{userName}}</p>
-              <p class= "tweet-num">45推文</p>
+              <p class= "tweet-num">{{tweetNum+'推文'}}</p>
             </div>          
           </div>
           <div class="nav-container">
@@ -65,7 +65,7 @@
   import Sidebar from '../components/Sidebar.vue'
   import NavTab from './../components/NavTab.vue'
   export default {
-    name: 'User',
+    name: 'UserFollow',
     mixins:[visitPage],
     components:{
       Popular,
@@ -76,13 +76,14 @@
       return {
         userId:8,
         userName:'',
+        tweetNum:0
       }
     },
     methods:{
       visit(id,pathName){
         this.visitUserPage(id,pathName)
       },
-       async fetchUser(userId){
+      async fetchUser(userId){
         try{
           const {data, statusText} = await userAPI.get({id:userId})   
           const {id,name} = data
@@ -98,11 +99,26 @@
             title:'無法載入使用者資訊，請稍後再試'
           })
         }       
+      },
+      async fetchUserTweets(id){
+        try{
+          const {data,statusText} = await userAPI.getTweets({id})
+          this.tweetNum = data.length
+          if(statusText !== 'OK'){
+            throw new Error(statusText)
+          }
+        } catch(error){
+          if(error.response.status === 500){
+            this.tweetNum = 0
+            return
+          }       
+        }
       }
     },
      created(){
       const {id} = this.$route.params
       this.fetchUser(id)
+      this.fetchUserTweets(id)
     }      
   }
 </script>
