@@ -61,7 +61,8 @@ export default {
   mixins:[textFilter, visitPage],
   data(){
     return{
-      followers:[]
+      followers:[],
+      // noFollowers:this.followers.length? false: true
     } 
   },
   methods:{

@@ -3,15 +3,15 @@
     <div class="user__container">
       <div class="user__image-container">
         <div class="background-wrapper">
-          <img :src="user.coverImg" alt="" class="background">
+          <img :src="user.coverImg | coverFilter" alt="" class="background">
         </div>
         <div class="avatar-wrapper">
-          <img :src="user.avatarImg" alt="" class="avatar">
+          <img :src="user.avatarImg | avatarFilter" alt="" class="avatar">
         </div>      
       </div>
       <div class="user__btn__group">
         <div class="user__btn__group__list">
-          <template v-if="!isCurrentUser">
+          <template v-if="user.id !== currentUser.id">
             <div class="group-item">
             <img 
               @click.stop.prevent="sendDm"
@@ -42,14 +42,14 @@
             <button 
               :disabled="isProcessing"
               @click="openModal"
-              class="edit">編輯個人資料</button>
+              class="edit">{{isProcessing? '處理中...':'編輯個人資料'}}</button>
           </div>
         </div>
       </div>
       <div class="user__container__info">
         <p class="name">{{user.name}}</p>
         <p class="id">@{{user.account}}</p>
-        <p class="intro">{{user.introduction}}</p>
+        <p class="intro">{{user.introduction | textFilter}}</p>
         <div class="user__follow">
           <router-link
             :to="{
@@ -84,6 +84,8 @@
   </div> 
 </template>
 <script>
+import {imgFilter} from '../utils/mixins'
+import {textFilter} from '../utils/mixins'
 import followShipAPI from '../apis/followShip'
 import {mapState} from 'vuex'
 import userAPI from '../apis/user'
@@ -93,170 +95,136 @@ export default {
   components:{
     Modal
   },
+  mixins:[textFilter, imgFilter],   
+  props:{
+    initialUser:{
+      type: Object,
+      default: () => {
+        return {
+          name: '',
+          id:'',
+          introduction:'',
+          account:'',
+          avatarImg:'',
+          coverImg:'',
+          is_following:'',
+          followerCount:'',
+          followingCount:'',
+        }
+      }
+    }
+  },
   data(){
     return{
+      route: '',
       isEditing: false,
       isCurrentUser: true,
       isSubscribe: false,
       isProcessing: false,
-      user:{
-        name: '',
-        id:'',
-        introduction:'',
-        account:'',
-        avatarImg:'',
-        coverImg:'',
-        is_following:'',
-        followerCount:'',
-        followingCount:'',
-      }  
+      user:{...this.initialUser}
     }
+  },
+  methods:{
+    switchRoute(newRoute){
+      this.route = newRoute
     },
-    methods:{
-      closeModal(){
-        this.isEditing = false
-      },
-      openModal(){
-        this.isEditing = true
-      },
-      toggleSub(){
-        if(this.isSubscribe === false){
-           this.isSubscribe = true
-        } else {
-          this.isSubscribe = false
-        }       
-      },
-      sendDm(){
+    closeModal(){
+      this.isEditing = false
+    },
+    openModal(){
+      this.isEditing = true
+    },
+    toggleSub(){
+      if(this.isSubscribe === false){
+          this.isSubscribe = true
+      } else {
+        this.isSubscribe = false
+      }       
+    },
+    sendDm(){
+      Toast.fire({
+        icon:'warning',
+        title: '私訊功能開發中'
+      })
+    },
+    async follow(id){
+      console.log(id)
+      try{
+        const {statusText} = await followShipAPI.follow({id})
+        if(statusText !=='OK'){
+          throw new Error(statusText)
+        }
+        this.user = {
+        ...this.user,
+        isFollowing: true
+      }
+      }catch(error){
         Toast.fire({
-          icon:'warning',
-          title: '私訊功能開發中'
+          icon:'error',
+          title:'無法追蹤此用戶，請稍後再試'
         })
-      },
-      async fetchUser(userId){
-          // TODO:篩除非user的用戶
-        try{
-          const {data, statusText} = await userAPI.get({id:userId})   
-          const {id,name, account ,coverImg, avatarImg, introduction, is_following:isFollowing, Following: following, Follower: follower} = data
-          let newIntro = ''
-          if(introduction.length > 160){
-            newIntro = introduction.slice(0,160) 
-          }else{
-            newIntro = introduction
-          }
-          this.user = {
-            id,
-            name,
-            account,
-            coverImg,
-            avatarImg,
-            introduction: newIntro,
-            isFollowing,
-            followingCount: following.length,
-            followerCount: follower.length
-          }
-          if(this.user.id === this.currentUser.id){
-            this.isCurrentUser = true
-          }else{
-            this.isCurrentUser = false
-          }
-          if(statusText !== 'OK'){
-            throw new Error(statusText)
-          }
-
-        }catch(error){
+      }       
+    },
+    async unfollow(id){
+      try{
+        const {statusText} = await followShipAPI.unFollow({id})
+        if(statusText !== 'OK'){
+          throw new Error (statusText)
+        }
+        this.user = {
+        ...this.user,
+        isFollowing: false
+      }
+      }catch(error){
           Toast.fire({
-            icon:'error',
-            title:'無法載入使用者資訊，請稍後再試'
-          })
-        }       
-      },
-      async follow(id){
-        console.log(id)
-        try{
-          const {statusText} = await followShipAPI.follow({id})
-          if(statusText !=='OK'){
-            throw new Error(statusText)
-          }
-          this.user = {
+          icon:'error',
+          title:'無法取消追蹤此用戶，請稍後再試'
+        })
+      }       
+    },
+    async afterSubmit(formData){    
+      try{
+        this.isProcessing = true
+        const {data, statusText} = await userAPI.updateProfile({
+          userId: this.currentUser.id,
+          formData
+        })
+        const {name, introduction, avatarImg, coverImg} = data
+        this.user = {
           ...this.user,
-          isFollowing: true
+          name,
+          introduction,
+          avatarImg,
+          coverImg
         }
-        }catch(error){
-          Toast.fire({
-            icon:'error',
-            title:'無法追蹤此用戶，請稍後再試'
-          })
-        }       
-      },
-      async unfollow(id){
-        try{
-          const {statusText} = await followShipAPI.unFollow({id})
-          if(statusText !== 'OK'){
-            throw new Error (statusText)
-          }
-          this.user = {
-          ...this.user,
-          isFollowing: false
+        if(statusText !== "OK"){
+          throw new Error (statusText)
         }
-        }catch(error){
-           Toast.fire({
-            icon:'error',
-            title:'無法取消追蹤此用戶，請稍後再試'
-          })
-        }       
-      },
-      async afterSubmit(formData){    
-        try{
-          this.isProcessing = true
-          const {data, statusText} = await userAPI.updateProfile({
-            userId: this.currentUser.id,
-            formData
-          })
-          const {name, introduction, avatarImg, coverImg} = data
-          this.user = {
-            ...this.user,
-            name,
-            introduction,
-            avatarImg,
-            coverImg
-          }
-          if(statusText !== "OK"){
-            throw new Error (statusText)
-          }
-          Toast.fire({
-            icon:'success',
-            title: '已儲存更新'
-          })
-          this.isProcessing = false
-        }catch(error){
-          this.isProcessing = false
-          Toast.fire({
-            icon:'error',
-            title: '無法儲存編輯，請稍後再試'
-          })
-        }
-      }   
-    },
-    beforeRouteUpdate(to, from, next){
-      const {id} = to.params    
-      this.fetchUser(id)
-      next()
-    },
-    computed:{
-      ...mapState(['currentUser'])
-    },
-    watch:{
-      //TODO:修bug待測
-      // nowRoute(newValue){
-      //   this.router = newValue
-      //   console.log(newValue)
-      //   this.fetchUser(newValue) 
-      // }
-    },
-    created(){
-      const {id} = this.$route.params
-      this.fetchUser(id)     
+        Toast.fire({
+          icon:'success',
+          title: '已儲存更新'
+        })
+        this.isProcessing = false
+      }catch(error){
+        this.isProcessing = false
+        Toast.fire({
+          icon:'error',
+          title: '無法儲存編輯，請稍後再試'
+        })
+      }
+    }   
+  },
+  computed:{
+    ...mapState(['currentUser'])
+  },
+  watch:{
+    initialUser(newValue){
+      this.user = {
+        ...this.user,
+        ...newValue
+      }
     }
+  }
 }
 </script>
 <style lang="scss" scoped>

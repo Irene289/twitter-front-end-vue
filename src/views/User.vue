@@ -21,7 +21,9 @@
                               
             </div> 
           </router-link>     
-        <UserCard />
+        <UserCard 
+          :initial-user="user"
+        />
         <div class="nav-container">       
           <NavTab >
             <template v-slot:nav-item> 
@@ -89,28 +91,44 @@
     },
     data(){
       return {
+        newRoute:this.$route.params.id,
         user:{
+          name: '',
           id:'',
-          name:''
+          introduction:'',
+          account:'',
+          avatarImg:'',
+          coverImg:'',
+          is_following:'',
+          followerCount:'',
+          followingCount:'',
         }  
       }
     },
     methods:{     
       async fetchUser(userId){
         try{
-          const {data, statusText} = await userAPI.get({id: userId})
-          const {id, name} = data
-          this.user= {
+          // TODO:篩除非user的用戶
+          const {data, statusText} = await userAPI.get({id:userId})   
+          const {id,name, account ,coverImg, avatarImg, introduction, is_following:isFollowing, Following: following, Follower: follower} = data
+          this.user = {
             id,
-            name
+            name,
+            account,
+            coverImg: coverImg? coverImg : "",
+            avatarImg: avatarImg? avatarImg : "",            introduction,
+            isFollowing,
+            followingCount: following.length? following.length : 0,
+            followerCount: follower.length? follower.length : 0,
           }
           if(statusText !== 'OK'){
             throw new Error(statusText)
           }
         }catch(error){
+
           Toast.fire({
             icon:'error',
-            title: '無法取得追蹤中用戶資料，請稍後再試'
+            title: '無法載入使用者資訊，請稍後再試'
           })
         }
       },
@@ -120,6 +138,7 @@
     },
      beforeRouteUpdate(to, from, next){
       const {id} = to.params
+      this.newRoute = id
       this.fetchUser(id)
       next()
     },

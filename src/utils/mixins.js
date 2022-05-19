@@ -47,7 +47,7 @@ export const textFilter = {
       let filteredText = ""
       //有些bio是null，return走
       if (!text){
-        return "用戶有點神秘，想多認識可以點擊頭像或追蹤他喔～"
+        return "用戶有點神秘，想多認識可以追蹤他喔～"
       }
       if (text.length > 160) {
         filteredText = text.slice(0, 160)
@@ -80,3 +80,15 @@ export const visitPage ={
     }  
   }
 }
+
+export const imgFilter ={
+  filters: {
+    avatarFilter(img){
+      return img || require('../assets/static/images/noImage@2x.png')
+    },
+    coverFilter(img) {
+      return img || 'https://picsum.photos/630/300'
+    }
+  }
+}
+// 
