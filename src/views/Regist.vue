@@ -41,7 +41,7 @@
       </div>
 
       <button class="btn btn-regist" type="submit" :disabled="isProcessing">
-        註冊
+        {{isProcessing? "處理中" : '註冊'}}
       </button>
 
       <div class="cancel-regist">
@@ -72,6 +72,26 @@ export default {
   },
   methods:{
     async handleSubmit(){
+      if(
+        !this.account ||
+        !this.name ||
+        !this.email ||
+        !this.password ||
+        !this.passwordCheck
+      ){
+        Toast.fire({
+          icon:"warning",
+          title:"輸入欄位不可為空白"
+        })
+        return
+      } 
+      if(this.password !== this.passwordCheck){
+         Toast.fire({
+          icon:"warning",
+          title:"密碼和密碼確認不一致"
+        })
+        return
+      }
       try{
         this.isProcessing = true
         const {data} = await authorizationAPI.regist({
@@ -104,6 +124,19 @@ export default {
           })
         }       
       }
+    },
+    warning(){
+      if(this.name.length > 50){
+        Toast.fire({
+          icon:'warning',
+          title:'名稱字數不可超過50字'
+        })
+      }
+    }
+  },
+  watch:{
+    name(){
+      this.warning()
     }
   }
 
@@ -144,6 +177,10 @@ export default {
     @extend %form-input;
     border: none;
     background: $form-input-grey;
+    &:focus{
+    background: transparent;
+    @extend %focus;
+  }
   }
   input::placeholder {
     color: $form-input-placeholder;
@@ -156,6 +193,7 @@ export default {
     background: transparent;
     @extend %focus;
   }
+  
 }
 .btn {
   @extend %button-orange;
