@@ -1,5 +1,6 @@
 <template>
   <div class="user-reply scrollbar">
+    <h3 v-if="noReplies">使用者尚無回覆</h3>
     <UserTweetCard 
       v-for="reply in replies"
       :key="reply.id"
@@ -32,7 +33,7 @@ import {visitPage} from '../utils/mixins'
 import UserTweetCard from '../components/UserTweetCard.vue'
 import { fromNowFilter } from './../utils/mixins'
 import userAPI from '../apis/user'
-import {Toast} from '../utils/helpers'
+// import {Toast} from '../utils/helpers'
 
 export default {
   mixins: [fromNowFilter, visitPage],
@@ -41,7 +42,8 @@ export default {
   },
   data(){
     return{
-       replies:[]    
+       replies:[],
+       noReplies: false    
     } 
   },
   methods:{
@@ -54,20 +56,26 @@ export default {
           throw new Error (statusText)
         }
       }catch(error){
-        Toast.fire({
-          icon:'error',
-          title: '無法載入使用者回覆，請稍後再試'
-        })
+        if(error.response.status === 500){
+          this.noReplies = true
+          return
+        }
       }
     },
     visit(id,pathName){
       this.visitUserPage(id,pathName)
     }
   },
+  beforeRouteUpdate(to, from, next){
+    const {id} = to.params
+    this.fetchUserReplies(id)
+    next()
+  },
   created(){
     const {id} = this.$route.params
     this.fetchUserReplies(id)
   }
+
 }
 </script>
 <style lang="scss" scoped>
@@ -79,5 +87,9 @@ export default {
       color: $orange;
       font-family: $number-font;
     }
+  }
+  h3{
+    text-align: center;
+    margin-top: 1rem;
   }
 </style>

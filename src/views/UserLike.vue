@@ -1,5 +1,6 @@
 <template>
   <div class="user-like scrollbar">
+    <h3 v-if="noLikes">使用者尚無喜歡的貼文</h3>
     <UserTweetCard 
       v-for="like in likeFilter"
       :key="like.TweetId"
@@ -60,7 +61,8 @@ export default {
   },
    data(){
     return{
-       likes:[]   
+       likes:[],
+       noLikes: false   
     }
    
   },
@@ -75,10 +77,11 @@ export default {
             throw new Error (statusText)
           }
         }catch(error){
-          Toast({
-            icon: 'error',
-            title: '無法取的用戶喜歡的推文，請稍後再試'
-          })
+          if(error.response.status === 500){
+            this.noLikes = true
+            return
+          }
+          
         }
       },
       async likeTweet(id){
@@ -92,8 +95,7 @@ export default {
               console.log()
               return {
               ...tweet,
-              likeUnlike: true,
-                
+              likeUnlike: true,               
               }
             }            
           })
@@ -134,6 +136,11 @@ export default {
       return this.likes.filter(like => like.likeUnlike )
     }
   },
+  beforeRouteUpdate(to, from, next){
+    const {id} = to.params
+    this.fetchUserLikes(id)
+    next()
+  },
   created(){
     const {id} = this.$route.params
     this.fetchUserLikes(id)
@@ -144,5 +151,9 @@ export default {
 <style lang="scss" scoped>
   .icon-wrapper{
     cursor: pointer;
+  }
+  h3{
+    text-align: center;
+    margin-top: 1rem;
   }
 </style>

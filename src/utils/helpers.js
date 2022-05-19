@@ -15,7 +15,6 @@ axiosInstance.interceptors.request.use(config => {
   }
   return config
 }, error => {
-  // console.log(error.toJSON())
   Promise.reject(error)
 })
 
