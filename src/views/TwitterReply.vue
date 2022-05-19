@@ -268,29 +268,29 @@ export default {
       }
     },
     //TODO:功能待後端補資料
-    async likeTweet(id){
-      try{
-        const {data} = await tweetAPI.likeTweet({id})
-        console.log(data)
-        this.likes = this.likes.map(tweet => {
-          if(tweet.TweetId !== id){
-            return tweet
-          } else if (tweet.TweetId === id){
-            console.log()
-            return {
-            ...tweet,
-            likeUnlike: true,
+    // async likeTweet(id){
+    //   try{
+    //     const {data} = await tweetAPI.likeTweet({id})
+    //     console.log(data)
+    //     this.likes = this.likes.map(tweet => {
+    //       if(tweet.TweetId !== id){
+    //         return tweet
+    //       } else if (tweet.TweetId === id){
+    //         console.log()
+    //         return {
+    //         ...tweet,
+    //         likeUnlike: true,
               
-            }
-          }            
-        })
-      }catch(error){
-        Toast.fire({
-          icon: 'error',
-          title: '無法對推文點讚，請稍後再試'
-        })
-      }
-    },
+    //         }
+    //       }            
+    //     })
+    //   }catch(error){
+    //     Toast.fire({
+    //       icon: 'error',
+    //       title: '無法對推文點讚，請稍後再試'
+    //     })
+    //   }
+    // },
   },
   computed: {
     ...mapState(['currentUser'])
