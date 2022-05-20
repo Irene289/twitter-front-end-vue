@@ -17,27 +17,27 @@
 
       <div class="regist-form__div regist-form__input-account">
         <label for="">帳號</label>
-        <input v-model="account" type="text" name="account" placeholder="請輸入帳號" />
+        <input v-model.trim="account" type="text" name="account" placeholder="請輸入帳號" />
       </div>
 
       <div class="regist-form__div regist-form__input-name">
         <label for="">名稱</label>
-        <input v-model="name" name="name" type="text" placeholder="請輸入使用者名稱" />
+        <input v-model.trim="name" name="name" type="text" placeholder="請輸入使用者名稱" />
       </div>
 
       <div class="regist-form__div regist-form__input-email">
         <label for="">Email</label>
-        <input v-model="email" name="email" type="text" placeholder="請輸入 Email" />
+        <input v-model.trim="email" name="email" type="text" placeholder="請輸入 Email" />
       </div>
 
       <div class="regist-form__div regist-form__input-password">
         <label for="">密碼</label>
-        <input v-model="password" name="password" type="text" placeholder="請設定密碼" />
+        <input v-model.trim="password" name="password" type="text" placeholder="請設定密碼" />
       </div>
 
       <div class="regist-form__div regist-form__input-password-check">
         <label for="">密碼確認</label>
-        <input v-model="passwordCheck" type="passwordCheck" name="passwordCheck" placeholder="請再次輸入密碼" />
+        <input v-model.trim="passwordCheck" type="passwordCheck" name="passwordCheck" placeholder="請再次輸入密碼" />
       </div>
 
       <button class="btn btn-regist" type="submit" :disabled="isProcessing">
