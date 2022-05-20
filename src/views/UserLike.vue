@@ -2,7 +2,7 @@
   <div class="user-like">
     <h3 v-if="noLikes">使用者尚無喜歡的貼文</h3>
     <UserTweetCard 
-      v-for="like in likeFilter"
+      v-for="like in likes"
       :key="like.TweetId"
       >
       <template v-slot:avatar>
@@ -33,11 +33,11 @@
           <div class="icon-wrapper">
             <img 
               @click.stop.prevent="unlikeTweet(like.TweetId)"
-              v-show="like.likeUnlike" 
+              v-show="like.is_like" 
               src="../assets/static/images/redHeart@2x.png" alt="">
             <img
               @click.stop.prevent="likeTweet(like.TweetId)" 
-              v-show="!like.likeUnlike" 
+              v-show="!like.is_like" 
               src="../assets/static/images/like@2x.png" alt="">
             <p class="count">{{like.Tweet.likeCount}}</p>
           </div>     
@@ -71,6 +71,7 @@ export default {
         try{
           const {data, statusText} = await userAPI.getLikes({id})
           // 篩除非user的用戶
+          console.log(data)
           this.likes = data.filter( like => like.Tweet.User.role === 'user')
           if(statusText !== "OK"){
             throw new Error (statusText)
@@ -90,10 +91,13 @@ export default {
            if(tweet.TweetId !== id){
              return tweet
            } else if (tweet.TweetId === id){
-              console.log()
               return {
               ...tweet,
-              likeUnlike: true,               
+              is_like: true,  
+              Tweet: {
+                  ...tweet.Tweet,
+                  likeCount: tweet.Tweet.likeCount+1
+                }             
               }
             }            
           })
@@ -106,15 +110,22 @@ export default {
       },
       async unlikeTweet(id){
         try{
-          const response = await tweetAPI.unlikeTweet({id})
-          console.log(response)
+          const {statusText} = await tweetAPI.unlikeTweet({id})
+          console.log(statusText)
+          if(statusText !== "OK"){
+            throw new Error (statusText)
+          }
           this.likes = this.likes.map(tweet => {
            if(tweet.TweetId !== id){
              return tweet
            } else if (tweet.TweetId === id){
               return {
-              ...tweet,
-              likeUnlike: false
+                ...tweet,
+                is_like: false,  
+                Tweet: {
+                    ...tweet.Tweet,
+                    likeCount: tweet.Tweet.likeCount-1
+                }     
               }
             }            
           })
@@ -128,11 +139,6 @@ export default {
       visit(id, pathName){
          this.visitUserPage(id, pathName)
       }
-  },
-  computed:{
-    likeFilter(){
-      return this.likes.filter(like => like.likeUnlike )
-    }
   },
   beforeRouteUpdate(to, from, next){
     const {id} = to.params
