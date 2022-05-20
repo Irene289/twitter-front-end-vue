@@ -30,18 +30,21 @@ const routes = [
   },
   // 前台首頁
   {
-    path: '/twitter',  
+    path: '/twitter', 
+    // meta: { requiresAuth: true }, 
     // name: 'twitter-main',
     component: TwitterMain,
     children: [
       {
         path: '',
         name: 'twitter',
+        // meta: { requiresAuth: true }, 
         component: () => import('../views/Twitter.vue')
       },
       {
         path: ':id/replies',
         name: 'twitter-replies',
+        // meta: { requiresAuth: true }, 
         component: () => import('../views/TwitterReply.vue')
       }
     ]
@@ -49,6 +52,7 @@ const routes = [
   // 前台使用者主頁
   {
     path: '/users',  
+    // meta: { requiresAuth:true },
     // name: 'user-tweets',  
     component: () => import('../views/User.vue'),
     children: [
@@ -73,7 +77,7 @@ const routes = [
   // 前台使用者追蹤頁
   {
     path: '/users',
-    
+    // meta: { requiresAuth: true },
     // name: 'user-follow',
     component: () => import('../views/UserFollow.vue'),
     children: [
@@ -91,7 +95,8 @@ const routes = [
   },
   {
     path: '/users/:id/setting',
-    name: 'user-setting',    
+    name: 'user-setting',
+    // meta: { requiresAuth: true },    
     component: () => import('../views/Setting.vue')
   },
   {
@@ -133,17 +138,7 @@ router.beforeEach(async (from, to, next) => {
   const stateToken = store.state.token
   let isAuthenticated = store.state.isAuthenticated
   // const noNeedAuthenticated = ['signin', 'regist', 'admin']
-  // console.log(isAuthenticated)
-  //註冊完直接跳轉
-  // if(!store.state.currentUser.is_admin){
-  //   isAuthenticated = await store.dispatch('fetchCurrentUser')
-  //   console.log(isAuthenticated)
-    
-  // }
-
-  // if(storageToken && storageToken!==stateToken) {
-  // console.log(isAuthenticated)
-  // const noNeedAuthenticated = ['sign-in', 'regist']
+  // console.log('登入:',isAuthenticated)
 
   if (storageToken && storageToken !== stateToken) {
     isAuthenticated = await store.dispatch('fetchCurrentUser')
@@ -162,7 +157,7 @@ router.beforeEach(async (from, to, next) => {
 
   // 上面會有無窮迴圈，改為以下
   // console.log(to.meta) 
-  // console.log(to.matched) 
+  // console.log(to.meta) 
   // console.log(to.matched.some(record => record.meta.requiresAuth))
   // 路由元資訊 .meta $route.matched 搭配路由守衛 進行驗證
   if (to.matched.some(record => record.meta.requiresAuth)) {
@@ -175,6 +170,41 @@ router.beforeEach(async (from, to, next) => {
     next()
     return
   }
+  //如果需要驗證的頁面，但沒有登入
+  // if (to.meta.requiresAuth && !isAuthenticated){
+  //   return next({ path: '/signin' })
+  // }
+  // console.log(to.matched)
+  //訪問的頁面需要驗證的話
+  // if (to.matched.some(record => record.meta.requiresAuth )) {
+  //   console.log('需要驗證')
+  //   console.log('驗證',to.path)
+  // 如果已經有驗證（sign in 的時候驗證），就可以next()
+    // if (isAuthenticated) {
+    //   next()
+    // }
+
+      // 若沒有驗證而且前往的頁面是首頁，那就跳轉至signin頁面
+  //     else if(!isAuthenticated && to.path === '/twitter'){
+  //     console.log('twitter')
+  //     next({ path: '/signin' })
+  //   }
+  // }
+    // isAuthenticated = await store.dispatch('fetchCurrentUser') 
+    // isAuthenticated
+    //   ? next({ path: '/twitter' })
+    //   : next({ path: '/signin' })
+    // return
+  // } 
+  //   else {
+  //     console.log('不需驗證')
+  //     console.log('不用驗證',to.path)
+  //     next()
+  //     return
+  //   }
+  
+  // next()
+  
 })
 
 export default router
