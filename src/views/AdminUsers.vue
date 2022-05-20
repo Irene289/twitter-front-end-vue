@@ -18,11 +18,11 @@
             <div class="card-info-tweets-likes">
               <div class="card-info-tweets">
                 <img src="../assets/static/images/post@2x.png" alt="">
-                <span class="counts">{{user.tweetAmount.count}}k</span>
+                <span class="counts">{{user.tweetAmount.count}}</span>
               </div>
               <div class="card-info-likes">
                 <img src="../assets/static/images/like@2x.png" alt="">
-                <span class="counts">{{user.likeAmount.count}}k</span>
+                <span class="counts">{{user.likeAmount.count}}</span>
               </div>
             </div>
             <div class="card-info-follow">
@@ -59,7 +59,6 @@ export default {
   },
   methods: {
     async getUsers(){
-      // TODO:推文數、按讚數、追蹤、被追蹤的單位Ｋ？
       try{
         const {data, statusText} = await adminAPI.get()
         this.users = data.filter( user => user.role === 'user')
@@ -74,7 +73,6 @@ export default {
             return user
           }
         })
-        console.log(this.users)
         if(statusText !== 'OK'){
           throw new Error(statusText)
         }
