@@ -70,17 +70,17 @@ export default {
     }
   },
   methods:{
-      // TODO:篩除非user的用戶
     async fetchUserFollowings(id){
       try{
         const {data, statusText} = await userAPI.get({id})
         const followings = data.Follower
+        // 篩除非user的用戶
+        this.followings = followings.filter( follower => follower.role === 'user')
         if(followings.length === 0){
           this.noFollowings = true
         }else {
           this.noFollowings = false
         }
-        this.followings = followings
         if(statusText !== 'OK'){
           throw new Error(statusText)
         }

@@ -48,7 +48,10 @@ export default {
     async fetchTopUsers(rank){
       try{
         const {data, statusText} = await userAPI.getTopUsers({rank})
-        this.topUsers = data.filter(user => user.id !== this.currentUser.id)
+        this.topUsers = data.filter(user => user.id !== this.currentUser.id )
+        // TODO:待補 API 資料
+        // 篩除用戶本人跟非user的用戶
+        // this.topUsers = data.filter(user => user.id !== this.currentUser.id && user.role === 'user' )
         if(statusText !== "OK"){
           throw new Error(statusText)
         }

@@ -128,13 +128,13 @@ export default {
     const { id } = this.$route.params
     this.setUser(id)
   },
-  beforeRouteUpdate (to, from, next) {
-    if (this.currentUser.id === -1) return
-    // console.log({to, from})
-    const { id } = to.params
-    this.setUser(id)
-    next()
-  },
+  // beforeRouteUpdate (to, from, next) {
+  //   if (this.currentUser.id === -1) return
+  //   // console.log({to, from})
+  //   const { id } = to.params
+  //   this.setUser(id)
+  //   next()
+  // },
   methods: {
     setUser(userId) {
       const { id, name, account, email } = this.currentUser

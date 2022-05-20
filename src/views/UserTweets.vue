@@ -76,7 +76,6 @@ export default {
     };
   },
   methods: {
-    // TODO:篩除非user的用戶
     async fetchUserTweets(id) {
       try {
         const { data, statusText } = await userAPI.getTweets({ id });
@@ -85,7 +84,9 @@ export default {
         } else {
           this.noTweets = false;
         }
-        this.tweets = data;
+        // 篩除非user的用戶
+        this.tweets = data.filter( tweet => tweet.User.role === 'user')
+        
         if (statusText !== "OK") {
           throw new Error(statusText);
         }
@@ -112,7 +113,7 @@ export default {
           if (tweet.id !== id) {
             return tweet
           } else {
-            console.log(typeof tweet.Likes)
+            // console.log(typeof tweet.Likes)
             return {
               ...tweet,
               Likes: tweet.Likes + 1
@@ -140,7 +141,7 @@ export default {
           if (tweet.id !== id) {
             return tweet
           } else {
-            console.log(typeof tweet.Likes)
+            // console.log(typeof tweet.Likes)
             return {
               ...tweet,
               Likes: tweet.Likes - 1

@@ -65,15 +65,13 @@ export default {
        likes:[],
        noLikes: false   
     }
-   
   },
   methods:{
-      // TODO:篩除非user的用戶
       async fetchUserLikes(id){
         try{
           const {data, statusText} = await userAPI.getLikes({id})
-          this.likes = data
-          console.log(data)
+          // 篩除非user的用戶
+          this.likes = data.filter( like => like.Tweet.User.role === 'user')
           if(statusText !== "OK"){
             throw new Error (statusText)
           }
@@ -81,8 +79,7 @@ export default {
           if(error.response.status === 500){
             this.noLikes = true
             return
-          }
-          
+          } 
         }
       },
       async likeTweet(id){
