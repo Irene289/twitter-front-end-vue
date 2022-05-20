@@ -79,7 +79,7 @@ export const textFilter = {
   }  
 }
 
-export const visitPage ={
+export const visitPage = {
   methods:{
     visitUserPage: function (id, pathName) {
       this.$router.push({
@@ -90,7 +90,7 @@ export const visitPage ={
   }
 }
 
-export const imgFilter ={
+export const imgFilter = {
   filters: {
     avatarFilter(img){
       return img || require('../assets/static/images/noImage@2x.png')

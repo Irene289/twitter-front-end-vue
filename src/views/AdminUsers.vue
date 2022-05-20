@@ -10,9 +10,8 @@
           v-for="user in users"
           :key ="user.id"
           class="users-div__user--card">
-          <div class="card-background"></div>
-          <img class="card-avatar" :src="user.coverImg
-" alt="">
+          <img class="card-background" :src="user.coverImg" alt="">
+          <img class="card-avatar" :src="user.avatarImg" alt="">
           <div class="card-info">
             <div class="card-info-name">{{user.name}}</div>
             <div class="card-info-account">@{{user.account}}</div>
@@ -64,6 +63,18 @@ export default {
       try{
         const {data, statusText} = await adminAPI.get()
         this.users = data.filter( user => user.role === 'user')
+        this.users = this.users.map(user => {
+          if(!user.coverImg || !user.avatarImg){
+            return{
+              ...user,
+              coverImg: 'https://picsum.photos/630/300',
+              avatarImg: require('../assets/static/images/noImage@2x.png')
+            }
+          }else {
+            return user
+          }
+        })
+        console.log(this.users)
         if(statusText !== 'OK'){
           throw new Error(statusText)
         }
@@ -137,7 +148,7 @@ export default {
   .card-background {
     width: 247px;
     height: 140px;
-    background: url('https://picsum.photos/247/140') no-repeat;
+    // background: url('https://picsum.photos/247/140') no-repeat;
     overflow: hidden;
     border-radius: 10px 10px 0px 0px;
     position: absolute;
