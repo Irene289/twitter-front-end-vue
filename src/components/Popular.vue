@@ -129,6 +129,7 @@ export default {
     border-radius: 16px;
     img{
       width:50px;
+      height: 50px;
       border-radius: 50%;
     }
     h1{
@@ -140,7 +141,7 @@ export default {
     .popular__list__item{  
       cursor:pointer; 
       display: flex;
-      padding: 1rem; 
+      padding: 0.4rem; 
       .item-account{
         flex: 1;
         width: 74px;
