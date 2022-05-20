@@ -11,7 +11,7 @@
         <form
           class="col-7 content-container setting-forms"
           action=""
-          @submit.stop.prevent="handleSubmit()"
+          @submit.stop.prevent="handleSubmit"
         >
           <div class="setting-form-title">
             <h1>帳戶設定</h1>
@@ -34,6 +34,7 @@
               v-model="user.name"
               type="text"
               name="name"
+              
               placeholder="請輸入使用者名稱"
               required
             />
@@ -59,6 +60,7 @@
               v-model="user.password"
               type="password"
               name="password"
+              
               placeholder="請設定密碼"
               required
             />
@@ -70,6 +72,7 @@
               v-model="user.passwordCheck"
               type="password"
               name="passwordCheck"
+              
               placeholder="請再次輸入密碼"
               required
             />
@@ -103,19 +106,17 @@ export default {
   },
   data() {
     return {
-      user: {},
-      account: '@' + '',
+      user: {
+        id: -1,
+        account: '',
+        name: '',
+        email: ''
+      },
       isProcessing: false,
       isExceed: false
     }
   },
   watch: {
-    currentUser (user) {
-      if (user.id !== this.currentUser.id) return
-
-      const { id } = this.$route.params
-      this.setUser(id)
-    },
     user: {
       handler: function() {
         this.textWarning()
@@ -128,13 +129,12 @@ export default {
     const { id } = this.$route.params
     this.setUser(id)
   },
-  // beforeRouteUpdate (to, from, next) {
-  //   if (this.currentUser.id === -1) return
-  //   // console.log({to, from})
-  //   const { id } = to.params
-  //   this.setUser(id)
-  //   next()
-  // },
+  beforeRouteUpdate (to, from, next) {
+    if (this.currentUser.id === -1) return
+    const { id } = to.params
+    this.setUser(id)
+    next()
+  },
   methods: {
     setUser(userId) {
       const { id, name, account, email } = this.currentUser
@@ -154,7 +154,6 @@ export default {
         this.isExceed = false
       } else if (length > 50) {
         this.isExceed = true
-        length = length.toString().slice(0, 50)
       } 
     },
     async handleSubmit() {
@@ -181,25 +180,28 @@ export default {
           Toast.fire({
             icon: 'warning',
             title: '密碼不一致，請再次輸入'
-          })
+          }) 
           this.isProcessing = false
-        }
-        // const form = e.target
-        // const formData = new FormData(form)
-        // console.log(formData)
-        // for (let [name, value] of formData) {
-        //   console.log(name + ': ' + value)
-        // }
-
+          return
+        } else if (
+          this.user.password.includes(' ')
+          && this.user.passwordCheck.includes(' ')
+          ) {
+            Toast.fire({
+              icon: 'warning',
+              title: '密碼不可包含空格'
+            }) 
+            this.isProcessing = false
+            return
+          }
+        
         const formData = {
-          account: this.user.account,
-          name: this.user.name,
-          email: this.user.email,
+          account: this.user.account.trim(),
+          name: this.user.name.trim(),
+          email: this.user.email.trim(),
           password: this.user.password,
           passwordCheck: this.user.passwordCheck,
         }
-        console.log(this.user)
-        console.log(formData)
         
         const { data, statusText } = await userAPI.update({
           userId: this.user.id,
@@ -213,6 +215,9 @@ export default {
             icon: 'success',
             title: '修改完成'
           })
+          this.user.password = ''
+          this.user.passwordCheck = ''
+          this.$store.commit('setCurrentUser', this.user)
         }
         
         this.isProcessing = false
@@ -221,6 +226,10 @@ export default {
         if(error.response.status === 500){
           console.log(error)
           console.log(error.response)
+          Toast.fire({
+            icon: "warning",
+            title: "account/email 已存在！",
+          })
         } else {
           Toast.fire({
             icon: "error",
@@ -233,7 +242,6 @@ export default {
   computed: {
     ...mapState(["currentUser"]),
   },
- 
 };
 </script>
 
@@ -281,6 +289,9 @@ main {
   input::placeholder {
     color: $form-input-placeholder;
   }
+  // &:focus::before {
+  //   content: '@';
+  // }
   &::after {
     content: "";
     @extend %input-bottom;

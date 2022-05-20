@@ -49,7 +49,6 @@ export default {
   },
   methods:{
     async handleSubmit(){
-      console.log('click')
       try{
         this.isProcessing = true
         if ( !this.account || !this.password ) {
