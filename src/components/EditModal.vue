@@ -47,7 +47,7 @@
         <div class="info-item">
           <label for="name">名稱</label>
           <input 
-            v-model="user.name" :class="{red:!nameIsValid}" 
+            v-model.trim="user.name" :class="{red:!nameIsValid}" 
             class="name" name="name" type="text" 
           />
           <div class="hint-group">
