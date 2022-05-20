@@ -133,7 +133,7 @@ router.beforeEach(async (from, to, next) => {
   const stateToken = store.state.token
   let isAuthenticated = store.state.isAuthenticated
   // const noNeedAuthenticated = ['signin', 'regist', 'admin']
-  console.log(isAuthenticated)
+  // console.log(isAuthenticated)
   //註冊完直接跳轉
   // if(!store.state.currentUser.is_admin){
   //   isAuthenticated = await store.dispatch('fetchCurrentUser')

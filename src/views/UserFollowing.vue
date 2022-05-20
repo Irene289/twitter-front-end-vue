@@ -1,7 +1,7 @@
 <template>
   <div class="follower-container">
     <h3 v-if="noFollowings">尚未追蹤其他用戶</h3>
-    <template v-else>
+    <template>
        <UserFollowCard
         v-for="following in followingFilter"
         :key="following.id"

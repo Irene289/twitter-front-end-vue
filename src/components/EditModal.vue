@@ -150,11 +150,6 @@ export default {
       }
     }
   },
-  computed:{
-    textLength(){
-      return this.user.introduction
-    }
-  },
   watch:{
     user:{
       deep: true,

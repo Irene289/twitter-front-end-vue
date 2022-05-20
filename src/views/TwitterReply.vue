@@ -21,7 +21,7 @@
       <div class="reply-div-content">
         <div class="content-text">
           <p>
-            {{ tweet.description }}
+            {{ tweet.description | tweetFilter }}
           </p>
         </div>
         <div class="content-when">
@@ -114,7 +114,7 @@
                   <p class="content-info-time">{{ tweet.createdAt | fromNow }}</p>
                 </div>                             
                 <p class="content-info-description">
-                {{ tweet.description }}
+                {{ tweet.description | tweetFilter}}
                 </p>
               </div>
              
