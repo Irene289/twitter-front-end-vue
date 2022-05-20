@@ -12,8 +12,8 @@
         <!-- <span class="text-length">{{text.length}}/140</span> -->
         <span v-if="!isEmpty" class="text-empty">內容不可空白</span>
         <span v-if="isExceed" class="text-exceed">字數不可超過 140 字</span>
-        <button 
-          class="btn tweet-btn" 
+        <button
+          class="btn tweet-btn"
           @click.stop.prevent="createTweet"
           :disabled="isExceed"
         >
@@ -58,14 +58,14 @@
             <div class="icon-wrapper">
               <img
                 v-if="!tweet.Likes.isLike"
-                src="../assets/static/images/like@2x.png" 
-                alt="" 
+                src="../assets/static/images/like@2x.png"
+                alt=""
                 @click.stop.prevent="likeTweet(tweet.id)"
               />
-              <img 
+              <img
                 v-else
-                src="../assets/static/images/redHeart@2x.png" 
-                alt="" 
+                src="../assets/static/images/redHeart@2x.png"
+                alt=""
                 @click.stop.prevent="unlikeTweet(tweet.id)"
               />
               <p class="count">{{ tweet.Likes.likeTotal }}</p>
@@ -101,7 +101,7 @@
               @{{ tweet.User.account }}
             </template>
             <template v-slot:replytoText>
-              {{tweet.description | tweetFilter }}
+              {{ tweet.description | tweetFilter }}
             </template>
 
             <!-- 回覆 -->
@@ -122,15 +122,17 @@
             </template>
             <template v-slot:alert>
               <!-- <span class="text-length">{{ isReplyModel ? textReply.length : text.length }}/140</span> -->
-              <span v-if="!isModalEmpty" class="text-empty modal-alert warning">內容不可空白</span>
-              <span v-if="isModalExceed" class="text-exceed modal-alert warning">字數不可超過 140 字</span>
+              <span v-if="!isModalEmpty" class="text-empty modal-alert warning"
+                >內容不可空白</span
+              >
+              <span v-if="isModalExceed" class="text-exceed modal-alert warning"
+                >字數不可超過 140 字</span
+              >
             </template>
           </TweetModal>
-         
-          <div class="btn-group">
-          </div>
+
+          <div class="btn-group"></div>
           <button
-            
             class="btn modal-tweet button-reply"
             @click.stop.prevent="handleReply(tweet.id)"
             :disabled="isProcessing || isModalExceed"
@@ -168,10 +170,9 @@ export default {
   },
   data() {
     return {
-      // avatarImg: '',
       text: "",                // 推文
       textReply: "",           // 回覆
-      tweets: {},              // 全部推文
+      tweets: [],              // 全部推文
       tweet: {                 // 單一推文
         id: -1,
         description: "",
@@ -187,13 +188,13 @@ export default {
       },
       newTweet: {},            // 新增推文
       newReply: {},            // 新增推文回覆
+      likes: {},
       dNoneReplyModal: true,   // 控制 Modal
       isReplyModel: true,      // 控制 Modal
       placeholder: "",         // 控制推文跟回覆的 placeholder
       isProcessing: false,     // 按鈕送出
       isEmpty: true,
       isExceed: false,
-      // isSubmit: false,
       isModalEmpty: true,
       isModalExceed: false
     }
@@ -214,21 +215,13 @@ export default {
     async fetchTweets() {
       try {
         const { data, statusText } = await tweetAPI.getTweets()
+
         if (statusText !== "OK") {
           throw new Error(statusText)
         }
-        this.tweets = data
-        // TODO:待補 API 資料
+
         // 篩除非user的用戶
-        // this.tweets = data.filter( data => data.User.role === 'user' )
-        // this.tweets = data.map( data => {
-        //   id: data.id,
-        //   User: data.User,
-        //   Replies: data.Replies,
-        //   description: data.description,
-
-        // })
-
+        this.tweets = data.filter( data => data.User.role === 'user' )
       } catch (error) {
         console.log(error);
         Toast.fire({
@@ -246,6 +239,19 @@ export default {
             throw new Error(data.status)
         }
 
+        // const { 
+        //   likeUnlike,
+        //   TweetId,
+        //  } = data.data
+
+        // this.likes = {
+        //   id: TweetId,
+        //   Likes: {
+        //     isLike: likeUnlike,
+        //     likeTotal: -1
+        //   }
+        // }
+
         this.tweets = this.tweets.map( tweet => { 
           if (tweet.id !== id) {
             return tweet
@@ -254,8 +260,7 @@ export default {
               ...tweet,
               Likes: {
                 isLike: true,
-                // TODO:問助教
-                likeTotal: parseInt(tweet.Likes.likeTotal) + 1
+                likeTotal: tweet.Likes.likeTotal + 1
               }
             }
           }
@@ -285,7 +290,7 @@ export default {
               ...tweet,
               Likes: {
                 isLike: false,
-                likeTotal: parseInt(tweet.Likes.likeTotal) - 1
+                likeTotal: tweet.Likes.likeTotal - 1
               }
             }
           }
@@ -323,6 +328,10 @@ export default {
       try {
         if (!this.text) {
           this.isEmpty = false
+          return
+        } else if (this.text.trim() === '') {
+          this.isEmpty = false
+          return
         }
 
         const { data } = await tweetAPI.createTweet({
@@ -336,6 +345,11 @@ export default {
           id,
           description,
           User: { id: UserId },
+          Replies: { replyTotal: 0 },
+          Likes: {
+            isLike: false,
+            likeTotal: 0
+          },
           createdAt,
         }
 
@@ -383,7 +397,7 @@ export default {
         //     return {
         //       ...tweets,
         //       Replies: {
-        //         replyTotal: tweets.replyTotal + 1
+        //         replyTotal: parseInt(tweets.replyTotal) + 1
         //       }
         //     }
         //   }
@@ -404,7 +418,7 @@ export default {
             {...this.newReply},
             ...this.tweet.Replies
           ],
-          replyTotal: this.tweet.replyTotal + 1
+          replyTotal: parseInt(this.tweet.replyTotal) + 1
         }
 
         if (data.status !== "success") {
@@ -623,13 +637,13 @@ export default {
   @extend %button-orange;
   min-width: 76px;
   height: 40px;
-  &.button-reply{
+  &.button-reply {
     position: absolute;
     right: 1rem;
     bottom: 1rem;
   }
   &:disabled {
-      background: $form-input-placeholder;
-    }
+    background: $form-input-placeholder;
+  }
 }
 </style>
