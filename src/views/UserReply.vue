@@ -48,14 +48,14 @@ export default {
     } 
   },
   methods:{
-      // TODO:篩除非user的用戶
     async fetchUserReplies(id){
       try{
         const {data, statusText} = await userAPI.getReplies({id})
-        this.replies = data
         if(statusText !== 'OK'){
           throw new Error (statusText)
         }
+        // 篩除非user的用戶
+        this.replies = data.filter( reply => reply.Tweet.User.role === 'user')
       }catch(error){
         if(error.response.status === 500){
           this.noReplies = true

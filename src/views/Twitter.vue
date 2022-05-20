@@ -217,8 +217,10 @@ export default {
         if (statusText !== "OK") {
           throw new Error(statusText)
         }
-        // console.log(data)
         this.tweets = data
+        // TODO:待補 API 資料
+        // 篩除非user的用戶
+        // this.tweets = data.filter( data => data.User.role === 'user' )
         // this.tweets = data.map( data => {
         //   id: data.id,
         //   User: data.User,

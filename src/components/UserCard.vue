@@ -205,6 +205,7 @@ export default {
           title: '已儲存更新'
         })
         this.isProcessing = false
+        this.$store.commit('setCurrentUser', this.user)
       }catch(error){
         this.isProcessing = false
         Toast.fire({

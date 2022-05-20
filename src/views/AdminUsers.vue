@@ -63,8 +63,7 @@ export default {
       // TODO:推文數、按讚數、追蹤、被追蹤的單位Ｋ？
       try{
         const {data, statusText} = await adminAPI.get()
-        console.log(data)
-        this.users = data
+        this.users = data.filter( user => user.role === 'user')
         if(statusText !== 'OK'){
           throw new Error(statusText)
         }

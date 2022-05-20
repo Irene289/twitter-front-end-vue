@@ -20,7 +20,7 @@ export default {
   //   return apiHelper.put(`/users/${userId}`, formData)
   // },
   update({ userId, formData }) {
-    return apiHelper.put(`/users/${userId}/account`, formData)
+    return apiHelper.put(`/users/${userId}?page=account`, formData)
   },
   getLikes({id}){
     return apiHelper.get(`/users/${id}/likes`)

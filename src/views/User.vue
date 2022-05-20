@@ -110,9 +110,11 @@
         try{
           // TODO:篩除非user的用戶
           const {data, statusText} = await userAPI.get({id:userId})   
-          const {id,name, account ,coverImg, avatarImg, introduction, is_following:isFollowing, Following: following, Follower: follower} = data
+          const {id,role, name, account ,coverImg, avatarImg, introduction, is_following:isFollowing, Following: following, Follower: follower} = data
+
           this.user = {
             id,
+            role,
             name,
             account,
             coverImg: coverImg? coverImg : "",
@@ -122,11 +124,12 @@
             followingCount: follower.length? follower.length : 0,
             followerCount: following.length? following.length : 0,
           }
+
           if(statusText !== 'OK'){
             throw new Error(statusText)
           }
-        }catch(error){
 
+        }catch(error){
           Toast.fire({
             icon:'error',
             title: '無法載入使用者資訊，請稍後再試'

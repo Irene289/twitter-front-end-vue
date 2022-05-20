@@ -1,21 +1,25 @@
 <template>
-  <div class="tweet__card">
-    <div class="tweet__card__item">
-      <slot name="avatar">
-        <img class="avatar" src="" alt="" />
-      </slot>
-    </div>
-    <div class="tweet__card__item">
-      <div class="account">
-        <p class="name"><slot name="name"></slot></p>
-        <p class="id"><slot name="id"></slot></p>
-        <p class="post-time">・<slot name="post-time"></slot></p>
+  <!-- <div>
+    <slot name="isUser"> -->
+      <div class="tweet__card">
+        <div class="tweet__card__item">
+          <slot name="avatar">
+            <img class="avatar" src="" alt="" />
+          </slot>
+        </div>
+        <div class="tweet__card__item">
+          <div class="account">
+            <p class="name"><slot name="name"></slot></p>
+            <p class="id"><slot name="id"></slot></p>
+            <p class="post-time">・<slot name="post-time"></slot></p>
+          </div>
+          <p class="text">
+            <slot name="text"></slot>
+          </p>
+        </div>
       </div>
-      <p class="text">
-        <slot name="text"></slot>
-      </p>
-    </div>
-  </div>
+    <!-- </slot>
+  </div> -->
 </template>
 <script>
 export default {};
