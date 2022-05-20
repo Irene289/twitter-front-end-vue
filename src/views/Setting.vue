@@ -173,6 +173,7 @@ export default {
             title: "請輸入所有欄位",
           });
           this.isProcessing = false;
+          return
         }
 
         // 密碼錯誤處理

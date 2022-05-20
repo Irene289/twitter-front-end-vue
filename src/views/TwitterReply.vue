@@ -11,11 +11,11 @@
     <div class="reply-div scrollbar">
       <div class="reply-div-user">
         <div class="user-img avatar">
-          <img :src="user.avatarImg" alt="" />
+          <img :src="tweet.User.avatarImg" alt="" />
         </div>
         <div class="user-info">
-          <p class="user-info-name">{{ user.name }}</p>
-          <p class="user-info-account">@{{ user.account }}</p>
+          <p class="user-info-name">{{ tweet.User.name }}</p>
+          <p class="user-info-account">@{{ tweet.User.account }}</p>
         </div>
       </div>
       <div class="reply-div-content">
@@ -43,10 +43,11 @@
             @click.stop.prevent="replyModal"
           />
           <img
-            v-if="!isLike"
+            v-if="!tweet.isLike"
             class="content-response-like"
             src="../assets/static/images/like@2x.png"
             alt=""
+            :disabled="isProcessing"
             @click.stop.prevent="likeTweet(tweet.id)"
           />
           <img
@@ -54,6 +55,7 @@
             class="content-response-like"
             src="../assets/static/images/redHeart@2x.png"
             alt=""
+            :disabled="isProcessing"
             @click.stop.prevent="unlikeTweet(tweet.id)"
           />
         </div>
@@ -74,22 +76,37 @@
           {{ reply.User.account }}
         </template>
         <template v-slot:post-time>
-          {{ reply.User.createdAt | fromNow }}
+          {{ reply.createdAt | fromNow }}
         </template>
         <template v-slot:text>
           <div class="reply-tag">
             回覆 <span>@{{ tweet.User.account }}</span>
           </div>
           {{ reply.comment | tweetFilter }}
+          <div class="icons">
+            <div class="icon-wrapper">
+              <img src="../assets/static/images/reply@2x.png" alt="" />
+              <!-- TODO:暫填，非真實數據 -->
+              <p class="count">{{ reply.User.id }}</p>
+            </div>
+            <div class="icon-wrapper">
+              <img src="../assets/static/images/like@2x.png" alt="" />
+              <!-- <img
+                v-else
+                src="../assets/static/images/redHeart@2x.png"
+                alt=""
+                @click.stop.prevent="unlikeTweet(tweet.id)"
+              /> -->
+              <!-- TODO:暫填，非真實數據 -->
+              <p class="count">{{ reply.User.id }}</p>
+            </div>
+          </div>
         </template>
       </UserTweetCard>
     </div>
 
     <!-- modal -->
-    <div 
-      class="container" 
-      :class="{ 'd-none': dNoneReplyModal }"
-    >
+    <div class="container" :class="{ 'd-none': dNoneModal }">
       <div class="modal row">
         <form class="modal-content col-6" action="">
           <div class="modal-content-cancel">
@@ -99,27 +116,30 @@
           </div>
 
           <TweetModal>
-              <!-- 推文 -->
-            <!-- <template v-slot:isReplyModel>
-              <div class="tweet-div"></div>
-            </template> -->
             <template v-slot:replytoAvatarImg>
-              <img class="avatar top-avatar" :src="user.avatarImg" alt="" />
+              <img
+                class="avatar top-avatar"
+                :src="tweet.User.avatarImg"
+                alt=""
+              />
             </template>
             <template v-slot:replyto>
-              <div class ="modal-topic-content"> 
+              <div class="modal-topic-content">
                 <div class="modal-user-content">
-                  <p class="content-info-name">{{ user.name }}</p>
-                  <p class="content-info-account">@{{ user.account }}</p>
-                  <p class="content-info-time">{{ tweet.createdAt | fromNow }}</p>
-                </div>                             
+                  <p class="content-info-name">{{ tweet.User.name }}</p>
+                  <p class="content-info-account">@{{ tweet.User.account }}</p>
+                  <p class="content-info-time">
+                    {{ tweet.createdAt | fromNow }}
+                  </p>
+                </div>
                 <p class="content-info-description">
-                {{ tweet.description | tweetFilter}}
+                  {{ tweet.description | tweetFilter }}
                 </p>
               </div>
-             
             </template>
-            <template v-slot:replytoAccount> @{{ user.account }} </template>
+            <template v-slot:replytoAccount>
+              @{{ tweet.User.account }}
+            </template>
 
             <!-- 回覆 -->
             <template v-slot:avatarImg>
@@ -138,17 +158,21 @@
               </textarea>
             </template>
             <template v-slot:alert>
-              <span v-if="!isModalEmpty" class="text-empty modal-alert warning">內容不可空白</span>
-              <span v-if="isModalExceed" class="text-exceed modal-alert warning">字數不可超過 140 字</span>
+              <span v-if="!isModalEmpty" class="text-empty modal-alert warning"
+                >內容不可空白</span
+              >
+              <span v-if="isModalExceed" class="text-exceed modal-alert warning"
+                >字數不可超過 140 字</span
+              >
             </template>
           </TweetModal>
 
-          <button 
+          <button
             class="btn modal-tweet"
             @click.stop.prevent="handleReply(tweet.id)"
-              :disabled="isModalExceed"
-            > 
-              {{ isProcessing ? "處理中" : "回覆" }}
+            :disabled="isModalExceed"
+          >
+            {{ isProcessing ? "處理中" : "回覆" }}
           </button>
         </form>
       </div>
@@ -159,66 +183,50 @@
 <script>
 import UserTweetCard from "../components/UserTweetCard.vue";
 import TweetModal from "../components/TweetModal";
-import { fromNowFilter, textFilter } from "./../utils/mixins"
+import { fromNowFilter, textFilter } from "./../utils/mixins";
 import tweetAPI from "../apis/tweet";
 import { Toast } from "../utils/helpers";
-import { mapState } from 'vuex'
+import { mapState } from "vuex";
 
 export default {
   name: "TwitterReply",
   mixins: [fromNowFilter, textFilter],
   components: {
     UserTweetCard,
-    TweetModal
+    TweetModal,
   },
   data() {
     return {
-      // 要回覆的對象
-      tweet: {},
-      user: {
-        avatarImg: "",
-        name: "",
-        account: "",
-      },
-      isLike: false,
-      // 回覆對象的其他回覆
-      replies: [],
-      avatarImg: "",
+      tweet: {},       // 要回覆的對象
+      replies: [],     // 回覆對象的其他回覆
       textReply: "",
-      // isReplyModel: true,
-      dNoneReplyModal: true,
+      dNoneModal: true,
       isProcessing: false,
       isModalEmpty: true,
-      isModalExceed: false
+      isModalExceed: false,
     };
   },
   watch: {
-     textReply(){
-       this.modalWarning()
-     }
+    textReply() {
+      this.modalWarning();
+    },
   },
   created() {
-    const { id: id } = this.$route.params;
+    const { id } = this.$route.params;
+    this.fetchTweet(id);
     this.fetchReplies(id);
   },
   methods: {
-    // 顯示推文跟所有回覆
-    async fetchReplies(id) {
+    // 顯示推文資訊
+    async fetchTweet(id) {
       try {
-        const { data, statusText } = await tweetAPI.getReply({ id });
+        const { data, statusText } = await tweetAPI.getTweet({ id });
 
         if (statusText !== "OK") {
           throw new Error(statusText);
         }
-        const { Replies } = data;
 
         this.tweet = data;
-        this.user = data.User;
-        this.replies = Replies;
-
-        console.log(data)
-        console.log(data.User)
-        // console.log(this.user)
       } catch (error) {
         console.log(error);
         Toast.fire({
@@ -227,122 +235,142 @@ export default {
         });
       }
     },
-    // 按讚
-    async likeTweet(id) {
+    // 顯示推文底下留言資訊
+    async fetchReplies(id) {
       try {
-        const { data } = await tweetAPI.likeTweet({id})
+        const { data, statusText } = await tweetAPI.getReplies({ id });
+        
+        if (statusText !== "OK") {
+          throw new Error(statusText);
+        }
 
-        if (data.status !== "success") {
-            throw new Error(data.status)
-        }
-        this.isLike = true
-        this.tweet = {
-          ...this.tweet,
-          likeTotal: this.tweet.likeTotal + 1
-        }
+        this.replies = data;
       } catch (error) {
-        console.log(error)
+        console.log(error);
         Toast.fire({
-          icon: 'error',
-          title: '無法點讚，請稍後再試'
-        })
+          icon: "error",
+          title: "暫時無法取得回覆",
+        });
       }
-    },
-    // 取消讚
-    async unlikeTweet(id) {
-      try {
-        const { data } = await tweetAPI.unlikeTweet({id})
-
-        if (data.status !== "success") {
-            throw new Error(data.status)
-        }
-        this.isLike = false
-        this.tweet = {
-          ...this.tweet,
-          likeTotal: this.tweet.likeTotal - 1
-        }
-      } catch (error) {
-        console.log(error)
-        Toast.fire({
-          icon: 'error',
-          title: '無法取消讚，請稍後再試'
-        })
-      }
-    },
-    // 開啟 Modal
-    replyModal() {
-      this.dNoneReplyModal = !this.dNoneReplyModal;
-    },
-    // 關閉 Modal
-    handleCloseBtn() {
-      this.dNoneReplyModal = !this.dNoneReplyModal;
-      this.textReply = "";
-    },
-    // 字數警示
-    modalWarning() {
-      if (this.textReply.length > 140) {
-        // this.isModalEmpty = false
-        this.isModalExceed = true
-        this.isProcessing = false
-      } else {
-        this.isModalEmpty = true
-        this.isModalExceed = false
-      }
-      return
     },
     // 回覆一則推文
     async handleReply(TweetId) {
       try {
         // 內容空白處理
         if (!this.textReply) {
-          this.isModalEmpty = false
+          this.isModalEmpty = false;
         }
-        // console.log(this.currentUser)
-        console.log(TweetId)
-        // const { id, comment, UserId, TweetId, createdAt } = payload
 
-        const { data } = await tweetAPI.createReply({ 
-          TweetId: TweetId, 
-          comment: this.textReply, 
-          UserId: this.currentUser.id,
-          // TweetId,
-        })
+        const { data } = await tweetAPI.createReply({
+          TweetId,
+          comment: this.textReply,
+        });
 
-        console.log(data)
+        this.textReply = {
+          comment: this.textReply,
+          createdAt: new Date(),
+          User: {
+            id: this.currentUser.id,
+            account: this.currentUser.account,
+            name: this.currentUser.name,
+            avatarImg: this.currentUser.avatarImg,
+          },
+        };
 
-        // this.tweet = {}
-
-        // this.newReply = {
-        //   // id,
-        //   comment: this.textReply,
-        //   UserId,
-        //   TweetId,
-        //   createdAt,
-        // }
+        this.replies = [{ ...this.textReply }, ...this.replies];
 
         if (data.status !== "success") {
-          throw new Error(data.message)
+          throw new Error(data.message);
         } else {
           Toast.fire({
-          icon: 'success',
-          title: "成功送出回覆",
-          })
-          this.textReply = ""
-          this.dNoneReplyModal = !this.dNoneReplyModal
+            icon: "success",
+            title: "成功送出回覆",
+          });
+          this.textReply = "";
+          // this.isProcessing = false;
+          this.dNoneModal = !this.dNoneModal;
         }
-
-        // console.log(data)
       } catch (error) {
+        // this.isProcessing = false;
         if (error.response.status === 500) {
-          return
+          return;
         } else {
           console.log(error);
           Toast.fire({
             icon: "error",
             title: "暫時無法回覆推文",
-          })
+          });
         }
       }
+    },
+    // 對推文按讚
+    async likeTweet(id) {
+      try {
+        this.isProcessing = true;
+        const { data } = await tweetAPI.likeTweet({ id });
+
+        if (data.status !== "success") {
+          throw new Error(data.status);
+        }
+
+        this.tweet.isLike = true;
+        this.tweet = {
+          ...this.tweet,
+          likeTotal: this.tweet.likeTotal + 1,
+        };
+        this.isProcessing = false;
+      } catch (error) {
+        this.isProcessing = false;
+        console.log(error);
+        Toast.fire({
+          icon: "error",
+          title: "無法點讚，請稍後再試",
+        });
+      }
+    },
+    // 對推文取消讚
+    async unlikeTweet(id) {
+      try {
+        this.isProcessing = true;
+        const { data } = await tweetAPI.unlikeTweet({ id });
+
+        if (data.status !== "success") {
+          throw new Error(data.status);
+        }
+        this.tweet.isLike = false;
+        this.tweet = {
+          ...this.tweet,
+          likeTotal: this.tweet.likeTotal - 1,
+        };
+        this.isProcessing = false;
+      } catch (error) {
+        this.isProcessing = false;
+        console.log(error);
+        Toast.fire({
+          icon: "error",
+          title: "無法取消讚，請稍後再試",
+        });
+      }
+    },
+    // 開啟 Modal
+    replyModal() {
+      this.dNoneModal = !this.dNoneModal;
+    },
+    // 關閉 Modal
+    handleCloseBtn() {
+      this.dNoneModal = !this.dNoneModal;
+      this.textReply = "";
+    },
+    // Modal 字數警示
+    modalWarning() {
+      if (this.textReply.length > 140) {
+        this.isModalExceed = true;
+        this.isProcessing = false;
+      } else {
+        this.isModalEmpty = true;
+        this.isModalExceed = false;
+      }
+      return;
     },
     //TODO:功能待後端補資料
     // async likeTweet(id){
@@ -357,9 +385,9 @@ export default {
     //         return {
     //         ...tweet,
     //         likeUnlike: true,
-              
+
     //         }
-    //       }            
+    //       }
     //     })
     //   }catch(error){
     //     Toast.fire({
@@ -370,8 +398,8 @@ export default {
     // },
   },
   computed: {
-    ...mapState(['currentUser'])
-  }
+    ...mapState(["currentUser"]),
+  },
 };
 </script>
 
@@ -490,6 +518,9 @@ export default {
     font-family: $number-font;
   }
 }
+.icon-wrapper img {
+  cursor: pointer;
+}
 
 // modal
 .modal {
@@ -523,18 +554,18 @@ export default {
     width: 50px;
     height: 50px;
     border-radius: 50%;
-    &.top-avatar{
+    &.top-avatar {
       margin-top: 16px;
     }
   }
-  .modal-topic-content{
+  .modal-topic-content {
     display: flex;
     flex-flow: column;
   }
-  .modal-user-content{
-    display: flex;  
+  .modal-user-content {
+    display: flex;
   }
-  .content-info-description{
+  .content-info-description {
     line-height: 26px;
     margin-top: 8px;
   }
@@ -543,7 +574,7 @@ export default {
 .modal-tweet {
   @extend %button-orange;
   position: absolute;
-  right:1rem;
+  right: 1rem;
   bottom: 1rem;
   min-width: 76px;
   height: 40px;
