@@ -124,9 +124,11 @@ export default {
     width:100%;
     margin-top: 13px;
     max-width:273px;
-    height:731px;
+    // height:731px;
     background: #FAFAFB;
     border-radius: 16px;
+    overflow-y: scroll;
+    height: 100vh;
     img{
       width:50px;
       height: 50px;
@@ -141,7 +143,7 @@ export default {
     .popular__list__item{  
       cursor:pointer; 
       display: flex;
-      padding: 0.4rem; 
+      padding: 1rem; 
       .item-account{
         flex: 1;
         width: 74px;
