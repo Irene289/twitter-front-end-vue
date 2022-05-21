@@ -11,7 +11,7 @@
           :key ="tweet.id"
           class="tweets-div__tweet">
           <div class="tweets-div__tweet--img">
-            <img :src="tweet.User.avatarImg" alt="" class="avatar">
+            <img :src="tweet.User.avatarImg | avatarFilter" alt="" class="avatar">
           </div>
           <div class="tweets-div__tweet--content">
             <div class="content-info">
@@ -25,7 +25,7 @@
             <button
               :disabled="isProcessing" 
               class="btn close-btn"
-              @click.stop.prevent="deleteTweet(tweet.id)"
+              @click.stop.prevent="confirmDelete(tweet.id)"
             >
               <img src="../assets/static/images/close@2x.png" alt="">
             </button>
@@ -37,26 +37,29 @@
 </template>
 
 <script>
-//TODO:日期顯示待調整
+import {imgFilter} from '../utils/mixins'
+import Swal from 'sweetalert2'
 import {textFilter} from '../utils/mixins'
 import { fromNowFilter } from './../utils/mixins'
 import Sidebar from '../components/Sidebar.vue'
 import {Toast} from '../utils/helpers'
 import tweetAPI from '../apis/tweet'
 export default {
+  name:'AdminTweetsList',
   components: { 
     Sidebar 
   },
-  mixins:[fromNowFilter, textFilter],
+  mixins:[fromNowFilter, textFilter, imgFilter],
   data () {
     return {
       tweets:[],
       isAdmin: true,
-      isProcessing: false
+      isProcessing: false,
+      isConfirm: false
     }
   },
   methods: {
-    async deleteTweet (id) {
+    async deleteTweet (id) {   
       try{
         this.isProcessing = true
         const {statusText} = await tweetAPI.deleteTweet({id})
@@ -71,8 +74,9 @@ export default {
           icon: 'error',
           title: '無法刪除貼文，請稍後再試'
         })
-      }
+      }     
     },
+     
     async fetchTweets(){
       try{  
         const {data, statusText} = await tweetAPI.getTweets()
@@ -87,6 +91,23 @@ export default {
         })
       }
     },
+    confirmDelete(id){
+       Swal.fire({
+        icon: 'warning',
+        title: '確定要刪除推文嗎？',
+        showCancelButton: true
+      }).then( result => {
+          if(result.value){
+            console.log('刪除',result.value)
+            return this.deleteTweet(id)
+          }else if(result.dismiss === 'cancel'){
+            console.log('取消',result)
+            return        
+          }
+        }
+      )         
+    }
+  
   },
   created(){
     this.fetchTweets()

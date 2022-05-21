@@ -6,6 +6,7 @@ import store from '../store'
 import NotFound from '../views/NotFound.vue'
 // import Twitter from '../views/Twitter.vue'
 import TwitterMain from '../views/TwitterMain.vue'
+import {Toast} from '../utils/helpers'
 
 Vue.use(VueRouter)
 
@@ -31,20 +32,17 @@ const routes = [
   // 前台首頁
   {
     path: '/twitter', 
-    // meta: { requiresAuth: true }, 
-    // name: 'twitter-main',
+    meta: { requiresAuth: true }, 
     component: TwitterMain,
     children: [
       {
         path: '',
         name: 'twitter',
-        // meta: { requiresAuth: true }, 
         component: () => import('../views/Twitter.vue')
       },
       {
         path: ':id/replies',
         name: 'twitter-replies',
-        // meta: { requiresAuth: true }, 
         component: () => import('../views/TwitterReply.vue')
       }
     ]
@@ -52,8 +50,7 @@ const routes = [
   // 前台使用者主頁
   {
     path: '/users',  
-    // meta: { requiresAuth:true },
-    // name: 'user-tweets',  
+    meta: { requiresAuth:true },
     component: () => import('../views/User.vue'),
     children: [
       {
@@ -77,8 +74,7 @@ const routes = [
   // 前台使用者追蹤頁
   {
     path: '/users',
-    // meta: { requiresAuth: true },
-    // name: 'user-follow',
+    meta: { requiresAuth: true },
     component: () => import('../views/UserFollow.vue'),
     children: [
       {
@@ -96,7 +92,7 @@ const routes = [
   {
     path: '/users/:id/setting',
     name: 'user-setting',
-    // meta: { requiresAuth: true },    
+    meta: { requiresAuth: true },    
     component: () => import('../views/Setting.vue')
   },
   {
@@ -133,78 +129,31 @@ const router = new VueRouter({
   routes
 })
 
-router.beforeEach(async (from, to, next) => {
+router.beforeEach(async (to, from, next) => {
   const storageToken = localStorage.getItem('token')
   const stateToken = store.state.token
   let isAuthenticated = store.state.isAuthenticated
-  // const noNeedAuthenticated = ['signin', 'regist', 'admin']
-  // console.log('登入:',isAuthenticated)
-
-  if (storageToken && storageToken !== stateToken) {
-    isAuthenticated = await store.dispatch('fetchCurrentUser')
-  }
-  //TODO:未登入訪問頁面導向signin ;已登入訪問signin, sign up頁面導向twitter 或 adminTweet
-  // if (!isAuthenticated && !noNeedAuthenticated.includes(to.name)){
-  //   next('/signin')
-  //   return
-  // }
-  // if (isAuthenticated && noNeedAuthenticated.includes(to.name)){
-  //   next('/twitter')
-  //   return
-  // }
-
-  // next()
-
-  // 上面會有無窮迴圈，改為以下
-  // console.log(to.meta) 
-  // console.log(to.meta) 
   // console.log(to.matched.some(record => record.meta.requiresAuth))
   // 路由元資訊 .meta $route.matched 搭配路由守衛 進行驗證
   if (to.matched.some(record => record.meta.requiresAuth)) {
-    isAuthenticated = await store.dispatch('fetchCurrentUser')
-    isAuthenticated
-      ? next({ path: '/twitter' })
-      : next({ path: '/signin' })
-    return
+    if (storageToken && storageToken !== stateToken) {
+      isAuthenticated = await store.dispatch('fetchCurrentUser')
+    }
+    if(isAuthenticated){
+      next()
+      return
+    } else {
+      Toast.fire({
+        icon: 'warning',
+        title: '您訪問的頁面需要登入，若尚未註冊，請先註冊在登入'
+      })
+      next({ path: '/signin' })
+      return
+    }
   } else {
     next()
     return
   }
-  //如果需要驗證的頁面，但沒有登入
-  // if (to.meta.requiresAuth && !isAuthenticated){
-  //   return next({ path: '/signin' })
-  // }
-  // console.log(to.matched)
-  //訪問的頁面需要驗證的話
-  // if (to.matched.some(record => record.meta.requiresAuth )) {
-  //   console.log('需要驗證')
-  //   console.log('驗證',to.path)
-  // 如果已經有驗證（sign in 的時候驗證），就可以next()
-    // if (isAuthenticated) {
-    //   next()
-    // }
-
-      // 若沒有驗證而且前往的頁面是首頁，那就跳轉至signin頁面
-  //     else if(!isAuthenticated && to.path === '/twitter'){
-  //     console.log('twitter')
-  //     next({ path: '/signin' })
-  //   }
-  // }
-    // isAuthenticated = await store.dispatch('fetchCurrentUser') 
-    // isAuthenticated
-    //   ? next({ path: '/twitter' })
-    //   : next({ path: '/signin' })
-    // return
-  // } 
-  //   else {
-  //     console.log('不需驗證')
-  //     console.log('不用驗證',to.path)
-  //     next()
-  //     return
-  //   }
-  
-  // next()
-  
 })
 
 export default router

@@ -18,18 +18,6 @@ axiosInstance.interceptors.request.use(config => {
   Promise.reject(error)
 })
 
-
-// axiosInstance.interceptors.response.use( response => {
-//   return response;
-// }, function (error) {
-//   if (error.response.status === 500) {
-//     console.log('HI, here is helpers.js')
-//     return error.response
-//   } else {
-//     return Promise.reject(error);
-//   }
-// })
-
 export const apiHelper = axiosInstance
 
 export const Toast = Swal.mixin({

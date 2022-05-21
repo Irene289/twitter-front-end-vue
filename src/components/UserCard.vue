@@ -14,18 +14,19 @@
           <template v-if="user.id !== currentUser.id">
             <div class="group-item">
             <img 
-              @click.stop.prevent="sendDm"
+              @click.stop.prevent="popUpMessage"
               src="../assets/static/images/msg@2x.png" alt="">          
             </div>
             <div class="group-item">
               <img 
-                v-if="!isSubscribe"
-                @click.stop.prevent="toggleSub" 
+                @click.stop.prevent="popUpMessage"
                 class="notify" src="../assets/static/images/notfi@2x.png" alt=""
               >
-              <img v-else 
+              <!--小鈴鐺訂閱功能待開發 -->
+              <!-- <img 
                  @click.stop.prevent="toggleSub" 
-                class="notified" src="../assets/static/images/notfied@2x.png" alt="">
+                class="notified" src="../assets/static/images/notfied@2x.png" alt=""
+              > -->
             </div>
             <div v-if="!user.isFollowing" class="group-item follow">
               <button 
@@ -119,7 +120,6 @@ export default {
       route: '',
       isEditing: false,
       isCurrentUser: true,
-      isSubscribe: false,
       isProcessing: false,
       user:{...this.initialUser}
     }
@@ -141,10 +141,10 @@ export default {
         this.isSubscribe = false
       }       
     },
-    sendDm(){
+    popUpMessage(){
       Toast.fire({
         icon:'warning',
-        title: '私訊功能開發中'
+        title: '此功能開發中'
       })
     },
     async follow(id){

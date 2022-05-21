@@ -32,12 +32,12 @@
 
       <div class="regist-form__div regist-form__input-password">
         <label for="">密碼</label>
-        <input v-model.trim="password" name="password" type="text" placeholder="請設定密碼" />
+        <input v-model.trim="password" name="password" type="password" placeholder="請設定密碼" />
       </div>
 
       <div class="regist-form__div regist-form__input-password-check">
         <label for="">密碼確認</label>
-        <input v-model.trim="passwordCheck" type="passwordCheck" name="passwordCheck" placeholder="請再次輸入密碼" />
+        <input v-model.trim="passwordCheck" type="password" name="passwordCheck" placeholder="請再次輸入密碼" />
       </div>
 
       <button class="btn btn-regist" type="submit" :disabled="isProcessing">

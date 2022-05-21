@@ -7,7 +7,7 @@
           <img
             @click.prevent.stop="visit(tweet.User.id, 'user-tweets')"
             class="avatar"
-            :src="tweet.User.avatarImg"
+            :src="tweet.User.avatarImg | avatarFilter"
             alt=""
           />
         </template>
@@ -56,7 +56,8 @@
   </div>
 </template>
 <script>
-import {textFilter} from '../utils/mixins'
+import { imgFilter } from '../utils/mixins'
+import { textFilter } from '../utils/mixins'
 import { visitPage } from "../utils/mixins"
 import UserTweetCard from "../components/UserTweetCard.vue"
 import { fromNowFilter } from "./../utils/mixins"
@@ -66,7 +67,7 @@ import {Toast} from '../utils/helpers'
 
 export default {
   name: "UserTweets",
-  mixins: [fromNowFilter, visitPage, textFilter],
+  mixins: [fromNowFilter, visitPage, textFilter, imgFilter],
   components: {
     UserTweetCard,
   },
