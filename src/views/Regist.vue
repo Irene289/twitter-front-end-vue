@@ -17,30 +17,110 @@
 
       <div class="regist-form__div regist-form__input-account">
         <label for="">帳號</label>
-        <input v-model="account" type="text" name="account" placeholder="請輸入帳號" />
+        <input 
+          v-model.trim="account" 
+          type="text" 
+          name="account" 
+          placeholder="請輸入帳號" 
+          @change="inputWarning"
+          required
+        />
+        <div class="text-limits">
+          <span 
+            v-show="wrongAccount"
+            class="text-limit">
+            請輸入英文字母或數字
+          </span>
+        </div>
       </div>
 
       <div class="regist-form__div regist-form__input-name">
         <label for="">名稱</label>
-        <input v-model="name" name="name" type="text" placeholder="請輸入使用者名稱" />
+        <input 
+          v-model.trim="name" 
+          name="name" 
+          type="text" 
+          placeholder="請輸入使用者名稱" 
+          @change="inputWarning"
+          required
+        />
+        <div class="text-limits text-limit-length">
+          <span 
+            v-show="wrongName"
+            class="text-limit">
+            請輸入英文字母或數字
+          </span>
+          <span class="text-length" :class="{ waring: isExceed }">
+            {{ textWarning(name.length) }}
+            {{ name.length }}/50</span
+          >
+        </div>
       </div>
 
       <div class="regist-form__div regist-form__input-email">
         <label for="">Email</label>
-        <input v-model="email" name="email" type="text" placeholder="請輸入 Email" />
+        <input 
+          v-model="email" 
+          name="email" 
+          type="email" 
+          placeholder="請輸入 Email"
+          @change="inputWarning"
+          required
+        />
+        <div class="text-limits">
+          <span 
+            v-if="wrongEmail"
+            class="text-limit"
+          >
+            請輸入正確 email 格式
+          </span>
+        </div>
       </div>
 
       <div class="regist-form__div regist-form__input-password">
         <label for="">密碼</label>
-        <input v-model="password" name="password" type="text" placeholder="請設定密碼" />
+        <input 
+          v-model.trim="password" 
+          name="password" 
+          type="password" 
+          placeholder="請設定密碼" 
+          @change="inputWarning"
+          required
+        />
+        <div class="text-limits">
+          <span 
+            v-show="wrongPassword"
+            class="text-limit"
+          >
+            請輸入英文字母或數字
+          </span>
+        </div>
       </div>
 
       <div class="regist-form__div regist-form__input-password-check">
         <label for="">密碼確認</label>
-        <input v-model="passwordCheck" type="passwordCheck" name="passwordCheck" placeholder="請再次輸入密碼" />
+        <input 
+          v-model.trim="passwordCheck" 
+          type="password" 
+          name="passwordCheck" 
+          placeholder="請再次輸入密碼"
+          @change="inputWarning"
+          required 
+        />
+        <div class="text-limits">
+          <span 
+            v-show="wrongPasswordCheck"
+            class="text-limit"
+          >
+            請輸入英文字母或數字
+          </span>
+        </div>
       </div>
 
-      <button class="btn btn-regist" type="submit" :disabled="isProcessing">
+      <button 
+        class="btn btn-regist" 
+        type="submit" :disabled="isProcessing || isExceed"
+      >
         {{isProcessing? "處理中" : '註冊'}}
       </button>
 
@@ -62,12 +142,18 @@ export default {
   name: 'Regist',
   data(){
     return{
-      isProcessing: false,
       account: "",
       name: "",
       email: "",
       password: "",
       passwordCheck: "",
+      wrongAccount: false,
+      wrongName: false,
+      wrongEmail: false,
+      wrongPassword: false,
+      wrongPasswordCheck: false,
+      isProcessing: false,
+      isExceed: false,
     }
   },
   methods:{
@@ -125,21 +211,54 @@ export default {
         }       
       }
     },
-    warning(){
-      if(this.name.length > 50){
-        Toast.fire({
-          icon:'warning',
-          title:'名稱字數不可超過50字'
-        })
+    textWarning(length){
+      if (!length) {
+        this.isExceed = false;
+      } else if (length > 50) {
+        this.isExceed = true;
       }
-    }
+    },
+    inputWarning() {
+      const re = /^[A-Za-z0-9]*$/
+      const emailRe = /[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,4}$/
+
+      re.test(this.account)
+        ? this.wrongAccount = false 
+        : this.wrongAccount = true
+
+      re.test(this.name)
+        ? this.wrongName = false 
+        : this.wrongName = true
+
+      emailRe.test(this.email) || this.email.trim() === ''
+        ? this.wrongEmail = false 
+        : this.wrongEmail = true
+
+      re.test(this.password)
+        ? this.wrongPassword = false 
+        : this.wrongPassword = true
+
+      re.test(this.passwordCheck)
+        ? this.wrongPasswordCheck = false 
+        : this.wrongPasswordCheck = true
+        
+      if (re.test(this.account) 
+        && re.test(this.name)
+        && emailRe.test(this.email)
+        && re.test(this.password)
+        && re.test(this.passwordCheck)
+      ) {
+        this.isProcessing = false
+      } else {
+        this.isProcessing = true
+      }
+    },
   },
   watch:{
     name(){
-      this.warning()
+      this.textWarning()
     }
   }
-
 };
 </script>
 
@@ -193,7 +312,28 @@ export default {
     background: transparent;
     @extend %focus;
   }
-  
+}
+.text-limits {
+  color: $modal-alert;
+  display: flex;
+  font-weight: 400;
+  font-size: 14px;
+  line-height: 14px;
+  padding-top: 4px;
+
+  .text-limit {
+    color: $modal-alert;
+    margin-left: 10px;
+  }
+  .text-length {
+    @extend %form-label;
+    display: inline-block;
+    margin-left: auto;
+    margin-top: -4px;
+  }
+  .waring {
+    color: $modal-alert;
+  }
 }
 .btn {
   @extend %button-orange;
