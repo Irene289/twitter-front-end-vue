@@ -52,9 +52,8 @@
         </form>
       </div>
     </div>
-
-    <ul class="nav__list">
-      <img class="logo" src="../assets/static/images/navLogo@2x.png" alt="" />
+    <img class="logo" src="../assets/static/images/navLogo@2x.png" alt="" />
+    <ul class="nav__list">     
       <template v-if="!isAdmin">
         <li class="nav__list__item">
           <router-link to="/twitter">
@@ -69,7 +68,7 @@
                 src="../assets/static/images/home@2x.png"
                 alt=""
               />
-              <p>首頁</p>
+              <p class="hidden">首頁</p>
             </div>
           </router-link>
         </li>
@@ -91,7 +90,7 @@
                 src="../assets/static/images/user@2x.png"
                 alt=""
               />
-              <p>個人資料</p>
+              <p class="hidden">個人資料</p>
             </div>
           </router-link>
         </li>
@@ -110,7 +109,7 @@
                 src="../assets/static/images/setIcon@2x.png"
                 alt=""
               />
-              <p>設定</p>
+              <p class="hidden">設定</p>
             </div>
           </router-link>
         </li>
@@ -121,7 +120,7 @@
             <div class="nav__list__item__wrapper">
               <img class="active" :src="item.iconActive" alt="" />
               <img class="inactive" :src="item.iconInactive" alt="" />
-              <p>{{ item.title }}</p>
+              <p class="hidden">{{ item.title }}</p>
             </div>
           </router-link>
         </li>
@@ -129,9 +128,10 @@
     </ul>
 
     <button class="tweet-btn" v-if="!isAdmin" @click.stop.prevent="tweetModal">
-      推文
+      <p class="hidden">推文</p>
+      <img class="show" src="../assets/static/images/tweet@2x.png" alt="">  
     </button>
-    <div
+    <div 
       class="logout nav__list__item__wrapper"
       @click.stop.prevent="onClickLogout"
     >
@@ -145,7 +145,7 @@
         src="../assets/static/images/logout@2x.png"
         alt=""
       />
-      <p>登出</p>
+      <p class="hidden">登出</p>
     </div>
   </nav>
 </template>
@@ -296,16 +296,25 @@ export default {
 
 <style lang="scss" scoped>
 @import "../assets/scss/_basic.scss";
+
 nav {
+  width:100%;
   height: 100%;
   position: relative;
   padding-top: 13px;
-  .nav__list {
-    padding-left: 20px;
-    .logo {
-      width: 40px;
-      height: 40px;
-    }
+  display: flex;
+  flex-flow: column;
+  align-items: center;
+  .hidden{
+    display: none;
+  }
+  .show{
+    width: 20px;
+    height: 20px;
+  }
+  .logo {
+    width: 32px;
+    height: 32px;
   }
   .nav__list__item {
     margin-top: 40px;
@@ -340,10 +349,12 @@ nav {
   }
   .tweet-btn {
     @extend %button-orange;
-    width: 100%;
-    max-width: 178px;
-    height: 46px;
-    font-size: 20px;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    img{
+      transform: translateY(8px);
+    }
   }
   .logout {
     position: absolute;
@@ -397,5 +408,32 @@ nav {
       background: $form-input-placeholder;
     }
   }
+}
+@media screen and (min-width:961px){
+  nav{
+    align-items:start;
+    .hidden{
+    display: block;
+    }
+    .logo{
+      width: 40px;
+      height: 40px;
+      margin-left: 20px;
+    }
+    .nav__list {
+    padding-left: 20px;
+    }
+    .tweet-btn{
+      border-radius: 50px;
+      width: 100%; 
+      max-width: 178px;
+      height: 46px;
+      font-size: 20px;
+    }
+    .show{
+      display: none;
+    }
+  }
+ 
 }
 </style>

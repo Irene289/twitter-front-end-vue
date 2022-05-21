@@ -3,17 +3,17 @@
     <div class="container">
       <div class="row">
         <!-- sidebar -->
-        <div class="col-2 sidebar">
+        <div class="col-1 col-lg-2 sidebar">
           <Sidebar />
         </div>
 
         <!-- tweeter / twitterReply -->
-        <div class="col-7 content-container">
+        <div class="col-7 col-lg-7  content-container">
           <router-view />
         </div>
 
         <!-- popular -->
-        <div class="col-3 popular-users">
+        <div class="col-4 col-lg-3 popular-users">
           <Popular />
         </div>
       </div>
@@ -35,9 +35,10 @@ export default {
 
 <style lang="scss" scoped>
 @import "../assets/scss/basic.scss";
-main {
+.container{
+  width:100%;
   max-width: 1140px;
-  margin: 0 auto;
+  // margin: 0 auto;
 }
 .content-container {
   border-left: 1px solid $border-grey;
