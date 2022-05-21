@@ -2,10 +2,10 @@
   <main>
     <div class="container">
       <div class="row">
-        <div class="col-2 sidebar">
+        <div class="col-2 co-lg-1 sidebar">
           <Sidebar />
         </div>
-        <div class="col-7 content-container">
+        <div class="col-7 co-lg-7 content-container">
           <router-link to="/twitter">
             <div class="title">
               <img
@@ -66,7 +66,7 @@
             </div>
           </div>
         </div>
-        <div class="col-3 popular-users">
+        <div class="col-3 co-lg-4 popular-users">
           <Popular />
         </div>
       </div>
