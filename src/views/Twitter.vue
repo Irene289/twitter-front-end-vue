@@ -1,5 +1,6 @@
 <template>
   <div>
+    <Loading v-if="isLoading" />
     <div class="title">
       <h1>首頁</h1>
     </div>
@@ -152,6 +153,7 @@ import { fromNowFilter, textFilter } from "./../utils/mixins"
 import tweetAPI from "../apis/tweet"
 import { Toast } from "../utils/helpers"
 import { mapState } from "vuex"
+import Loading from '../components/Loading'
 
 export default {
   name: "Twitter",
@@ -159,6 +161,7 @@ export default {
   components: {
     UserTweetCard,
     TweetModal,
+    Loading,
   },
   data() {
     return {
@@ -172,6 +175,7 @@ export default {
       isReplyModel: true,  // 控制 Modal
       placeholder: "",     // 控制推文跟回覆的 placeholder
       isProcessing: false, // 按鈕送出
+      isLoading: false,
       isEmpty: true,
       isExceed: false,
       isModalEmpty: true,
@@ -193,6 +197,7 @@ export default {
     // 拿到全部推文
     async fetchTweets() {
       try {
+        this.isLoading = true
         const { data, statusText } = await tweetAPI.getTweets();
 
         if (statusText !== "OK") {
@@ -201,7 +206,9 @@ export default {
 
         // 篩除非user的用戶
         this.tweets = data.filter((data) => data.User.role === "user");
+        this.isLoading = false
       } catch (error) {
+        this.isLoading = false
         console.log(error);
         Toast.fire({
           icon: "error",
