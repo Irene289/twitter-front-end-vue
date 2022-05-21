@@ -2,10 +2,10 @@
   <main>
     <div class="container">
       <div class="row">
-        <div class="col-2 sidebar">
+        <div class="col-1 col-lg-2  sidebar">
           <Sidebar />
         </div>
-        <div class="col-7 content-container">
+        <div class="col-7 col-lg-7  content-container">
           <router-link to="/twitter">
             <div class="title">
               <img
@@ -66,7 +66,7 @@
             </div>
           </div>
         </div>
-        <div class="col-3 popular-users">
+        <div class="col-4 col-lg-3 popular-users">
           <Popular />
         </div>
       </div>
@@ -170,6 +170,10 @@
 </script>
 <style lang="scss" scoped>
 @import "../assets/scss/_basic.scss";
+.container{
+  width:100%;
+  max-width: 1140px;
+}
 .content-container {
   padding: 0;
   border: 1px solid $border-grey;

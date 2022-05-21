@@ -1,6 +1,6 @@
 <template>
   <div class="container">
-    <Sidebar />
+    <Sidebar />  
     <div class="tweets-div" action="">
       <div class="title">
         <h1 class="tweets-div__title">推文清單</h1>
