@@ -202,6 +202,9 @@
   display: flex;
   border-bottom: 1px solid $border-grey;
 }
+.popular-users{
+  height: 100vh;
+}
 .scrollbar {
   height: calc(100vh - 75px);
   overflow-y: scroll;

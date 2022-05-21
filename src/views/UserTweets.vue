@@ -7,7 +7,7 @@
           <img
             @click.prevent.stop="visit(tweet.User.id, 'user-tweets')"
             class="avatar"
-            :src="tweet.User.avatarImg"
+            :src="tweet.User.avatarImg | avatarFilter"
             alt=""
           />
         </template>
@@ -32,20 +32,22 @@
                 src="../assets/static/images/reply@2x.png"
                 alt=""
               />
-              <p class="count">{{ tweet.Replies }}</p>
+              <p class="count">{{ tweet.Replies.replyTotal }}</p>
             </div>
             <div class="icon-wrapper">
               <img 
+                v-show="!tweet.Likes.isLike"
                 src="../assets/static/images/like@2x.png" 
                 alt="" 
                 @click.stop.prevent="likeTweet(tweet.id)"
               />
               <img 
+                v-show="tweet.Likes.isLike"
                 src="../assets/static/images/redHeart@2x.png" 
                 alt="" 
                 @click.stop.prevent="unlikeTweet(tweet.id)"
               />
-              <p class="count">{{ tweet.Likes }}</p>
+              <p class="count">{{ tweet.Likes.likeTotal}}</p>
             </div>
           </div>
         </template>
@@ -54,7 +56,8 @@
   </div>
 </template>
 <script>
-import {textFilter} from '../utils/mixins'
+import { imgFilter } from '../utils/mixins'
+import { textFilter } from '../utils/mixins'
 import { visitPage } from "../utils/mixins"
 import UserTweetCard from "../components/UserTweetCard.vue"
 import { fromNowFilter } from "./../utils/mixins"
@@ -64,7 +67,7 @@ import {Toast} from '../utils/helpers'
 
 export default {
   name: "UserTweets",
-  mixins: [fromNowFilter, visitPage, textFilter],
+  mixins: [fromNowFilter, visitPage, textFilter, imgFilter],
   components: {
     UserTweetCard,
   },
@@ -86,7 +89,7 @@ export default {
         }
         // 篩除非user的用戶
         this.tweets = data.filter( tweet => tweet.User.role === 'user')
-        
+        console.log(data)
         if (statusText !== "OK") {
           throw new Error(statusText);
         }
@@ -113,10 +116,14 @@ export default {
           if (tweet.id !== id) {
             return tweet
           } else {
-            // console.log(typeof tweet.Likes)
+            console.log(typeof tweet.Likes.likeTotal)
             return {
               ...tweet,
-              Likes: tweet.Likes + 1
+              Likes: {
+                ...tweet.Likes,
+                isLike: true,
+                likeTotal: tweet.Likes.likeTotal+1  
+              }
             }
           }
         })
@@ -141,10 +148,13 @@ export default {
           if (tweet.id !== id) {
             return tweet
           } else {
-            // console.log(typeof tweet.Likes)
             return {
               ...tweet,
-              Likes: tweet.Likes - 1
+              Likes: {
+                ...tweet.Likes,
+                isLike: false,
+                likeTotal: tweet.Likes.likeTotal-1
+              }
             }
           }
         })

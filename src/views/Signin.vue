@@ -137,11 +137,10 @@ export default {
       } catch (error) {
         this.isProcessing = false
         this.password = ''
-
         console.log('Error', error)
         Toast.fire({
           icon: 'warning',
-          title: '請確認您輸入了正確的帳號密碼'
+          title: '此帳號不存在'
         })
       }
     },

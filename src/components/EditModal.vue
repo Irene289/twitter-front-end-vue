@@ -47,7 +47,7 @@
         <div class="info-item">
           <label for="name">名稱</label>
           <input 
-            v-model="user.name" :class="{red:!nameIsValid}" 
+            v-model.trim="user.name" :class="{red:!nameIsValid}" 
             class="name" name="name" type="text" 
           />
           <div class="hint-group">
@@ -71,6 +71,7 @@
 </template>
 <script>
 import {imgFilter} from '../utils/mixins'
+import {Toast} from '../utils/helpers'
 export default {
   props:{
     initialUserEdit:{
@@ -124,6 +125,15 @@ export default {
       this.user.coverImg = this.initialCover
     },
     handleSubmit(e){
+      //排除name輸入空格
+      const name = this.user.name.replace(/ /g,'')
+      if(name.length === 0 ){
+        Toast.fire({
+          icon: 'warning',
+          title: '名稱不可為空白'
+        }) 
+        return 
+      }
       if(this.user.name.length > 50 || this.user.introduction.length > 160) {
          return
       } 

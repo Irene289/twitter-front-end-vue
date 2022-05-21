@@ -3,7 +3,7 @@
     <h3 v-if="noFollowings">尚未追蹤其他用戶</h3>
     <template>
        <UserFollowCard
-        v-for="following in followingFilter"
+        v-for="following in followings"
         :key="following.id"
       >
         <template v-slot:avatar>
@@ -146,9 +146,6 @@ export default {
   },
   computed:{
     ...mapState(['currentUser']),
-    followingFilter(){
-      return this.followings.filter(user => user.is_following)    
-    }
   },
   beforeRouteUpdate(to, from, next){
     const {id} = to.params
