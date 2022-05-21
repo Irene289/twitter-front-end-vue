@@ -1,16 +1,5 @@
 <template>
   <main>
-    <!-- <div class="container">
-      <div class="modal row">
-        <form class="modal-content col-6" action=""> -->
-    <!-- <div class="modal-content-cancel"> -->
-    <!-- <slot name="closeBtn"> -->
-    <!-- <button class="btn">
-                <img src="" alt="">
-              </button>   -->
-    <!-- </slot> -->
-    <!-- </div> -->
-
     <!-- 推文 -->
     <slot name="isReplyModel">
       <div class="tweet-div">
@@ -49,27 +38,13 @@
         <span class="text-empty modal-alert"></span>
         <span class="text-exceed modal-alert"></span>
       </slot>
-      <!-- <button 
-              class="btn modal-tweet"
-            >
-              回覆
-            </button> -->
     </div>
-    <!-- </form>
-      </div>
-    </div> -->
   </main>
 </template>
 
 <script>
 export default {
   name: "TweetModal",
-  // props: {
-  //   dNoneReplyModal: {
-  //     type: Boolean,
-  //     default: true
-  //   }
-  // },
 };
 </script>
 
@@ -82,42 +57,10 @@ main {
   margin: 0 auto;
 }
 
-// .modal {
-//   background-color: $modal-background;
-//   position: fixed;
-//   top: 0;
-//   right: 0;
-//   bottom: 0;
-//   left: 0;
-// }
-// .modal-content {
-//   background-color: $white;
-//   border-radius: 14px;
-//   margin: auto;
-//   margin-top: 56px;
-//   padding: 0;
-//   box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.25);
-//   &-cancel {
-//     width: 100%;
-//     border-bottom: 1px solid $border-grey;
-//   }
-//   &-cancel img {
-//     width: 24px;
-//     height: 24px;
-//     margin: 16px;
-//   }
-//   .avatar {
-//     width: 50px;
-//     height: 50px;
-//     border-radius: 50%;
-//   }
-// }
 // 推文
 .tweet-div {
   width: 100%;
   display: flex;
-  // padding: 16px;
-
   &-avatar {
     margin-right: 8px;
     position: relative;
@@ -175,7 +118,6 @@ main {
 .reply-div {
   display: flex;
   align-items: flex-start;
-  // padding: 0 16px 16px 16px;
   margin: 0 16px 16px 16px;
   position: relative;
   .modal-content-avatar {
@@ -202,26 +144,6 @@ textarea {
     color: $font-small;
   }
 }
-// scrollbar
-// .scrollbar {
-//   &::-webkit-scrollbar {
-//     width: 2px;
-//   }
-//   &::-webkit-scrollbar-track {
-//     box-shadow: inset 0 0 1px $scrollbar;
-//     border-radius: 4px;
-//   }
-//   &::-webkit-scrollbar-thumb {
-//     border-radius: 4px;
-//     background-color: $scrollbar;
-//   }
-// }
-// .modal-tweet {
-//   @extend %button-orange;
-//   min-width: 76px;
-//   height: 40px;
-//   align-self: flex-end;
-// }
 .modal-alert {
   color: $modal-alert;
   font-weight: 500;

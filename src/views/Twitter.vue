@@ -60,12 +60,14 @@
                 v-if="!tweet.Likes.isLike"
                 src="../assets/static/images/like@2x.png"
                 alt=""
+                :disabled="isProcessing"
                 @click.stop.prevent="likeTweet(tweet.id)"
               />
               <img
                 v-else
                 src="../assets/static/images/redHeart@2x.png"
                 alt=""
+                :disabled="isProcessing"
                 @click.stop.prevent="unlikeTweet(tweet.id)"
               />
               <p class="count">{{ tweet.Likes.likeTotal }}</p>
@@ -76,7 +78,7 @@
     </div>
 
     <!-- modal -->
-    <div class="container" :class="{ 'd-none': dNoneReplyModal }">
+    <div class="container" :class="{ 'd-none': dNoneModal }">
       <div class="modal row">
         <form class="modal-content col-6" action="">
           <div class="modal-content-cancel">
@@ -86,9 +88,6 @@
           </div>
           <TweetModal>
             <!--   推文 -->
-            <!-- <template v-slot:isReplyModel v-if="!isReplyModel">
-              <div class="tweet-div"></div>
-            </template> -->
             <template v-slot:replytoAvatarImg>
               <img class="avatar" :src="tweet.User.avatarImg" alt="" />
             </template>
@@ -139,14 +138,6 @@
           >
             {{ isProcessing ? "處理中" : "回覆" }}
           </button>
-          <!-- <button
-            v-else
-            class="btn modal-tweet"
-            @click.stop.prevent="createTweet2"
-            :disabled="isProcessing"
-          >
-            {{isProcessing ? "處理中" : "推文" }}
-          </button> -->
         </form>
       </div>
     </div>
@@ -171,58 +162,45 @@ export default {
   },
   data() {
     return {
-      text: "",                // 推文
-      textReply: "",           // 回覆
-      tweets: [],              // 全部推文
-      tweet: {                 // 單一推文
-        id: -1,
-        description: "",
-        createdAt: "",
-        User: {
-          avatarImg: '',
-          name: '',
-          account: '',
-        },
-        Replies: [],
-        likeTotal: -1,
-        replyTotal: -1,
-      },
-      newTweet: {},            // 新增推文
-      newReply: {},            // 新增推文回覆
-      likes: {},
-      dNoneReplyModal: true,   // 控制 Modal
-      isReplyModel: true,      // 控制 Modal
-      placeholder: "",         // 控制推文跟回覆的 placeholder
-      isProcessing: false,     // 按鈕送出
+      text: "",            // 推文
+      textReply: "",       // 回覆
+      tweets: [],          // 全部推文
+      tweet: {},           // 單一推文
+      newTweet: {},        // 新增推文
+      newReply: {},        // 新增推文回覆
+      dNoneModal: true,    // 控制 Modal
+      isReplyModel: true,  // 控制 Modal
+      placeholder: "",     // 控制推文跟回覆的 placeholder
+      isProcessing: false, // 按鈕送出
       isEmpty: true,
       isExceed: false,
       isModalEmpty: true,
-      isModalExceed: false
-    }
+      isModalExceed: false,
+    };
   },
   watch: {
-    text(){
-      this.textWarning()
+    text() {
+      this.textWarning();
     },
-     textReply(){
-       this.modalWarning()
-     },
+    textReply() {
+      this.modalWarning();
+    },
   },
   created() {
-    this.fetchTweets()
+    this.fetchTweets();
   },
   methods: {
     // 拿到全部推文
     async fetchTweets() {
       try {
-        const { data, statusText } = await tweetAPI.getTweets()
+        const { data, statusText } = await tweetAPI.getTweets();
 
         if (statusText !== "OK") {
-          throw new Error(statusText)
+          throw new Error(statusText);
         }
 
         // 篩除非user的用戶
-        this.tweets = data.filter( data => data.User.role === 'user' )
+        this.tweets = data.filter((data) => data.User.role === "user");
       } catch (error) {
         console.log(error);
         Toast.fire({
@@ -231,269 +209,192 @@ export default {
         });
       }
     },
-    // 按讚
-    async likeTweet(id) {
-      try {
-        const { data } = await tweetAPI.likeTweet({id})
-
-        if (data.status !== "success") {
-            throw new Error(data.status)
-        }
-
-        // const { 
-        //   likeUnlike,
-        //   TweetId,
-        //  } = data.data
-
-        // this.likes = {
-        //   id: TweetId,
-        //   Likes: {
-        //     isLike: likeUnlike,
-        //     likeTotal: -1
-        //   }
-        // }
-
-        this.tweets = this.tweets.map( tweet => { 
-          if (tweet.id !== id) {
-            return tweet
-          } else {
-            return {
-              ...tweet,
-              Likes: {
-                isLike: true,
-                likeTotal: tweet.Likes.likeTotal + 1
-              }
-            }
-          }
-        })
-      } catch (error) {
-        console.log(error)
-        Toast.fire({
-          icon: 'error',
-          title: '無法按讚，請稍後再試'
-        })
-      }
-    },
-    // 取消讚
-    async unlikeTweet(id) {
-      try {
-        const { data } = await tweetAPI.unlikeTweet({id})
-
-        if (data.status !== "success") {
-            throw new Error(data.status)
-        }
-
-        this.tweets = this.tweets.map( tweet => { 
-          if (tweet.id !== id) {
-            return tweet
-          } else {
-            return {
-              ...tweet,
-              Likes: {
-                isLike: false,
-                likeTotal: tweet.Likes.likeTotal - 1
-              }
-            }
-          }
-        })
-      } catch (error) {
-        console.log(error)
-        Toast.fire({
-          icon: 'error',
-          title: '無法取消讚，請稍後再試'
-        })
-      }
-    },
-    // 字數警示
-    textWarning() {
-      if (this.text.length > 140) {
-        this.isExceed = true
-        this.isProcessing = false
-      } else {
-        this.isEmpty = true
-        this.isExceed = false
-      } return
-    },
-    // Modal 字數警示
-    modalWarning(){
-      if (this.textReply.length > 140) {
-        this.isModalExceed = true
-        this.isProcessing = false
-      } else {
-        this.isModalEmpty = true
-        this.isModalExceed = false
-      } return
-    },
     // 推一則推文
     async createTweet() {
       try {
         if (!this.text) {
-          this.isEmpty = false
-          return
-        } else if (this.text.trim() === '') {
-          this.isEmpty = false
-          return
+          this.isEmpty = false;
+          return;
+        } else if (this.text.trim() === "") {
+          this.isEmpty = false;
+          return;
         }
+        this.isProcessing = true;
 
         const { data } = await tweetAPI.createTweet({
           description: this.text,
-          UserId: this.currentUser.id
-        })
+          UserId: this.currentUser.id,
+        });
 
-        const { id, description, UserId, createdAt } = data.data
+        const { id, description, UserId, createdAt } = data.data;
 
         this.newTweet = {
           id,
           description,
-          User: { id: UserId },
+          User: { 
+            id: UserId, 
+            account: this.currentUser.account,
+            name: this.currentUser.name,
+            avatarImg: this.currentUser.avatarImg,
+          },
           Replies: { replyTotal: 0 },
           Likes: {
             isLike: false,
-            likeTotal: 0
+            likeTotal: 0,
           },
           createdAt,
-        }
+        };
 
-        this.tweets = [
-          {...this.newTweet},
-          ...this.tweets
-        ]
+        this.tweets = [{ ...this.newTweet }, ...this.tweets];
 
         if (data.status !== "success") {
-          throw new Error(data.message)
+          throw new Error(data.message);
         }
-        this.text = ""
-        this.isEmpty = true
+        this.text = "";
+        this.isEmpty = true;
+        this.isProcessing = false;
       } catch (error) {
+        this.isProcessing = false;
         if (error.response.status === 500) {
-          return
+          return;
         } else {
-          console.log(error)
+          console.log(error);
           Toast.fire({
             icon: "error",
             title: "暫時無法推文",
-          })
+          });
         }
       }
     },
-    // 回覆一則推文
+    // Modal 回覆一則推文
     async handleReply(TweetId) {
       try {
         // 內容字數警告
         if (!this.textReply) {
-          this.isModalEmpty = false
+          this.isModalEmpty = false;
+          return;
+        } else if (this.textReply.trim() === "") {
+          this.isModalEmpty = false;
+          return;
         }
+        this.isProcessing = true;
 
-        const { data } = await tweetAPI.createReply({ 
-          TweetId, 
-          comment: this.textReply, 
-          UserId: this.currentUser.id,
-        })
+        const { data } = await tweetAPI.createReply({
+          TweetId,
+          comment: this.textReply,
+        });
 
-        // tweets 是全部推文，Array => map
-        // this.tweets = this.tweets.map( tweets => {
-        //   if ( tweets.id !== TweetId ) {
-        //     return
-        //   } else {
-        //     return {
-        //       ...tweets,
-        //       Replies: {
-        //         replyTotal: parseInt(tweets.replyTotal) + 1
-        //       }
-        //     }
-        //   }
-        // })
-        
-        const { id, comment, UserId, createdAt } = data.data
-        this.newReply = {
-          id,
-          comment,
-          User: {
-            id: UserId,
-            createdAt
-          },
-        }
-        // tweet 是單一推文跟他的回覆，Obj
-        this.tweet = {
-          Replies: [
-            {...this.newReply},
-            ...this.tweet.Replies
-          ],
-          replyTotal: parseInt(this.tweet.replyTotal) + 1
-        }
+        this.tweets = this.tweets.map((tweets) => {
+          if (tweets.id !== TweetId) {
+            return tweets;
+          } else {
+            return {
+              ...tweets,
+              Replies: {
+                ...tweets.Replies,
+                replyTotal: tweets.Replies.replyTotal + 1,
+              },
+            };
+          }
+        });
 
         if (data.status !== "success") {
-          throw new Error(data.message)
+          throw new Error(data.message);
         } else {
           Toast.fire({
-          icon: 'success',
-          title: "成功送出回覆",
-          })
-          this.textReply = ""
-          this.dNoneReplyModal = true
+            icon: "success",
+            title: "成功送出回覆",
+          });
+          this.textReply = "";
+          this.isProcessing = false;
+          this.dNoneModal = true;
         }
       } catch (error) {
+        this.isProcessing = false;
         if (error.response.status === 500) {
-          return
+          return;
         } else {
           console.log(error);
           Toast.fire({
             icon: "error",
             title: "暫時無法回覆推文",
-          })
+          });
         }
       }
     },
-    // 關閉 Modal
-    handleCloseBtn() {
-      this.dNoneReplyModal = !this.dNoneReplyModal;
-      this.textReply = "";
+    // 按讚
+    async likeTweet(id) {
+      try {
+        this.isProcessing = true;
+        const { data } = await tweetAPI.likeTweet({ id });
+
+        if (data.status !== "success") {
+          throw new Error(data.status);
+        }
+
+        this.tweets = this.tweets.map((tweet) => {
+          if (tweet.id !== id) {
+            return tweet;
+          } else {
+            return {
+              ...tweet,
+              Likes: {
+                isLike: true,
+                likeTotal: tweet.Likes.likeTotal + 1,
+              },
+            };
+          }
+        });
+        this.isProcessing = false;
+      } catch (error) {
+        this.isProcessing = false;
+        console.log(error);
+        Toast.fire({
+          icon: "error",
+          title: "無法按讚，請稍後再試",
+        });
+      }
     },
-    // 開啟推文 Modal
-    // tweetModal() {
-    //   this.dNoneReplyModal = !this.dNoneReplyModal
-    //   this.isReplyModel = false;
-    //   this.placeholder = "有什麼新鮮事？";
-    // },
-    // 開啟回覆 Modal
+    // 取消讚
+    async unlikeTweet(id) {
+      try {
+        const { data } = await tweetAPI.unlikeTweet({ id });
+
+        if (data.status !== "success") {
+          throw new Error(data.status);
+        }
+
+        this.tweets = this.tweets.map((tweet) => {
+          if (tweet.id !== id) {
+            return tweet;
+          } else {
+            return {
+              ...tweet,
+              Likes: {
+                isLike: false,
+                likeTotal: tweet.Likes.likeTotal - 1,
+              },
+            };
+          }
+        });
+      } catch (error) {
+        console.log(error);
+        Toast.fire({
+          icon: "error",
+          title: "無法取消讚，請稍後再試",
+        });
+      }
+    },
+    // 開啟 Modal
     async replyModal(id) {
       try {
-        const { data, statusText } = await tweetAPI.getReply({ id })
+        const { data, statusText } = await tweetAPI.getTweet({ id });
 
         if (statusText !== "OK") {
           throw new Error(statusText);
         }
-        this.tweet = data
-        // console.log(this.tweet)
-
-        // const {
-        //   description,
-        //   createdAt,
-        //   User,
-        //   Replies,
-        //   likeTotal
-        // } = data
-
-        // const {
-        //   avatarImg,
-        //   name,
-        //   account
-        // } = User
-
-        // this.tweet = {
-        //   id,
-        //   description,
-        //   createdAt,
-        //   Replies,
-        //   likeTotal
-        // }
-        // this.User = {
-        //   avatarImg,
-        //   name,
-        //   account
-        // }
-
-        this.dNoneReplyModal = !this.dNoneReplyModal;
+        this.tweet = data;
+        this.dNoneModal = !this.dNoneModal;
         this.isReplyModel = true;
         this.placeholder = "推你的回覆";
       } catch (error) {
@@ -504,12 +405,40 @@ export default {
         });
       }
     },
+    // 關閉 Modal
+    handleCloseBtn() {
+      this.isModalEmpty = true
+      this.dNoneModal = !this.dNoneModal;
+      this.textReply = "";
+    },
+    // 字數警示
+    textWarning() {
+      if (this.text.length > 140) {
+        this.isExceed = true;
+        this.isProcessing = false;
+      } else {
+        this.isEmpty = true;
+        this.isExceed = false;
+      }
+      return;
+    },
+    // Modal 字數警示
+    modalWarning() {
+      if (this.textReply.length > 140) {
+        this.isModalExceed = true;
+        this.isProcessing = false;
+      } else {
+        this.isModalEmpty = true;
+        this.isModalExceed = false;
+      }
+      return;
+    },
   },
   // 取得 currentUser
   computed: {
     ...mapState(["currentUser"]),
   },
-}
+};
 </script>
 
 <style lang="scss" scoped>
@@ -618,10 +547,9 @@ export default {
   margin: auto;
   margin-top: 56px;
   padding: 0;
-  // box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.25);
+  box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.25);
   &-cancel {
     width: 100%;
-    border-bottom: 1px solid $border-grey;
   }
   &-cancel img {
     width: 24px;

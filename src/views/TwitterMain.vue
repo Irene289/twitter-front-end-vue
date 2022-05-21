@@ -6,7 +6,7 @@
         <div class="col-2 sidebar">
           <Sidebar />
         </div>
-        
+
         <!-- tweeter / twitterReply -->
         <div class="col-7 content-container">
           <router-view />
@@ -21,22 +21,16 @@
   </main>
 </template>
 <script>
-import Popular from "../components/Popular.vue"
-import Sidebar from "../components/Sidebar.vue"
+import Popular from "../components/Popular.vue";
+import Sidebar from "../components/Sidebar.vue";
 
 export default {
   name: "TwitterMain",
   components: {
     Popular,
-    Sidebar
+    Sidebar,
   },
-  data() {
-    return {
-    }
-  },
-  methods: {
-  },
-}
+};
 </script>
 
 <style lang="scss" scoped>
@@ -50,5 +44,4 @@ main {
   border-right: 1px solid $border-grey;
   padding: 0;
 }
-
 </style>
