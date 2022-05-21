@@ -24,7 +24,8 @@ export default new Vuex.Store({
     setCurrentUser(state, currentUser){
       state.currentUser = {
         ...state.currentUser,
-        ...currentUser
+        ...currentUser,
+        avatarImg: currentUser.avatarImg? currentUser.avatarImg : require('../assets/static/images/noImage@2x.png')
       }
       state.token = localStorage.getItem('token'), 
       state.isAuthenticated = true
