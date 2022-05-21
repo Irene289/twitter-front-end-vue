@@ -9,7 +9,7 @@
         <label for=""></label>
         <textarea v-model="text" name="tweet" placeholder="有什麼新鮮事？">
         </textarea>
-        <!-- <span class="text-length">{{text.length}}/140</span> -->
+        <span class="text-length">{{text.length}}/140</span>
         <span v-if="!isEmpty" class="text-empty">內容不可空白</span>
         <span v-if="isExceed" class="text-exceed">字數不可超過 140 字</span>
         <button

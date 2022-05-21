@@ -257,9 +257,11 @@ export default {
     async handleReply(TweetId) {
       try {
         // 內容空白處理
-        if (!this.textReply) {
+        if (!this.textReply || this.textReply.trim() === '') {
           this.isModalEmpty = false;
-        }
+          return
+        } 
+        this.isProcessing = true;
 
         const { data } = await tweetAPI.createReply({
           TweetId,
@@ -274,10 +276,19 @@ export default {
             account: this.currentUser.account,
             name: this.currentUser.name,
             avatarImg: this.currentUser.avatarImg,
+            createdAt: new Date(),
           },
         };
 
-        this.replies = [{ ...this.textReply }, ...this.replies];
+        this.replies = [
+          { ...this.textReply }, 
+          ...this.replies
+        ];
+
+        this.tweet = {
+          ...this.tweet,
+          replyTotal: this.tweet.replyTotal + 1
+        }
 
         if (data.status !== "success") {
           throw new Error(data.message);
@@ -287,11 +298,9 @@ export default {
             title: "成功送出回覆",
           });
           this.textReply = "";
-          // this.isProcessing = false;
           this.dNoneModal = !this.dNoneModal;
         }
       } catch (error) {
-        // this.isProcessing = false;
         if (error.response.status === 500) {
           return;
         } else {
