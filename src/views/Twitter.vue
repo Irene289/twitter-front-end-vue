@@ -28,7 +28,7 @@
           <router-link
             :to="{ name: 'user-tweets', params: { id: tweet.User.id } }"
           >
-            <img class="avatar" :src="tweet.User.avatarImg" alt="" />
+            <img class="avatar" :src="tweet.User.avatarImg | avatarFilter" alt="" />
           </router-link>
         </template>
         <template v-slot:name>
@@ -154,6 +154,7 @@
 </template>
 
 <script>
+import {imgFilter} from '../utils/mixins'
 import UserTweetCard from "../components/UserTweetCard"
 import TweetModal from "../components/TweetModal"
 import { fromNowFilter, textFilter } from "./../utils/mixins"
@@ -163,7 +164,7 @@ import { mapState } from "vuex"
 
 export default {
   name: "Twitter",
-  mixins: [fromNowFilter, textFilter],
+  mixins: [fromNowFilter, textFilter, imgFilter],
   components: {
     UserTweetCard,
     TweetModal,

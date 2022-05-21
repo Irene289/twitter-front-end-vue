@@ -8,7 +8,7 @@
       <template v-slot:avatar>
         <img 
           @click.prevent.stop="visit(reply.User.id, 'user-tweets')"
-          class="avatar" :src="reply.User.avatarImg" alt="">
+          class="avatar" :src="reply.User.avatarImg | avatarFilter" alt="">
       </template>
        <template v-slot:name>
          {{reply.User.name}}
@@ -29,6 +29,7 @@
   </div>
 </template>
 <script>
+import { imgFilter } from '../utils/mixins'
 import {textFilter} from '../utils/mixins'
 import {visitPage} from '../utils/mixins'
 import UserTweetCard from '../components/UserTweetCard.vue'
@@ -37,7 +38,7 @@ import userAPI from '../apis/user'
 // import {Toast} from '../utils/helpers'
 
 export default {
-  mixins: [fromNowFilter, visitPage,textFilter],
+  mixins: [fromNowFilter, visitPage, textFilter, imgFilter],
   components:{
     UserTweetCard
   },

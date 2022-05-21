@@ -11,7 +11,7 @@
     <div class="reply-div scrollbar">
       <div class="reply-div-user">
         <div class="user-img avatar">
-          <img :src="user.avatarImg" alt="" />
+          <img :src="user.avatarImg | avatarFilter" alt="" />
         </div>
         <div class="user-info">
           <p class="user-info-name">{{ user.name }}</p>
@@ -64,7 +64,7 @@
           <router-link
             :to="{ name: 'user-tweets', params: { id: reply.User.id } }"
           >
-            <img class="avatar" :src="reply.User.avatarImg" alt="" />
+            <img class="avatar" :src="reply.User.avatarImg | avatarFilter" alt="" />
           </router-link>
         </template>
         <template v-slot:name>
@@ -104,7 +104,7 @@
               <div class="tweet-div"></div>
             </template> -->
             <template v-slot:replytoAvatarImg>
-              <img class="avatar top-avatar" :src="user.avatarImg" alt="" />
+              <img class="avatar top-avatar" :src="user.avatarImg | avatarFilter" alt="" />
             </template>
             <template v-slot:replyto>
               <div class ="modal-topic-content"> 
@@ -157,6 +157,7 @@
 </template>
 
 <script>
+import {imgFilter} from '../utils/mixins'
 import UserTweetCard from "../components/UserTweetCard.vue";
 import TweetModal from "../components/TweetModal";
 import { fromNowFilter, textFilter } from "./../utils/mixins"
@@ -166,7 +167,7 @@ import { mapState } from 'vuex'
 
 export default {
   name: "TwitterReply",
-  mixins: [fromNowFilter, textFilter],
+  mixins: [fromNowFilter, textFilter, imgFilter],
   components: {
     UserTweetCard,
     TweetModal
