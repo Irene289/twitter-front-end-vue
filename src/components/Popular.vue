@@ -128,7 +128,7 @@ export default {
     background: #FAFAFB;
     border-radius: 16px;
     overflow-y: scroll;
-    height: 100vh;
+    height: calc(100vh - 2*13px);
     img{
       width:50px;
       height: 50px;

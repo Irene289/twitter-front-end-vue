@@ -1,7 +1,7 @@
 <template>
   <div class="container">
     <form 
-      @submit.stop.prevent="handleSubmit"
+      @submit.stop.prevent="handleSubmit" autocomplete="off"
       class="regist-form" action="">
       <div class="logo">
         <img
@@ -85,6 +85,7 @@
           type="password" 
           placeholder="請設定密碼" 
           @change="inputWarning"
+          autocomplete="new-password"
           required
         />
         <div class="text-limits">
