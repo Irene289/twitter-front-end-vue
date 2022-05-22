@@ -123,12 +123,11 @@ export default {
   #popular{
     width:100%;
     margin-top: 13px;
+    margin-bottom: 13px;
     max-width:273px;
-    // height:731px;
     background: #FAFAFB;
     border-radius: 16px;
-    overflow-y: scroll;
-    height: calc(100vh - 2*13px);
+    height: calc(100vh - 2 * 13px);
     img{
       width:50px;
       height: 50px;
@@ -140,8 +139,12 @@ export default {
       font-family: $main-font;
       font-size: 24px;
     }
+    .popular__list {
+      height: calc(100% - 2 * 37px - 1px);
+      overflow-y: scroll;
+    }
     .popular__list__item{  
-      cursor:pointer; 
+      cursor: pointer; 
       display: flex;
       padding: 1rem; 
       .item-account{
