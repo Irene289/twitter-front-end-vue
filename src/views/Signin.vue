@@ -1,10 +1,6 @@
 <template>
-<!-- TODO: delete this .vue -->
   <div class="container">
-    <form 
-      class="signin-form"
-      @submit.prevent.stop="handleSubmit"
-    >
+    <form class="signin-form" action="">
       <div class="logo">
         <img
           class="signin-form__logo-img"
@@ -12,7 +8,6 @@
           alt=""
         />
       </div>
-
       <div class="title">
         <h1 
           v-if="frontStage"
@@ -22,34 +17,16 @@
         </h1>
         <h1 
           v-else
-          class="signin-form__title"
+          class="signin-form__title "
         >
           後台登入
         </h1>
       </div>
-
-      <div class="signin-form__div signin-form__input-account">
-        <label for="">帳號</label>
-        <input 
-          id="account" v-model="account" name="account" 
-          type="text" placeholder="請輸入帳號" 
-          required autofocus
+      <div class="form-container">
+        <SignInForm 
         />
       </div>
-
-      <div class="signin-form__div signin-form__input-password">
-        <label for="">密碼</label>
-        <input 
-          id="password" v-model="password" name="password"
-          type="password" 
-          placeholder="請輸入密碼" 
-        />
-      </div>
-
-      <button class="btn btn-signin" type="submit" :disabled="isProcessing">
-        登入
-      </button>
-      <div 
+        <div 
         v-if="frontStage"
         class="cancel-signin"
       >
@@ -58,7 +35,7 @@
         </p>
         <p>・</p>
         <p 
-          class="backstage-signin" 
+          class="backstage-signin sign-in" 
           @click="toggleRoute"
         >
           後台登入
@@ -69,82 +46,32 @@
         class="cancel-signin"
       >
         <p
-          class="frontstage-signin" 
+          class="frontstage-signin sign-in" 
           @click="toggleRoute"
         >
           前台登入
         </p>
       </div>
     </form>
+    
   </div>
 </template>
 
 <script>
-import authorizationAPI from './../apis/authorization'
-import {Toast} from './../utils/helpers'
-
+import SignInForm from '../components/SignInForm.vue'
 export default {
   name: 'Signin',
+  components:{
+    SignInForm
+  },
   data () {
     return {
-      account: '',
-      password: '',
-      isProcessing: false,
+      isAdmin: true,
       frontStage: true,
     }
   },
-  // beforeRouteUpdate(to, from, next) {
-  //   console.log({to, from})
-  //   next()
-  // },test
-  methods: {
-    async handleSubmit() {
-      try {
-        this.isProcessing = true
-
-        if ( !this.account || !this.password ) {
-          Toast.fire({
-            icon: 'warning',
-            title: '請輸入帳密'
-          })
-          return
-        } 
-        const {data} = await authorizationAPI.signIn({
-          account: this.account,
-          password: this.password
-        })
-        const {user} = data.data
-        console.log(user)
-        if ( data.status !== 'success' ) {
-          throw new Error(data.message)
-        }
-        //前後台帳號不能互登，會跳出警告
-        //TODO:此功能待測試，需要後端資料建好
-        // const route = this.$route.name
-        if(!user.is_admin){
-          // token
-        localStorage.setItem('token', data.data.token)
-        // this.$router.push('/twitter')
-        }else if(user.is_admin === true){
-          this.isProcessing = false
-          // console.log('isadmin')
-          Toast.fire({
-            icon:'warning',
-            title:'此帳號不存在'
-          })
-          return
-        }
-      } catch (error) {
-        this.isProcessing = false
-        this.password = ''
-        console.log('Error', error)
-        Toast.fire({
-          icon: 'warning',
-          title: '此帳號不存在'
-        })
-      }
-    },
-    toggleRoute () {
+  methods:{
+     toggleRoute () {
       const route = this.$route.path
       if (route === '/signin') {
         this.frontStage = false
@@ -167,6 +94,9 @@ export default {
   justify-content: center;
   align-items: center;
 }
+.form-container{
+  width:365px;
+}
 .logo img {
   width: 50px;
   height: 50px;
@@ -177,49 +107,23 @@ export default {
   margin-top: 24px;
   margin-bottom: 8px;
 }
-.signin-form__div {
-  @extend %input-block;
-  display: flex;
-  flex-flow: column nowrap;
-  label {
-    @extend %form-label;
-  }
-  input {
-    @extend %form-input;
-    border: none;
-    background: $form-input-grey;
-  }
-  input::placeholder {
-    color: $form-input-placeholder;
-  }
-  &::after {
-    content: "";
-    @extend %input-bottom;
-  }
-}
-.btn {
-  @extend %button-orange;
-  width: 356px;
-  height: 46px;
-  margin-top: 40px;
-  margin-bottom: 16px;
-  font-size: 20px;
-  line-height: 30px;
-}
+
 .cancel-signin {
   display: flex;
   justify-content: flex-end;
   align-items: center;
   width: 356px;
   height: 36px;
-  .regist,
-  .backstage-signin,
   .frontstage-signin {
     color: $form-link-blue;
     font-size: 16px;
     font-weight: 400;
-    text-decoration: none;
     padding: 6px 12px;
   }
+}
+.sign-in, .regist{
+  cursor: pointer;
+  color: $form-link-blue;
+  text-decoration: underline;
 }
 </style>

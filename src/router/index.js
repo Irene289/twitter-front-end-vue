@@ -1,10 +1,8 @@
 import Vue from 'vue'
 import VueRouter from 'vue-router'
 import store from '../store'
-//TODO:Signin頁面元件確定要刪除的話，把AdminSignin的名字改成Signin
-// import Signin from '../views/Signin.vue'
+import Signin from '../views/Signin.vue'
 import NotFound from '../views/NotFound.vue'
-// import Twitter from '../views/Twitter.vue'
 import TwitterMain from '../views/TwitterMain.vue'
 import {Toast} from '../utils/helpers'
 
@@ -21,7 +19,7 @@ const routes = [
     path: '/signin',
     name: 'sign-in',
     meta: { requiresAuth: false },
-    component: () => import('../views/AdminSignin.vue')
+    component: Signin
   },
   {
     path: '/regist',
@@ -105,7 +103,7 @@ const routes = [
     path: '/admin',
     name: 'admin', 
     meta: { requiresAuth: false}, 
-    component: () => import('../views/AdminSignin.vue')
+    component: Signin
   },
   {
     path: '/admin/tweets',

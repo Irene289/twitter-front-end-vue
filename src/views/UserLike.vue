@@ -31,11 +31,13 @@
             <p class="count">{{like.Tweet.replyCount}}</p>
           </div>
           <div class="icon-wrapper">
-            <img 
+            <img
+              :disabled="isProcessing"
               @click.stop.prevent="unlikeTweet(like.TweetId)"
               v-show="like.is_like" 
               src="../assets/static/images/redHeart@2x.png" alt="">
             <img
+              :disabled="isProcessing"
               @click.stop.prevent="likeTweet(like.TweetId)" 
               v-show="!like.is_like" 
               src="../assets/static/images/like@2x.png" alt="">
@@ -64,7 +66,8 @@ export default {
    data(){
     return{
        likes:[],
-       noLikes: false   
+       noLikes: false,
+       isProcessing: false 
     }
   },
   methods:{
@@ -85,6 +88,7 @@ export default {
       },
       async likeTweet(id){
         try{
+          this.isProcessing = true
           const {data} = await tweetAPI.likeTweet({id})
           console.log(data)
           this.likes = this.likes.map(tweet => {
@@ -101,7 +105,9 @@ export default {
               }
             }            
           })
+          this.isProcessing = false
         }catch(error){
+          this.isProcessing = false
           Toast.fire({
             icon: 'error',
             title: '無法對推文點讚，請稍後再試'
@@ -110,6 +116,7 @@ export default {
       },
       async unlikeTweet(id){
         try{
+          this.isProcessing = true
           const {statusText} = await tweetAPI.unlikeTweet({id})
           console.log(statusText)
           if(statusText !== "OK"){
@@ -129,7 +136,9 @@ export default {
               }
             }            
           })
+          this.isProcessing = false
         }catch(error){
+          this.isProcessing = false
           Toast.fire({
             icon: 'error',
             title: '無法對推文點讚，請稍後再試'

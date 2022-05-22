@@ -75,7 +75,8 @@ export default {
     return {
       tweets: [],
       noTweets: false,
-      isLikes: false
+      isLikes: false,
+      isProcessing: false 
     };
   },
   methods: {
@@ -105,6 +106,7 @@ export default {
     // 按讚
     async likeTweet(id) {
       try {
+        this.isProcessing = true
         const { data } = await tweetAPI.likeTweet({id})
 
         if (data.status !== "success") {
@@ -126,8 +128,9 @@ export default {
             }
           }
         })
+        this.isProcessing = false
       } catch (error) {
-        console.log(error)
+        this.isProcessing = false
         Toast.fire({
           icon: 'error',
           title: '無法按讚，請稍後再試'
@@ -136,13 +139,13 @@ export default {
     },
     // 取消讚
     async unlikeTweet(id) {
+      this.isProcessing = true
       try {
         const { data } = await tweetAPI.unlikeTweet({id})
 
         if (data.status !== "success") {
             throw new Error(data.status)
         }
-        // this.isLikes = false
         this.tweets = this.tweets.map( tweet => { 
           if (tweet.id !== id) {
             return tweet
@@ -157,8 +160,9 @@ export default {
             }
           }
         })
+        this.isProcessing = false
       } catch (error) {
-        console.log(error)
+        this.isProcessing = false
         Toast.fire({
           icon: 'error',
           title: '無法取消讚，請稍後再試'

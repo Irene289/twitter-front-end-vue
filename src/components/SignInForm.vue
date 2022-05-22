@@ -52,6 +52,7 @@ export default {
       try{
         this.isProcessing = true
         if ( !this.account || !this.password ) {
+          this.isProcessing = false
           Toast.fire({
             icon: 'warning',
             title: '請輸入帳密'
@@ -69,6 +70,7 @@ export default {
         const isAdmin = user.is_admin
         const route = this.$route.name
         if(!user.id){
+          this.isProcessing= false,
           this.isValid = false
         }
        if(isAdmin && route === 'admin'){
@@ -83,10 +85,10 @@ export default {
         this.$router.push('/twitter')
         return
       } else {
+        this.isProcessing= false,
         this.isValid = false
         }
          this.password = ''
-      
         this.isProcessing = false
       }catch(error){
         this.isProcessing = false
