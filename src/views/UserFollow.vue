@@ -26,7 +26,7 @@
                 <router-link
                   :to="{
                     name:'follower',
-                    params: userId
+                    params: {id: userId}
                   }"
                 >
                 <p>追蹤者</p> 
@@ -38,7 +38,7 @@
                 <router-link
                   :to="{
                     name:'following',
-                    params: userId
+                    params: {id: userId}
                   }"
                 >
                 <p>正在追隨</p> 

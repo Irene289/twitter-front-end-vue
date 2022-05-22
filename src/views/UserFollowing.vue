@@ -66,7 +66,7 @@ export default {
   data(){
     return{
       followings:[],
-      noFollowings: false
+      noFollowings: false,
     }
   },
   methods:{
@@ -76,6 +76,7 @@ export default {
         const followings = data.Follower
         // 篩除非user的用戶
         this.followings = followings.filter( follower => follower.role === 'user')
+        // this.$store.commit('setUserFollowing',this.followings)
         if(followings.length === 0){
           this.noFollowings = true
         }else {
@@ -146,6 +147,7 @@ export default {
   },
   computed:{
     ...mapState(['currentUser']),
+    ...mapState(['userFollowings'])
   },
   beforeRouteUpdate(to, from, next){
     const {id} = to.params
