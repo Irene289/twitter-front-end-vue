@@ -54,6 +54,9 @@ export default {
           margin-right: 8px;        
         }
       }
+      .text {
+        word-break: break-all;
+      }
     }
   }
 </style>

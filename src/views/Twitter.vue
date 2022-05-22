@@ -121,11 +121,11 @@
               </textarea>
             </template>
             <template v-slot:alert>
-              <!-- <span class="text-length">{{ isReplyModel ? textReply.length : text.length }}/140</span> -->
-              <span v-if="!isModalEmpty" class="text-empty modal-alert warning"
+              <span class="text-reply-length">{{ textReply.length }}/140</span>
+              <span v-if="!isModalEmpty" class="modal-alert warning"
                 >內容不可空白</span
               >
-              <span v-if="isModalExceed" class="text-exceed modal-alert warning"
+              <span v-if="isModalExceed" class="modal-alert warning"
                 >字數不可超過 140 字</span
               >
             </template>
@@ -332,7 +332,7 @@ export default {
     // 按讚
     async likeTweet(id) {
       try {
-        this.isProcessing = true;
+        // this.isProcessing = true;
         const { data } = await tweetAPI.likeTweet({ id });
 
         if (data.status !== "success") {
@@ -352,9 +352,9 @@ export default {
             };
           }
         });
-        this.isProcessing = false;
+        // this.isProcessing = false;
       } catch (error) {
-        this.isProcessing = false;
+        // this.isProcessing = false;
         console.log(error);
         Toast.fire({
           icon: "error",
@@ -569,15 +569,25 @@ export default {
     border-radius: 50%;
   }
 }
+// .text-reply-length {
+
+//   position: absolute;
+//   right: 1rem;
+//   bottom: 1rem;
+//   // margin-bottom: 0;
+// }
 .modal-tweet {
   @extend %button-orange;
   min-width: 76px;
   height: 40px;
-  &.button-reply {
-    position: absolute;
-    right: 1rem;
-    bottom: 1rem;
-  }
+  position: absolute;
+  right: 1rem;
+  bottom: 1rem;
+  // &.button-reply {
+  //   position: absolute;
+  //   right: 1rem;
+  //   bottom: 1rem;
+  // }
   &:disabled {
     background: $form-input-placeholder;
   }
