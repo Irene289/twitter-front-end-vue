@@ -104,7 +104,7 @@ const routes = [
   {
     path: '/admin',
     name: 'admin', 
-    meta: { requiresAuth: true }, 
+    meta: { requiresAuth: false}, 
     component: () => import('../views/AdminSignin.vue')
   },
   {
