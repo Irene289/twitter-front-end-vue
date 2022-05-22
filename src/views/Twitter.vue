@@ -518,12 +518,10 @@ export default {
     }
   }
 }
-.tweet-content {
-  height: calc(100vh - 3 * 24px - 140px);
-  overflow-y: scroll;
-}
 // scrollbar
 .scrollbar {
+  height: calc(100vh - 75px - 140px);
+  overflow-y: scroll;
   &::-webkit-scrollbar {
     width: 8px;
   }

@@ -443,7 +443,7 @@ export default {
   cursor: pointer;
 }
 .reply-div {
-  height: calc(100vh - 72px);
+  height: calc(100vh - 75px);
   padding: 16px 0;
   overflow-y: scroll;
 }
@@ -471,6 +471,7 @@ export default {
   @extend %tweet-text;
   font-size: 24px;
   line-height: 36px;
+  word-break: break-all;
 }
 .content-when {
   @extend %tweet-account;

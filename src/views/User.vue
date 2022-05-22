@@ -194,7 +194,8 @@
 }
 .content-container {
   padding: 0;
-  border: 1px solid $border-grey;
+  border-left: 1px solid $border-grey;
+  border-right: 1px solid $border-grey;
 }
 .title {
   padding-left: 28px;
