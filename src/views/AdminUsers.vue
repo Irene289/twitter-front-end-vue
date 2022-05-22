@@ -176,17 +176,25 @@ export default {
   flex-flow: column nowrap;
   justify-content: center;
   align-items: center;
+  
   &-name {
+    @extend %single-ellipsis;
+    width: 100%;
     color: $font-black;
     font-size: 16px;
     font-weight: 700;
     line-height: 26px;
+    text-align: center;
+    padding: 0 16px;
   }
   &-account {
+    @extend %single-ellipsis;
     color: $font-small;
     font-size: 14px;
     font-weight: 400;
     line-height: 22px;
+    text-align: center;
+    padding: 0 16px;
   }
   &-tweets-likes, &-follow {
     display: flex;

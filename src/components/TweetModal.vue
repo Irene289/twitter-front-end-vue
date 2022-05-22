@@ -34,7 +34,7 @@
         <textarea class="scrollbar" name="tweet"> </textarea>
       </slot>
       <slot name="alert">
-        <span class="text-length"></span>
+        <span class="text-reply-length"></span>
         <span class="text-empty modal-alert"></span>
         <span class="text-exceed modal-alert"></span>
       </slot>
@@ -143,6 +143,12 @@ textarea {
   &::placeholder {
     color: $font-small;
   }
+}
+.text-reply-length {
+  @extend %form-label;
+  position: absolute;
+  bottom: 8px;
+  left: 0;
 }
 .modal-alert {
   color: $modal-alert;
