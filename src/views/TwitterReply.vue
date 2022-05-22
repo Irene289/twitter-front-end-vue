@@ -48,7 +48,7 @@
             class="content-response-like"
             src="../assets/static/images/like@2x.png"
             alt=""
-            :disabled="isProcessing"
+            :disabled="likeUnlikeProcessing"
             @click.stop.prevent="likeTweet(tweet.id)"
           />
           <img
@@ -56,7 +56,7 @@
             class="content-response-like"
             src="../assets/static/images/redHeart@2x.png"
             alt=""
-            :disabled="isProcessing"
+            :disabled="likeUnlikeProcessing"
             @click.stop.prevent="unlikeTweet(tweet.id)"
           />
         </div>
@@ -209,6 +209,7 @@ export default {
       isLoading: false,
       isModalEmpty: true,
       isModalExceed: false,
+      likeUnlikeProcessing: false
     };
   },
   watch: {
@@ -326,7 +327,7 @@ export default {
     // 對推文按讚
     async likeTweet(id) {
       try {
-        this.isProcessing = true;
+        this.likeUnlikeProcessing = true;
         const { data } = await tweetAPI.likeTweet({ id });
 
         if (data.status !== "success") {
@@ -338,9 +339,9 @@ export default {
           ...this.tweet,
           likeTotal: this.tweet.likeTotal + 1,
         };
-        this.isProcessing = false;
+        this.likeUnlikeProcessing = false;
       } catch (error) {
-        this.isProcessing = false;
+        this.likeUnlikeProcessing = false;
         console.log(error);
         Toast.fire({
           icon: "error",
@@ -351,7 +352,7 @@ export default {
     // 對推文取消讚
     async unlikeTweet(id) {
       try {
-        this.isProcessing = true;
+        this.likeUnlikeProcessing = true;
         const { data } = await tweetAPI.unlikeTweet({ id });
 
         if (data.status !== "success") {
@@ -362,9 +363,9 @@ export default {
           ...this.tweet,
           likeTotal: this.tweet.likeTotal - 1,
         };
-        this.isProcessing = false;
+        this.likeUnlikeProcessing = false;
       } catch (error) {
-        this.isProcessing = false;
+        this.likeUnlikeProcessing = false;
         console.log(error);
         Toast.fire({
           icon: "error",

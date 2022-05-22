@@ -4,11 +4,11 @@
       <div class="side-bar">
         <Sidebar />
       </div>    
+      <!-- scrollbar -->
       <div class="users-div scrollbar" action="">
         <div class="title">
           <h1 class="users-div__title">使用者列表</h1>
         </div>
-        <!-- scrollbar -->
             <div class="users-div__user ">
                 <div 
                 v-for="user in users"
@@ -115,6 +115,7 @@ export default {
 }
 .users-div {
   grid-column: 2/13;
+  padding-right: 1rem;
   display: flex;
   flex-flow: column nowrap;
   justify-content: flex-start;

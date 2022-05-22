@@ -28,8 +28,9 @@
                     name:'follower',
                     params: {id: userId}
                   }"
+                  class="nav-link"
                 >
-                <p>追蹤者</p> 
+                <p class="nav-item">追蹤者</p> 
                 </router-link>         
               </template>
             </NavTab>
@@ -40,8 +41,9 @@
                     name:'following',
                     params: {id: userId}
                   }"
+                  class="nav-link"
                 >
-                <p>正在追隨</p> 
+                <p class="nav-item">正在追隨</p> 
                 </router-link>         
               </template>
             </NavTab>
@@ -124,6 +126,15 @@
 </script>
 <style lang="scss" scoped>
 @import "../assets/scss/_basic.scss";
+.nav-link.active,
+.nav-link:focus{
+  .nav-item{
+    border-bottom: 2px solid $orange;   
+  } 
+}
+.nav-item{
+  padding: 15px 0;
+}
 .content-container{
   padding:0;
   border: 1px solid $border-grey;

@@ -61,14 +61,14 @@
                 v-if="!tweet.Likes.isLike"
                 src="../assets/static/images/like@2x.png"
                 alt=""
-                :disabled="isProcessing"
+                :disabled="likeUnlikeProcessing"
                 @click.stop.prevent="likeTweet(tweet.id)"
               />
               <img
                 v-else
                 src="../assets/static/images/redHeart@2x.png"
                 alt=""
-                :disabled="isProcessing"
+                :disabled="likeUnlikeProcessing"
                 @click.stop.prevent="unlikeTweet(tweet.id)"
               />
               <p class="count">{{ tweet.Likes.likeTotal }}</p>
@@ -90,7 +90,7 @@
           <TweetModal>
             <!--   推文 -->
             <template v-slot:replytoAvatarImg>
-              <img class="avatar" :src="tweet.User.avatarImg" alt="" />
+              <img class="avatar" :src=" tweet.User.avatarImg | avatarFilter " alt="" />
             </template>
             <template v-slot:replyto>
               <p class="content-info-name">{{ tweet.User.name }}</p>
@@ -180,6 +180,7 @@ export default {
       isExceed: false,
       isModalEmpty: true,
       isModalExceed: false,
+      likeUnlikeProcessing: false //likeUnlike
     };
   },
   watch: {
@@ -332,7 +333,7 @@ export default {
     // 按讚
     async likeTweet(id) {
       try {
-        // this.isProcessing = true;
+        this.likeUnlikeProcessing = true
         const { data } = await tweetAPI.likeTweet({ id });
 
         if (data.status !== "success") {
@@ -352,10 +353,9 @@ export default {
             };
           }
         });
-        // this.isProcessing = false;
+        this.likeUnlikeProcessing = false
       } catch (error) {
-        // this.isProcessing = false;
-        console.log(error);
+        this.likeUnlikeProcessing = false
         Toast.fire({
           icon: "error",
           title: "無法按讚，請稍後再試",
@@ -365,6 +365,7 @@ export default {
     // 取消讚
     async unlikeTweet(id) {
       try {
+        this.likeUnlikeProcessing = true
         const { data } = await tweetAPI.unlikeTweet({ id });
 
         if (data.status !== "success") {
@@ -384,8 +385,9 @@ export default {
             };
           }
         });
+        this.likeUnlikeProcessing = false
       } catch (error) {
-        console.log(error);
+        this.likeUnlikeProcessing = false
         Toast.fire({
           icon: "error",
           title: "無法取消讚，請稍後再試",
