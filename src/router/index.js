@@ -128,7 +128,7 @@ const routes = [
 ]
 
 const router = new VueRouter({
-  // linkExactActiveClass: 'active',
+  linkExactActiveClass: 'active',
   routes
 })
 

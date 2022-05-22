@@ -7,14 +7,13 @@
           <Sidebar />
         </div>
         <div class="col-7 col-lg-7  content-container">
-          <router-link to="/twitter">
+          <router-link to="/twitter" class="nav-link">
             <div class="title">
               <img
                 class="title__item"
                 src="../assets/static/images/leftArrow@2x.png"
                 alt=""
               />
-
               <div class="title__item user">
                 <p class="name">{{ user.name }}</p>
                 <p class="tweet-num">{{tweetNum+'推文'}}</p>
@@ -27,13 +26,14 @@
             <div class="nav-container">
               <NavTab>
                 <template v-slot:nav-item>
-                  <router-link
-                    :to="{
-                      name: 'user-tweets',
-                      params:{id: user.id}
-                    }"
-                  >
-                    <p>推文</p>
+                    <router-link
+                      :to="{
+                        name: 'user-tweets',
+                        params:{id: user.id}
+                      }"
+                      class="nav-link"
+                    >
+                    <p class="nav-item">推文</p>
                   </router-link>
                 </template>
               </NavTab>
@@ -44,8 +44,9 @@
                       name: 'user-replies',
                       params:{id: user.id}
                     }"
+                     class="nav-link"
                   >
-                    <p>回覆</p>
+                    <p  class="nav-item">回覆</p>
                   </router-link>
                 </template>
               </NavTab>
@@ -56,8 +57,9 @@
                       name: 'user-like',
                       params: {id: user.id}
                     }"
+                    class="nav-link"
                   >
-                    <p>喜歡的內容</p>
+                    <p  class="nav-item">喜歡的內容</p>
                   </router-link>
                 </template>
               </NavTab>
@@ -176,6 +178,16 @@
 </script>
 <style lang="scss" scoped>
 @import "../assets/scss/_basic.scss";
+//nav tab active
+.nav-link.active,
+.nav-link:focus{
+  .nav-item{
+    border-bottom: 2px solid $orange;   
+  } 
+}
+.nav-item{
+  padding: 15px 0;
+}
 .container{
   width:100%;
   max-width: 1140px;

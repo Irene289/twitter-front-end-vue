@@ -10,7 +10,6 @@
   .nav__tab{  
     cursor: pointer;
     &__list__item{
-      padding: 15px 0;  
       width:130px;
       text-align: center;
       color: #657786;
@@ -18,13 +17,13 @@
       a{
         color: #657786;
       }
-      &:hover{
+      &:hover, .active{
         color: $orange;
-        padding: 14px 0; // fix hover jitter
         border-bottom: 2px solid $orange;
         a{
-          color: $orange;      
+          color: $orange;   
         }
+
       }
     }
   }
