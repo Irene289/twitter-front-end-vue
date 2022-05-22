@@ -1,12 +1,15 @@
 <template>
   <div class="container">
     <Loading v-if="isLoading" />
-    <Sidebar />
-    <div class="tweets-div" action="">
+    <div class="side-bar"> 
+      <Sidebar />
+    </div>
+    
+    <div class="tweets-div scrollbar" action="">
       <div class="title">
         <h1 class="tweets-div__title">推文清單</h1>
       </div>
-      <div class="tweets-div__tweets scrollbar">
+      <div class="tweets-div__tweets">
         <div 
           v-for ="tweet in tweets"
           :key ="tweet.id"
@@ -29,7 +32,7 @@
               @click.stop.prevent="confirmDelete(tweet.id)"
             >
               <img src="../assets/static/images/close@2x.png" alt="">
-            </button>
+            </button>           
           </div>   
         </div>
       </div>
@@ -127,11 +130,15 @@ export default {
 
 .container {
   display: grid;
-  grid-template-columns: 178px 937px auto;
+  grid-template-columns: repeat(12, 1fr);
   grid-template-rows: 100vh;
   grid-gap: 24px;
 }
+.side-bar{
+  grid-column: 1/2;
+}
 .tweets-div {
+  grid-column: 2/13;
   display: flex;
   flex-flow: column nowrap;
   justify-content: flex-start;
@@ -164,15 +171,13 @@ export default {
   }
 }
 .tweets-div__tweets {
-  width: 937px;
+  width: 100%;
   overflow-y: scroll;
   .tweets-div__tweet {
     position: relative;
-    // left: -6px;
   }
 }
 .scrollbar {
-  // padding-left: 6px;
   &::-webkit-scrollbar {
     width: 6px;
   }
@@ -182,10 +187,8 @@ export default {
   }
 }
 .tweets-div__tweet--content {
-  width: 849px;
-  position: relative;
+  width:100%;
   .content-info {
-    // margin-bottom: 8px;
     &-name {
       @extend %tweet-name;
       margin-right: 8px;
@@ -202,22 +205,23 @@ export default {
     @extend %tweet-text;
     margin-top: 8px;
     margin-right: 82px;
-    
-    // height: 52px;
-    // display: -webkit-box;
-    // -webkit-box-orient: vertical;
-    // -webkit-line-clamp: 2;
-    // overflow: hidden;
-    // text-overflow: ellipsis;
   }
   .close-btn {
     position: absolute;
-    top: 1px;
+    top: 1rem;
     right: 1px;
     img {
       width: 24px;
       height: 24px;
     }
+  }
+}
+@media screen and (min-width: 961px){
+  .side-bar {
+    grid-column: 1/3;
+  }
+  .tweets-div {
+    grid-column: 3/13;
   }
 }
 </style>

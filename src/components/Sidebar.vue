@@ -359,7 +359,6 @@ nav {
   .logout {
     position: absolute;
     bottom: 13px;
-    left: 13px;
   }
 }
 // modal
@@ -432,6 +431,9 @@ nav {
     }
     .show{
       display: none;
+    }
+    .logout{
+      left: 13px;
     }
   }
  

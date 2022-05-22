@@ -35,11 +35,7 @@ export default {
 
 <style lang="scss" scoped>
 @import "../assets/scss/basic.scss";
-.container{
-  width:100%;
-  max-width: 1140px;
-  // margin: 0 auto;
-}
+
 .content-container {
   border-left: 1px solid $border-grey;
   border-right: 1px solid $border-grey;
