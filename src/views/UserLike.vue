@@ -72,7 +72,6 @@ export default {
         try{
           const {data, statusText} = await userAPI.getLikes({id})
           // 篩除非user的用戶
-          console.log(data)
           this.likes = data.filter( like => like.Tweet.User.role === 'user')
           if(statusText !== "OK"){
             throw new Error (statusText)

@@ -89,7 +89,6 @@ export default {
         }
         // 篩除非user的用戶
         this.tweets = data.filter( tweet => tweet.User.role === 'user')
-        console.log(data)
         if (statusText !== "OK") {
           throw new Error(statusText);
         }
