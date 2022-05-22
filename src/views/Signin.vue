@@ -93,10 +93,6 @@ export default {
       frontStage: true,
     }
   },
-  // beforeRouteUpdate(to, from, next) {
-  //   console.log({to, from})
-  //   next()
-  // },test
   methods: {
     async handleSubmit() {
       try {
@@ -119,8 +115,7 @@ export default {
           throw new Error(data.message)
         }
         //前後台帳號不能互登，會跳出警告
-        //TODO:此功能待測試，需要後端資料建好
-        // const route = this.$route.name
+      
         if(!user.is_admin){
           // token
         localStorage.setItem('token', data.data.token)
