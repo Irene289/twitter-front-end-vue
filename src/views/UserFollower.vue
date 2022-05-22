@@ -1,53 +1,60 @@
 <template>
   <div class="follower-container">
-    <h3 v-if="noFollowers">尚無追蹤者</h3>
+    <Loading v-if="isLoading" />
     <template v-else>
-      <UserFollowCard
-        v-for="follower in followers"
-        :key="follower.id"
-      >
-        <template v-slot:avatar>
-          <img
-            @click.stop.prevent="visit(follower.id, 'user-tweets')"
-            class="avatar" :src="follower.avatarImg | avatarFilter" alt="">      
-        </template>
-        <template v-slot:name>
-          {{follower.name}}
-        </template>
-        <template v-slot:id>
-          {{follower.account}}
-        </template>
-        <template v-slot:btn>
-          <div class="btn-group">
-            <div v-if="currentUser.id !== follower.id">
-              <button 
-              @click.stop.prevent="follow(follower.id)"
-              v-show="!follower.is_following" class="follow">
-              跟隨
-              </button>
-              <button 
-                @click.stop.prevent="unfollow(follower.id)"
-                v-show="follower.is_following" class="following">
-                正在跟隨
-              </button>
-            </div>
-              <button 
-              v-else
-              disabled
-              class="following">
-              用戶本人
-            </button>         
-          </div>       
-        </template>
-        <template v-slot:text>
-          {{follower.introduction | textFilter}}
-        </template>
-      </UserFollowCard>
+      <h3 v-if="noFollowers">尚無追蹤者</h3>
+      <template v-else>
+        <UserFollowCard
+          v-for="follower in followers"
+          :key="follower.id"
+        >
+          <template v-slot:avatar>
+            <img
+              @click.stop.prevent="visit(follower.id, 'user-tweets')"
+              class="avatar" :src="follower.avatarImg | avatarFilter" alt="">      
+          </template>
+          <template v-slot:name>
+            {{follower.name}}
+          </template>
+          <template v-slot:id>
+            {{follower.account}}
+          </template>
+          <template v-slot:btn>
+            <div class="btn-group">
+              <div v-if="currentUser.id !== follower.id">
+                <button 
+                :disabled="isProcessing"
+                @click.stop.prevent="follow(follower.id)"
+                v-show="!follower.is_following" class="follow">
+                跟隨
+                </button>
+                <button 
+                  :disabled="isProcessing"
+                  @click.stop.prevent="unfollow(follower.id)"
+                  v-show="follower.is_following" class="following">
+                  正在跟隨
+                </button>
+              </div>
+                <button 
+                v-else
+                disabled
+                class="following">
+                用戶本人
+              </button>         
+            </div>       
+          </template>
+          <template v-slot:text>
+            {{follower.introduction | textFilter}}
+          </template>
+        </UserFollowCard>
+      </template>
     </template>
+    
   </div>
   
 </template>
 <script>
+import Loading from '../components/Loading'
 import {imgFilter} from '../utils/mixins'
 import {mapState} from 'vuex'
 import {textFilter} from '../utils/mixins'
@@ -59,18 +66,22 @@ import {Toast} from '../utils/helpers'
 export default {
   name: 'UserFollower',
   components:{
-    UserFollowCard
+    UserFollowCard,
+    Loading
   },
   mixins:[textFilter, visitPage, imgFilter],
   data(){
     return{
       followers:[],
-      noFollowers: false
+      noFollowers: false,
+      isProcessing: false,
+      isLoading: false
     } 
   },
   methods:{
     async fetchUserFollowers(id){
       try{
+        this.isLoading = true
         const {data, statusText} = await userAPI.get({id})
         const followers = data.Following
         // 篩除非user的用戶
@@ -84,7 +95,9 @@ export default {
         if(statusText !== 'OK'){
           throw new Error(statusText)
         }
+        this.isLoading = false
       }catch(error){
+        this.isLoading = false
         Toast.fire({
           icon:'error',
           title: '無法取得追蹤中用戶資料，請稍後再試'
@@ -93,6 +106,7 @@ export default {
     },
     async follow(id){
       try{
+        this.isProcessing = true
         const {statusText} = await followShipAPI.follow({id})
         if(statusText !=='OK'){
           throw new Error(statusText)
@@ -108,7 +122,9 @@ export default {
             }
           }
         })
+        this.isProcessing = false
       }catch(error){
+        this.isProcessing = false
         Toast.fire({
           icon:'error',
           title:'無法追蹤此用戶，請稍後再試'
@@ -117,6 +133,7 @@ export default {
     },
     async unfollow(id){  
       try{
+        this.isProcessing = true
         const {statusText} = await followShipAPI.unFollow({id})
         if(statusText !== 'OK'){
           throw new Error (statusText)
@@ -132,8 +149,10 @@ export default {
             }
           }
         })
+        this.isProcessing = false
       }catch(error){
-          Toast.fire({
+        this.isProcessing = false
+        Toast.fire({
           icon:'error',
           title:'無法取消追蹤此用戶，請稍後再試'
         })

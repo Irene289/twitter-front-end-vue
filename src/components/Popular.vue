@@ -14,11 +14,13 @@
         </div>
         <button 
           v-if="user.is_following" 
+          :disabled="isProcessing"
           @click.stop.prevent="unfollow(user.id)"
           class="following">正在跟隨
         </button>
         <button
           v-else-if="!user.is_following"
+          :disabled="isProcessing"
           @click.stop.prevent="follow(user.id)"
           class="follow">跟隨
         </button>
@@ -38,7 +40,8 @@ export default {
   mixins:[visitPage, imgFilter],
   data(){
     return{
-      topUsers:[]
+      topUsers:[],
+      isProcessing: false
     }
   },
   methods:{
@@ -62,6 +65,7 @@ export default {
     },
     async follow(id){
         try{
+          this.isProcessing = true
           const {statusText} = await followShipAPI.follow({id})
           if(statusText !=='OK'){
             throw new Error(statusText)
@@ -77,7 +81,9 @@ export default {
               }
             }
           })
+          this.isProcessing = false
         }catch(error){
+          this.isProcessing = false
           Toast.fire({
             icon:'error',
             title:'無法追蹤此用戶，請稍後再試'
@@ -86,6 +92,7 @@ export default {
       },
     async unfollow(id){  
       try{
+        this.isProcessing = true
         const {statusText} = await followShipAPI.unFollow({id})
         if(statusText !== 'OK'){
           throw new Error (statusText)
@@ -101,8 +108,10 @@ export default {
             }
           }
         })
+        this.isProcessing = false
       }catch(error){
-          Toast.fire({
+        this.isProcessing = false
+        Toast.fire({
           icon:'error',
           title:'無法取消追蹤此用戶，請稍後再試'
         })
