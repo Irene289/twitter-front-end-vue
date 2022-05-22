@@ -3,13 +3,13 @@
     <div class="container">
       <div class="row">
         <!-- sidebar -->
-        <div class="col-2 sidebar">
+        <div class="col-1 col-lg-2 sidebar">
           <Sidebar />
         </div>
 
         <!-- form -->
         <form
-          class="col-7 content-container setting-forms"
+          class="col-7 col-lg-7 content-container setting-forms"
           action=""
           @submit.stop.prevent="handleSubmit"
         >
@@ -128,7 +128,9 @@
         </form>
 
         <!-- blank -->
-        <div class="col-3"></div>
+        <div class="col-4 col-lg-3">
+          <div class="space"></div>
+        </div>
       </div>
     </div>
   </main>
@@ -327,10 +329,6 @@ export default {
 <style lang="scss" scoped>
 @import "../assets/scss/basic.scss";
 
-main {
-  max-width: 1140px;
-  margin: 0 auto;
-}
 .content-container {
   height: 100vh;
   border-left: 1px solid $border-grey;
@@ -406,5 +404,9 @@ main {
   &:disabled {
     background: $form-input-placeholder;
   }
+  .space{
+    width:100%;
+  }
 }
+
 </style>
