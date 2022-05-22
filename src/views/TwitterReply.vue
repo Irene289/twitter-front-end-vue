@@ -1,5 +1,6 @@
 <template>
   <div>
+    <Loading v-if="isLoading" />
     <div class="title">
       <img
         src="../assets/static/images/back@2x.png"
@@ -87,7 +88,7 @@
             <div class="icon-wrapper">
               <img src="../assets/static/images/reply@2x.png" alt="" />
               <!-- TODO:暫填，非真實數據 -->
-              <p class="count">{{ reply.User.id }}</p>
+              <p class="count">0</p>
             </div>
             <div class="icon-wrapper">
               <img src="../assets/static/images/like@2x.png" alt="" />
@@ -98,7 +99,7 @@
                 @click.stop.prevent="unlikeTweet(tweet.id)"
               /> -->
               <!-- TODO:暫填，非真實數據 -->
-              <p class="count">{{ reply.User.id }}</p>
+              <p class="count">0</p>
             </div>
           </div>
         </template>
@@ -188,6 +189,7 @@ import { fromNowFilter, textFilter } from "./../utils/mixins";
 import tweetAPI from "../apis/tweet";
 import { Toast } from "../utils/helpers";
 import { mapState } from "vuex";
+import Loading from '../components/Loading'
 
 export default {
   name: "TwitterReply",
@@ -195,6 +197,7 @@ export default {
   components: {
     UserTweetCard,
     TweetModal,
+    Loading
   },
   data() {
     return {
@@ -203,6 +206,7 @@ export default {
       textReply: "",
       dNoneModal: true,
       isProcessing: false,
+      isLoading: false,
       isModalEmpty: true,
       isModalExceed: false,
     };
@@ -220,7 +224,8 @@ export default {
   methods: {
     // 顯示推文資訊
     async fetchTweet(id) {
-      try {
+      try {  
+        this.isLoading = true
         const { data, statusText } = await tweetAPI.getTweet({ id });
 
         if (statusText !== "OK") {
@@ -228,7 +233,9 @@ export default {
         }
 
         this.tweet = data;
+        this.isLoading = false
       } catch (error) {
+        this.isLoading = false
         console.log(error);
         Toast.fire({
           icon: "error",
@@ -239,6 +246,7 @@ export default {
     // 顯示推文底下留言資訊
     async fetchReplies(id) {
       try {
+        this.isLoading = true
         const { data, statusText } = await tweetAPI.getReplies({ id });
         
         if (statusText !== "OK") {
@@ -246,7 +254,9 @@ export default {
         }
 
         this.replies = data;
+        this.isLoading = false
       } catch (error) {
+        this.isLoading = false
         console.log(error);
         Toast.fire({
           icon: "error",

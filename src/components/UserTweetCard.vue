@@ -69,17 +69,18 @@ export default {};
         width: 14px;
         height: 14px;
       }
-      &.icon-wrapper:nth-child(2) {
+      .icon-wrapper:nth-child(2) {
         margin-left: 40px;
       }
       .icon-wrapper {
         display: flex;
         align-items: center;
-        width: 2rem;
+        width: 4rem;
         font-size: 14px;
         color: $font-small;
         font-weight: 600;
         .count {
+          width: 2rem;
           margin-left: 9px;
         }
       }

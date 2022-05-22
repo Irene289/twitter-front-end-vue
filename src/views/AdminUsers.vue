@@ -1,5 +1,6 @@
 <template>
   <div class="container">
+    <Loading v-if="isLoading" />
     <Sidebar />
     <div class="users-div" action="">
       <div class="title">
@@ -47,19 +48,23 @@
 import Sidebar from '../components/Sidebar.vue'
 import adminAPI from '../apis/admin'
 import {Toast} from '../utils/helpers'
+import Loading from '../components/Loading'
 
 export default {
   components: { 
-    Sidebar 
+    Sidebar,
+    Loading
   },
   data(){
     return{
-      users:[]
+      users:[],
+      isLoading: false,
     }   
   },
   methods: {
     async getUsers(){
       try{
+        this.isLoading = true
         const {data, statusText} = await adminAPI.get()
         this.users = data.filter( user => user.role === 'user')
         this.users = this.users.map(user => {
@@ -76,7 +81,9 @@ export default {
         if(statusText !== 'OK'){
           throw new Error(statusText)
         }
+        this.isLoading = false
       }catch(error){
+        this.isLoading = false
         Toast.fire({
           icon: 'error',
           title: '無法取的使用者，請稍後再試'
@@ -169,17 +176,25 @@ export default {
   flex-flow: column nowrap;
   justify-content: center;
   align-items: center;
+  
   &-name {
+    @extend %single-ellipsis;
+    width: 100%;
     color: $font-black;
     font-size: 16px;
     font-weight: 700;
     line-height: 26px;
+    text-align: center;
+    padding: 0 16px;
   }
   &-account {
+    @extend %single-ellipsis;
     color: $font-small;
     font-size: 14px;
     font-weight: 400;
     line-height: 22px;
+    text-align: center;
+    padding: 0 16px;
   }
   &-tweets-likes, &-follow {
     display: flex;

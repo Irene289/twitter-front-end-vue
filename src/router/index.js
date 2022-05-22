@@ -103,17 +103,20 @@ const routes = [
   // 後台
   {
     path: '/admin',
-    name: 'admin',  
+    name: 'admin', 
+    meta: { requiresAuth: true }, 
     component: () => import('../views/AdminSignin.vue')
   },
   {
     path: '/admin/tweets',
-    name: 'admin-tweets',    
+    name: 'admin-tweets',
+    meta: { requiresAuth: true },   
     component: () => import('../views/AdminTweetsList.vue')
   },
   {
     path: '/admin/users',
-    name: 'admin-users',   
+    name: 'admin-users',  
+    meta: { requiresAuth: true }, 
     component: () => import('../views/AdminUsers.vue')
   },
   // NotFound

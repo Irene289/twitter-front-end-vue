@@ -1,5 +1,6 @@
 <template>
   <div>
+    <Loading v-if="isLoading" />
     <div class="title">
       <h1>首頁</h1>
     </div>
@@ -120,11 +121,11 @@
               </textarea>
             </template>
             <template v-slot:alert>
-              <!-- <span class="text-length">{{ isReplyModel ? textReply.length : text.length }}/140</span> -->
-              <span v-if="!isModalEmpty" class="text-empty modal-alert warning"
+              <span class="text-reply-length">{{ textReply.length }}/140</span>
+              <span v-if="!isModalEmpty" class="modal-alert warning"
                 >內容不可空白</span
               >
-              <span v-if="isModalExceed" class="text-exceed modal-alert warning"
+              <span v-if="isModalExceed" class="modal-alert warning"
                 >字數不可超過 140 字</span
               >
             </template>
@@ -152,6 +153,7 @@ import { fromNowFilter, textFilter } from "./../utils/mixins"
 import tweetAPI from "../apis/tweet"
 import { Toast } from "../utils/helpers"
 import { mapState } from "vuex"
+import Loading from '../components/Loading'
 
 export default {
   name: "Twitter",
@@ -159,6 +161,7 @@ export default {
   components: {
     UserTweetCard,
     TweetModal,
+    Loading,
   },
   data() {
     return {
@@ -172,6 +175,7 @@ export default {
       isReplyModel: true,  // 控制 Modal
       placeholder: "",     // 控制推文跟回覆的 placeholder
       isProcessing: false, // 按鈕送出
+      isLoading: false,
       isEmpty: true,
       isExceed: false,
       isModalEmpty: true,
@@ -193,6 +197,7 @@ export default {
     // 拿到全部推文
     async fetchTweets() {
       try {
+        this.isLoading = true
         const { data, statusText } = await tweetAPI.getTweets();
 
         if (statusText !== "OK") {
@@ -201,7 +206,9 @@ export default {
 
         // 篩除非user的用戶
         this.tweets = data.filter((data) => data.User.role === "user");
+        this.isLoading = false
       } catch (error) {
+        this.isLoading = false
         console.log(error);
         Toast.fire({
           icon: "error",
@@ -325,7 +332,7 @@ export default {
     // 按讚
     async likeTweet(id) {
       try {
-        this.isProcessing = true;
+        // this.isProcessing = true;
         const { data } = await tweetAPI.likeTweet({ id });
 
         if (data.status !== "success") {
@@ -345,9 +352,9 @@ export default {
             };
           }
         });
-        this.isProcessing = false;
+        // this.isProcessing = false;
       } catch (error) {
-        this.isProcessing = false;
+        // this.isProcessing = false;
         console.log(error);
         Toast.fire({
           icon: "error",
@@ -562,15 +569,25 @@ export default {
     border-radius: 50%;
   }
 }
+// .text-reply-length {
+
+//   position: absolute;
+//   right: 1rem;
+//   bottom: 1rem;
+//   // margin-bottom: 0;
+// }
 .modal-tweet {
   @extend %button-orange;
   min-width: 76px;
   height: 40px;
-  &.button-reply {
-    position: absolute;
-    right: 1rem;
-    bottom: 1rem;
-  }
+  position: absolute;
+  right: 1rem;
+  bottom: 1rem;
+  // &.button-reply {
+  //   position: absolute;
+  //   right: 1rem;
+  //   bottom: 1rem;
+  // }
   &:disabled {
     background: $form-input-placeholder;
   }
