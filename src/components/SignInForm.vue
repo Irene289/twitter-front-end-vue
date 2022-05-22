@@ -73,8 +73,7 @@ export default {
         }
        if(isAdmin && route === 'admin'){
          // token
-        localStorage.setItem('token', data.data.token)
-        
+        localStorage.setItem('token', data.data.token)      
         this.$router.push('/admin/tweets')
         return
         } 

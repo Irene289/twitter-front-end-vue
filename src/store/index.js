@@ -15,6 +15,7 @@ export default new Vuex.Store({
         avatarImg: '',
         is_admin: false
       },
+      userFollowings:[],
       isAuthenticated: false,
       token: ''
   },
@@ -30,10 +31,7 @@ export default new Vuex.Store({
       state.token = localStorage.getItem('token'), 
       state.isAuthenticated = true
     },
-    //自動登入功能
-    // setToken(state) {
-    //   state.token = localStorage.getItem('token')
-    // },
+    //登出
     revokeAuthentication(state){
       //清空state
       state.currentUser = {}
