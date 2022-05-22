@@ -88,7 +88,7 @@
             <div class="icon-wrapper">
               <img src="../assets/static/images/reply@2x.png" alt="" />
               <!-- TODO:暫填，非真實數據 -->
-              <p class="count">{{ reply.User.id }}</p>
+              <p class="count">0</p>
             </div>
             <div class="icon-wrapper">
               <img src="../assets/static/images/like@2x.png" alt="" />
@@ -99,7 +99,7 @@
                 @click.stop.prevent="unlikeTweet(tweet.id)"
               /> -->
               <!-- TODO:暫填，非真實數據 -->
-              <p class="count">{{ reply.User.id }}</p>
+              <p class="count">0</p>
             </div>
           </div>
         </template>
