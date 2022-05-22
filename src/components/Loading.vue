@@ -31,10 +31,10 @@
   height: 65px;
   width: 65px;
   position: absolute;
-  top: 40%;
-  bottom: 50%;
-  right: 50%;
-  left: 50%;
+  top: calc(50vh - 65px / 2);
+  bottom: calc(50vh - 65px / 2);
+  right: calc(50vw - 65px / 2);
+  left: calc(50vw - 65px / 2);
   display: flex;
   flex-direction: row;
   align-items: center;

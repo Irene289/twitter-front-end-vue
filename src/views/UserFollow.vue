@@ -126,11 +126,11 @@
 @import "../assets/scss/_basic.scss";
 .content-container{
   padding:0;
-  border: 1px solid $border-grey;
-  
+  border-left: 1px solid $border-grey;
+  border-right: 1px solid $border-grey;
 }
 .title{
-  cursor:pointer;
+  cursor: pointer;
   padding-left: 28px;
   height: 75px;
   display: flex;
@@ -152,7 +152,6 @@
         font-weight: 500;
         font-size:13px;
         line-height: 18px;
-        
     }
   }
 }
@@ -162,18 +161,18 @@
   border-bottom: 1px solid $border-grey;
 }
 .scrollbar {
-    height: calc(100vh - 130px);
+    height: calc(100vh - 76px - 55px);
     overflow-y: scroll;
-    &::-webkit-scrollbar {
-      width: 8px;
-    }
-    &::-webkit-scrollbar-track {
-      box-shadow: inset 0 0 1px $scrollbar;
-      border-radius: 4px;
-    }
-    &::-webkit-scrollbar-thumb {
-      border-radius: 4px;
-      background-color: $scrollbar;
-    }
+      &::-webkit-scrollbar {
+        width: 8px;
+      }
+      &::-webkit-scrollbar-track {
+        box-shadow: inset 0 0 1px $scrollbar;
+        border-radius: 4px;
+      }
+      &::-webkit-scrollbar-thumb {
+        border-radius: 4px;
+        background-color: $scrollbar;
+      }
   }
 </style>
