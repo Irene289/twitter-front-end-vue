@@ -1,46 +1,50 @@
 <template>
   <div class="container">
     <Loading v-if="isLoading" />
-    <Sidebar />
-    <div class="users-div" action="">
-      <div class="title">
-        <h1 class="users-div__title">使用者列表</h1>
-      </div>
-      <div class="users-div__user scrollbar">
-        <div 
-          v-for="user in users"
-          :key ="user.id"
-          class="users-div__user--card">
-          <img class="card-background" :src="user.coverImg" alt="">
-          <img class="card-avatar" :src="user.avatarImg" alt="">
-          <div class="card-info">
-            <div class="card-info-name">{{user.name}}</div>
-            <div class="card-info-account">@{{user.account}}</div>
-            <div class="card-info-tweets-likes">
-              <div class="card-info-tweets">
-                <img src="../assets/static/images/post@2x.png" alt="">
-                <span class="counts">{{user.tweetAmount.count}}</span>
+      <div class="side-bar">
+        <Sidebar />
+      </div>    
+      <div class="users-div scrollbar" action="">
+        <div class="title">
+          <h1 class="users-div__title">使用者列表</h1>
+        </div>
+        <!-- scrollbar -->
+            <div class="users-div__user ">
+                <div 
+                v-for="user in users"
+                :key ="user.id"
+                class="users-div__user--card"
+                >
+                <img class="card-background" :src="user.coverImg" alt="">
+                <img class="card-avatar" :src="user.avatarImg" alt="">
+                <div class="card-info">
+                  <div class="card-info-name">{{user.name}}</div>
+                  <div class="card-info-account">@{{user.account}}</div>
+                  <div class="card-info-tweets-likes">
+                    <div class="card-info-tweets">
+                      <img src="../assets/static/images/post@2x.png" alt="">
+                      <span class="counts">{{user.tweetAmount.count}}</span>
+                    </div>
+                    <div class="card-info-likes">
+                      <img src="../assets/static/images/like@2x.png" alt="">
+                      <span class="counts">{{user.likeAmount.count}}</span>
+                    </div>
+                  </div>
+                  <div class="card-info-follow">
+                    <div class="card-info-followings">
+                      <span class="counts">{{user.followedAmount.count}} 個</span>
+                      <span class="type">跟隨中</span>
+                    </div>
+                    <div class="card-info-followers">
+                      <span class="counts">{{user.followingAmount.count}}  位</span>
+                      <span class="type">跟隨者</span>
+                    </div>
+                  </div>
+                </div> 
               </div>
-              <div class="card-info-likes">
-                <img src="../assets/static/images/like@2x.png" alt="">
-                <span class="counts">{{user.likeAmount.count}}</span>
               </div>
-            </div>
-            <div class="card-info-follow">
-              <div class="card-info-followings">
-                <span class="counts">{{user.followedAmount.count}} 個</span>
-                <span class="type">跟隨中</span>
-              </div>
-              <div class="card-info-followers">
-                <span class="counts">{{user.followingAmount.count}}  位</span>
-                <span class="type">跟隨者</span>
-              </div>
-            </div>
-          </div>
-        </div>  
-      </div>
-    </div>
-    <div></div>
+             
+            </div>       
   </div>
 </template>
 
@@ -102,11 +106,15 @@ export default {
 
 .container {
   display: grid;
-  grid-template-columns: 178px auto;
+  grid-template-columns: repeat(12, 1fr);
   grid-template-rows: 100vh;
   grid-column-gap: 24px;
 }
+.side-bar{
+  grid-column: 1/2;
+}
 .users-div {
+  grid-column: 2/13;
   display: flex;
   flex-flow: column nowrap;
   justify-content: flex-start;
@@ -122,8 +130,9 @@ export default {
   }
 }
 .users-div__user {
+  width: 100%;
   display: grid;
-  grid-template-columns: repeat(4, 249px);
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
   grid-template-rows: auto;
   overflow-y: scroll;
   grid-gap: 16px;
@@ -151,10 +160,9 @@ export default {
   border-radius: 10px;
   z-index: -2;
   .card-background {
-    width: 247px;
+    width: 100%;
     height: 140px;
-    // background: url('https://picsum.photos/247/140') no-repeat;
-    overflow: hidden;
+    object-fit: cover;
     border-radius: 10px 10px 0px 0px;
     position: absolute;
     top: 0;
@@ -162,20 +170,28 @@ export default {
     z-index: -1;
   }
   .card-avatar {
+    position: absolute;
+    top: 20%;
+    left: 50%;
+    transform: translateX(-50%);
     width: 100px;
     height: 100px;
     aspect-ratio: 1/1;
     object-fit: cover;
     border: 4px solid $white;
     border-radius: 50%;
-    margin: 64px 74px 8px 74px;
   }
 }
 .card-info {
+  position: absolute;
+  width: 200px;
   display: flex;
   flex-flow: column nowrap;
   justify-content: center;
   align-items: center;
+  bottom: 24px;
+  left: 50%;
+  transform: translateX(-50%);
   
   &-name {
     @extend %single-ellipsis;
@@ -229,6 +245,14 @@ export default {
   }
   .type {
     color: $font-small;
+  }
+}
+@media screen and (min-width: 961px){
+  .side-bar{
+    grid-column: 1/3;
+  }
+  .users-div {
+  grid-column: 3/13;
   }
 }
 </style>
