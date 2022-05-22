@@ -29,7 +29,7 @@
                   <router-link
                     :to="{
                       name: 'user-tweets',
-                      params: user.id,
+                      params:{id: user.id}
                     }"
                   >
                     <p>推文</p>
@@ -41,7 +41,7 @@
                   <router-link
                     :to="{
                       name: 'user-replies',
-                      params: user.id,
+                      params:{id: user.id}
                     }"
                   >
                     <p>回覆</p>
@@ -53,7 +53,7 @@
                   <router-link
                     :to="{
                       name: 'user-like',
-                      params: user.id,
+                      params: {id: user.id}
                     }"
                   >
                     <p>喜歡的內容</p>
