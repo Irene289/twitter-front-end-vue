@@ -50,7 +50,7 @@
               <span 
                 v-show="wrongName"
                 class="text-limit">
-                請輸入英文字母或數字
+                請輸入英文姓名（可包含 - 與空白，不包含其它符號）
               </span>
               <span class="text-length" :class="{ waring: isExceed }">
                 {{ textWarning(user.name.length) }}
@@ -121,7 +121,7 @@
           <button
             class="btn btn-setting"
             type="submit"
-            :disabled="isProcessing || isExceed"
+            :disabled="isExceed || isWarning"
           >
             {{ isProcessing ? "處理中" : "儲存" }}
           </button>
@@ -158,13 +158,15 @@ export default {
       wrongEmail: false,
       wrongPassword: false,
       wrongPasswordCheck: false,
-      isProcessing: false,
-      isExceed: false,
+      isProcessing: false,  // 按鈕送出後處理
+      isExceed: false,      // 字數超過按鈕失效
+      isWarning: false      // 字數不合規則按鈕失效
     };
   },
   watch: {
     user() {
       this.textWarning()
+      console.log(this.user.account)
     }
   },
   created() {
@@ -193,25 +195,22 @@ export default {
       }
     },
     textWarning(length) {
-      if (!length) {
-        this.isExceed = false;
-      } else if (length > 50) {
-        this.isExceed = true;
-      }
+      length > 50 ? this.isExceed = true : this.isExceed = false
     },
     inputWarning() {
       const re = /^[A-Za-z0-9]*$/
+      const nameRe = /^([A-Za-z]{1,}\s?-?)*[A-Za-z]{1,}$/
       const emailRe = /[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,4}$/
 
       re.test(this.user.account)
         ? this.wrongAccount = false 
         : this.wrongAccount = true
 
-      re.test(this.user.name)
+      nameRe.test(this.user.name)
         ? this.wrongName = false 
         : this.wrongName = true
 
-      emailRe.test(this.user.email)
+      emailRe.test(this.user.email) || this.user.email.trim() === ''
         ? this.wrongEmail = false 
         : this.wrongEmail = true
 
@@ -224,14 +223,14 @@ export default {
         : this.wrongPasswordCheck = true
         
       if (re.test(this.user.account) 
-        && re.test(this.user.name)
+        && nameRe.test(this.user.name)
         && emailRe.test(this.user.email)
         && re.test(this.user.password)
         && re.test(this.user.passwordCheck)
       ) {
-        this.isProcessing = false
+        this.isWarning = false
       } else {
-        this.isProcessing = true
+        this.isWarning = true
       }
     },
     async handleSubmit() {
@@ -262,17 +261,18 @@ export default {
           });
           this.isProcessing = false;
           return;
-        } else if (
-          this.user.password.includes(" ") &&
-          this.user.passwordCheck.includes(" ")
-        ) {
-          Toast.fire({
-            icon: "warning",
-            title: "密碼不可包含空格",
-          });
-          this.isProcessing = false;
-          return;
-        }
+        } 
+        // else if (
+        //   this.user.password.includes(" ") &&
+        //   this.user.passwordCheck.includes(" ")
+        // ) {
+        //   Toast.fire({
+        //     icon: "warning",
+        //     title: "密碼不可包含空格",
+        //   });
+        //   this.isProcessing = false;
+        //   return;
+        // }
 
         const formData = {
           account: this.user.account,

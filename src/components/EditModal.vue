@@ -51,8 +51,8 @@
             class="name" name="name" type="text" 
           />
           <div class="hint-group">
-            <p :class="{hidden:nameIsValid}" class="warning">字數超出上限</p>
-            <p class="length">{{user.name.length}}/50</p>
+            <p :class="{hidden:nameIsValid}" class="warning-name">字數超出上限</p>
+            <p class="length-name">{{user.name.length}}/50</p>
           </div>
         </div>
         <div class="info-item">
@@ -61,8 +61,8 @@
             v-model="user.introduction" :class="{red:!introIsValid}"
             name="introduction" class="intro" cols="30" rows="10" ></textarea>
           <div class="hint-group">
-            <p :class="{hidden:introIsValid}" class="warning" >字數超出上限</p>
-            <p class="length">{{user.introduction.length}}/160</p>
+            <p :class="{hidden:introIsValid}" class="warning-intro" >字數超出上限</p>
+            <p class="length-intro">{{user.introduction.length}}/160</p>
           </div>
         </div>        
       </div>     
@@ -190,9 +190,14 @@ export default {
   .hidden{
     visibility:hidden;
   }
-  .warning{
-    color:#FC5A5A;
+  .warning-intro, .warning-name {
+    color: $modal-alert;
+    font-weight: 500;
+    font-size: 15px;
+    line-height: 15px;
+    margin-top: 10px;
   }
+
   .modal {
     position: fixed;
     z-index: 1; 
@@ -299,10 +304,6 @@ export default {
     height: 353px;   
     .info-item{
       position: relative;
-      .length{
-          font-size: 12px;
-          color: $font-small;
-        }
       label{
         cursor: none;
         position: absolute;
@@ -326,7 +327,13 @@ export default {
       }
     }
   }
-
+  .length-name {
+    @extend %form-label;
+  }
+  .length-intro {
+    @extend %form-label;
+    margin-top: -0px;
+  }
 
 
 </style>

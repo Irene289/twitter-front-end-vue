@@ -40,7 +40,7 @@
           v-model.trim="name" 
           name="name" 
           type="text" 
-          placeholder="請輸入使用者名稱" 
+          placeholder="請輸入使用者名稱"
           @change="inputWarning"
           required
         />
@@ -48,7 +48,7 @@
           <span 
             v-show="wrongName"
             class="text-limit">
-            請輸入英文字母或數字
+            請輸入英文姓名（可包含 - 與空白，不包含其它符號）
           </span>
           <span class="text-length" :class="{ waring: isExceed }">
             {{ textWarning(name.length) }}
@@ -60,10 +60,11 @@
       <div class="regist-form__div regist-form__input-email">
         <label for="">Email</label>
         <input 
-          v-model="email" 
+          v-model.trim="email" 
           name="email" 
           type="email" 
           placeholder="請輸入 Email"
+          autocomplete="new-email"
           @change="inputWarning"
           required
         />
@@ -85,7 +86,7 @@
           type="password" 
           placeholder="請設定密碼" 
           @change="inputWarning"
-          autocomplete="new-password"
+          
           required
         />
         <div class="text-limits">
@@ -120,9 +121,9 @@
 
       <button 
         class="btn btn-regist" 
-        type="submit" :disabled="isProcessing || isExceed"
+        type="submit" :disabled="isExceed"
       >
-        {{isProcessing? "處理中" : '註冊'}}
+        {{isProcessing ? "處理中" : "註冊"}}
       </button>
 
       <div class="cancel-regist">
@@ -155,6 +156,7 @@ export default {
       wrongPasswordCheck: false,
       isProcessing: false,
       isExceed: false,
+      isWarning: false
     }
   },
   methods:{
@@ -175,7 +177,7 @@ export default {
       if(this.password !== this.passwordCheck){
          Toast.fire({
           icon:"warning",
-          title:"密碼和密碼確認不一致"
+          title:"密碼不一致，請再次輸入"
         })
         return
       }
@@ -195,7 +197,7 @@ export default {
         localStorage.setItem('token', data.data.token) 
         // this.$store.commit('setToken')
         this.$router.push('/signin')       
-        
+        this.isProcessing = false
       }catch(error){
         this.isProcessing = false
         console.log(error.toJSON() )
@@ -213,21 +215,18 @@ export default {
       }
     },
     textWarning(length){
-      if (!length) {
-        this.isExceed = false;
-      } else if (length > 50) {
-        this.isExceed = true;
-      }
+      length > 50 ? this.isExceed = true : this.isExceed = false
     },
     inputWarning() {
       const re = /^[A-Za-z0-9]*$/
+      const nameRe = /^([A-Za-z]{1,}\s?-?)*[A-Za-z]{1,}$/
       const emailRe = /[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,4}$/
 
       re.test(this.account)
         ? this.wrongAccount = false 
         : this.wrongAccount = true
 
-      re.test(this.name)
+      nameRe.test(this.name) || !this.name.trim() === ''
         ? this.wrongName = false 
         : this.wrongName = true
 
@@ -235,23 +234,23 @@ export default {
         ? this.wrongEmail = false 
         : this.wrongEmail = true
 
-      re.test(this.password)
+      re.test(this.password) || this.password.trim() === ''
         ? this.wrongPassword = false 
         : this.wrongPassword = true
 
-      re.test(this.passwordCheck)
+      re.test(this.passwordCheck) || this.passwordCheck.trim() === ''
         ? this.wrongPasswordCheck = false 
         : this.wrongPasswordCheck = true
         
       if (re.test(this.account) 
-        && re.test(this.name)
+        && nameRe.test(this.name)
         && emailRe.test(this.email)
         && re.test(this.password)
         && re.test(this.passwordCheck)
       ) {
-        this.isProcessing = false
+        this.isWarning = false
       } else {
-        this.isProcessing = true
+        this.isWarning = true
       }
     },
   },
