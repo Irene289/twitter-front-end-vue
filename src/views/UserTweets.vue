@@ -15,7 +15,7 @@
           {{ tweet.User.name }}
         </template>
         <template v-slot:id>
-          {{ tweet.User.account }}
+          {{ '@'+tweet.User.account }}
         </template>
         <template v-slot:post-time>
           {{ tweet.created_at | fromNow }}

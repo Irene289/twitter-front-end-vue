@@ -22,7 +22,7 @@
       </div>
 
       <button class="btn btn-signin" type="submit" :disabled="isProcessing">
-        登入
+       {{ isProcessing? '處理中' : '登入' }}
       </button>
     </form>    
   </div>

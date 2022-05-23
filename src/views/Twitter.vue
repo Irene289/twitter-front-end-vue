@@ -556,6 +556,7 @@ export default {
   padding: 0;
   box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.25);
   &-cancel {
+    border-bottom: 1px solid $border-grey;
     width: 100%;
   }
   &-cancel img {

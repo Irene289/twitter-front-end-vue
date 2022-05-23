@@ -14,7 +14,7 @@
          {{reply.User.name}}
       </template>
        <template v-slot:id>
-         {{reply.User.account}}
+         {{'@'+reply.User.account}}
       </template>
        <template v-slot:post-time>
          {{reply.created_at | fromNow}}

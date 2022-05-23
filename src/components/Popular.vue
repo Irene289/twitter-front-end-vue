@@ -155,7 +155,7 @@ export default {
     .popular__list__item{  
       cursor: pointer; 
       display: flex;
-      padding: 1rem; 
+      padding: 1rem 1rem 5px 1rem; 
       .item-account{
         flex: 1;
         width: 74px;
