@@ -151,9 +151,10 @@
 </template>
 <script>
 import TweetModal from "../components/TweetModal";
-import tweetAPI from "../apis/tweet";
-import { Toast } from "../utils/helpers";
+// import tweetAPI from "../apis/tweet";
+// import { Toast } from "../utils/helpers";
 import { mapState } from "vuex";
+// import store from '../store'
 
 export default {
   name: "Sidebar",
@@ -180,7 +181,7 @@ export default {
           path: "/admin/users",
         },
       ],
-      tweets: [],
+      // tweets: [],
       text: "",              // 推文
       newTweet: {},          // 新增推文
       dNoneModal: true,      // 控制 Modal
@@ -206,58 +207,69 @@ export default {
       this.$router.push("/signin");
     },
     // 推一則推文
-    async createTweet(payload) {
-      try {
-        // 內容空白處理
-        if (!this.text) {
-          this.isModalEmpty = false;
-          return;
-        } else if (this.text.trim() === "") {
-          this.isModalEmpty = false;
-          return;
-        }
-        this.isProcessing = true;
+    // async createTweet() {
+    //   // if (!this.text) {
+    //   //     this.isModalEmpty = false;
+    //   //     return;
+    //   //   } else if (this.text.trim() === "") {
+    //   //     this.isModalEmpty = false;
+    //   //     return;
+    //   //   }
+    //   // this.isProcessing = true;
+    //   this.newTweet = await store.dispatch('postTweet')
+    // },
+    // async createTweet(payload) {
+    //   try {
+    //     // 內容空白處理
+    //     if (!this.text) {
+    //       this.isModalEmpty = false;
+    //       return;
+    //     } else if (this.text.trim() === "") {
+    //       this.isModalEmpty = false;
+    //       return;
+    //     }
+    //     this.isProcessing = true;
 
-        const { id, description, UserId, createdAt } = payload;
+    //     const { id, description, UserId, createdAt } = payload;
 
-        const { data } = await tweetAPI.createTweet({
-          description: this.text,
-          UserId: this.currentUser.id,
-        });
+    //     const { data } = await tweetAPI.createTweet({
+    //       description: this.text,
+    //       UserId: this.currentUser.id,
+    //     });
 
-        this.newTweet = {
-          id, // 推文 id
-          description,
-          createdAt,
-          User: { id: UserId },
-        };
+    //     this.newTweet = {
+    //       id, // 推文 id
+    //       description,
+    //       createdAt,
+    //       User: { id: UserId },
+    //     };
 
-        this.tweets = [{ ...this.newTweet }, ...this.tweets];
+    //     this.tweets = [{ ...this.newTweet }, ...this.tweets];
 
-        if (data.status !== "success") {
-          throw new Error(data.message);
-        } else {
-          Toast.fire({
-            icon: "success",
-            title: "成功送出回覆",
-          });
-          this.text = "";
-          this.dNoneModal = true;
-          this.isProcessing = false;
-        }
-      } catch (error) {
-        this.isProcessing = false;
-        if (error.response.status === 500) {
-          return;
-        } else {
-          console.log(error);
-          Toast.fire({
-            icon: "error",
-            title: "暫時無法推文",
-          });
-        }
-      }
-    },
+    //     if (data.status !== "success") {
+    //       throw new Error(data.message);
+    //     } else {
+    //       Toast.fire({
+    //         icon: "success",
+    //         title: "成功送出回覆",
+    //       });
+    //       this.text = "";
+    //       this.dNoneModal = true;
+    //       this.isProcessing = false;
+    //     }
+    //   } catch (error) {
+    //     this.isProcessing = false;
+    //     if (error.response.status === 500) {
+    //       return;
+    //     } else {
+    //       console.log(error);
+    //       Toast.fire({
+    //         icon: "error",
+    //         title: "暫時無法推文",
+    //       });
+    //     }
+    //   }
+    // },
     // 開啟 Modal
     tweetModal() {
       this.dNoneModal = !this.dNoneModal;
@@ -281,7 +293,7 @@ export default {
     },
   },
   computed: {
-    ...mapState(["currentUser"]),
+    ...mapState(["currentUser", "tweet"]),
   },
   watch: {
     text() {

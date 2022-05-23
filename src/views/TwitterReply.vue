@@ -2,21 +2,23 @@
   <div>
     <Loading v-if="isLoading" />
     <div class="title">
+      <router-link to="/twitter" >
       <img
         src="../assets/static/images/back@2x.png"
         alt=""
-        @click="$router.back()"
+        
       />
+      </router-link>
       <h1>推文</h1>
     </div>
     <div class="reply-div scrollbar">
       <div class="reply-div-user">
         <div class="user-img avatar">
-          <img :src="tweet.User.avatarImg | avatarFilter" alt="" />
+          <img :src="tweet.User.avatarImg" alt="" />
         </div>
         <div class="user-info">
           <p class="user-info-name">{{ tweet.User.name }}</p>
-          <p class="user-info-account">@{{ tweet.User.account }}</p>
+          <p class="user-info-account">{{ tweet.User.account }}</p>
         </div>
       </div>
       <div class="reply-div-content">
@@ -48,7 +50,7 @@
             class="content-response-like"
             src="../assets/static/images/like@2x.png"
             alt=""
-            :disabled="likeUnlikeProcessing"
+            :disabled="isProcessing"
             @click.stop.prevent="likeTweet(tweet.id)"
           />
           <img
@@ -56,7 +58,7 @@
             class="content-response-like"
             src="../assets/static/images/redHeart@2x.png"
             alt=""
-            :disabled="likeUnlikeProcessing"
+            :disabled="isProcessing"
             @click.stop.prevent="unlikeTweet(tweet.id)"
           />
         </div>
@@ -74,10 +76,10 @@
           {{ reply.User.name }}
         </template>
         <template v-slot:id>
-          {{ reply.User.account }}
+          @{{ reply.User.account }}
         </template>
         <template v-slot:post-time>
-          {{ reply.createdAt | fromNow }}
+          {{ reply.User.createdAt | fromNow }}
         </template>
         <template v-slot:text>
           <div class="reply-tag">
@@ -182,18 +184,18 @@
 </template>
 
 <script>
-import {imgFilter} from '../utils/mixins'
+// import {imgFilter} from '../utils/mixins'
 import UserTweetCard from "../components/UserTweetCard.vue";
 import TweetModal from "../components/TweetModal";
 import { fromNowFilter, textFilter } from "./../utils/mixins";
 import tweetAPI from "../apis/tweet";
 import { Toast } from "../utils/helpers";
 import { mapState } from "vuex";
-import Loading from '../components/Loading'
+import Loading from '../components/Loading.vue'
 
 export default {
   name: "TwitterReply",
-  mixins: [fromNowFilter, textFilter, imgFilter],
+  mixins: [fromNowFilter, textFilter],
   components: {
     UserTweetCard,
     TweetModal,
@@ -206,11 +208,18 @@ export default {
       textReply: "",
       dNoneModal: true,
       isProcessing: false,
-      isLoading: false,
+      isLoading: true,
       isModalEmpty: true,
       isModalExceed: false,
-      likeUnlikeProcessing: false
+      // isProcessing: false
     };
+  },
+  beforeRouteUpdate(to, from, next){
+    const { id } = to.params
+    this.fetchTweet(id)
+    this.fetchReplies(id)
+    next()
+    // console.log(id)
   },
   watch: {
     textReply() {
@@ -220,7 +229,6 @@ export default {
   created() {
     const { id } = this.$route.params;
     this.fetchTweet(id);
-    this.fetchReplies(id);
   },
   methods: {
     // 顯示推文資訊
@@ -232,8 +240,10 @@ export default {
         if (statusText !== "OK") {
           throw new Error(statusText);
         }
+        const { Replies } = data
 
         this.tweet = data;
+        this.replies = Replies
         this.isLoading = false
       } catch (error) {
         this.isLoading = false
@@ -241,27 +251,6 @@ export default {
         Toast.fire({
           icon: "error",
           title: "暫時無法取得推文",
-        });
-      }
-    },
-    // 顯示推文底下留言資訊
-    async fetchReplies(id) {
-      try {
-        this.isLoading = true
-        const { data, statusText } = await tweetAPI.getReplies({ id });
-        
-        if (statusText !== "OK") {
-          throw new Error(statusText);
-        }
-
-        this.replies = data;
-        this.isLoading = false
-      } catch (error) {
-        this.isLoading = false
-        console.log(error);
-        Toast.fire({
-          icon: "error",
-          title: "暫時無法取得回覆",
         });
       }
     },
@@ -327,7 +316,7 @@ export default {
     // 對推文按讚
     async likeTweet(id) {
       try {
-        this.likeUnlikeProcessing = true;
+        this.isProcessing = true;
         const { data } = await tweetAPI.likeTweet({ id });
 
         if (data.status !== "success") {
@@ -339,9 +328,9 @@ export default {
           ...this.tweet,
           likeTotal: this.tweet.likeTotal + 1,
         };
-        this.likeUnlikeProcessing = false;
+        this.isProcessing = false;
       } catch (error) {
-        this.likeUnlikeProcessing = false;
+        this.isProcessing = false;
         console.log(error);
         Toast.fire({
           icon: "error",
@@ -352,7 +341,7 @@ export default {
     // 對推文取消讚
     async unlikeTweet(id) {
       try {
-        this.likeUnlikeProcessing = true;
+        this.isProcessing = true;
         const { data } = await tweetAPI.unlikeTweet({ id });
 
         if (data.status !== "success") {
@@ -363,9 +352,9 @@ export default {
           ...this.tweet,
           likeTotal: this.tweet.likeTotal - 1,
         };
-        this.likeUnlikeProcessing = false;
+        this.isProcessing = false;
       } catch (error) {
-        this.likeUnlikeProcessing = false;
+        this.isProcessing = false;
         console.log(error);
         Toast.fire({
           icon: "error",
@@ -590,6 +579,8 @@ export default {
   .content-info-description {
     line-height: 26px;
     margin-top: 8px;
+    margin-right: 16px;
+    word-break: break-all;
   }
 }
 // 回覆按鈕
