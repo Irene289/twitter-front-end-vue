@@ -17,7 +17,7 @@
 
         <!-- popular -->
         <div class="col-4 col-lg-3 popular-users">
-          <Popular />
+          <Popular :top-users="topUsers" />
         </div>
       </div>
     </div>
@@ -40,7 +40,8 @@ export default {
   data(){
     return {
       tweets: [],          // 全部推文
-      isLoading: false
+      isLoading: false,
+      topUsers: []
     }
   },
   methods: {
@@ -66,9 +67,9 @@ export default {
         });
       }
     },
-    update(tweets) {
+    update() {
+      // 接受 Sidebar 推文的 emit，重新打 fetchTweets API
       this.fetchTweets()
-      this.tweets = [...tweets]
     },
   }
 };

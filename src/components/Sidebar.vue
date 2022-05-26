@@ -291,7 +291,8 @@ export default {
     updateTweet() {
       this.createTweet()
       this.fetchTweets()
-      this.$emit('update', this.tweets)
+      // 點擊 Modal 中的推文按鈕後，emit 到 TwitterMain
+      this.$emit('update')
     },
     // 開啟 Modal
     tweetModal() {

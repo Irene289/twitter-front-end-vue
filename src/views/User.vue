@@ -70,7 +70,10 @@
           </div>
         </div>
         <div class="col-4 col-lg-3 popular-users">
-          <Popular />
+          <Popular 
+            :top-users="topUsers"
+            @after-follow="afterPopularClick"
+          />
         </div>
       </div>
     </div>
@@ -110,6 +113,7 @@
           isLoading: false,
         },
         tweets: [],          // 全部推文
+        topUsers: []
       }
     },
     methods:{     
@@ -150,6 +154,7 @@
           const {data,statusText} = await userAPI.getTweets({id})
           this.tweetNum = data.length
           this.tweets = data
+          
           if(statusText !== 'OK'){
             throw new Error(statusText)
           }
@@ -164,6 +169,34 @@
         const { id } = this.$route.params
         this.fetchUserTweets(id)
       },
+      afterPopularClick(data) {
+        const { id, status } = data
+        if (this.currentUser.id === id) {
+          if (status === 'follow') {
+            this.user = {
+              ...this.user,
+              followingCount: this.user.followingCount + 1,
+            } 
+          } else {
+              this.user = {
+              ...this.user,
+              followingCount: this.user.followingCount - 1,
+            }
+          }
+        } else if (this.user.id === id) {
+          if (status === 'follow') {
+            this.user = {
+              ...this.user,
+              followerCount: this.user.followerCount + 1,
+            }
+          } else {
+            this.user = {
+              ...this.user,
+              followerCount: this.user.followerCount - 1,
+            }
+          }
+        }
+      }
     },
     computed:{
       ...mapState(['currentUser'])

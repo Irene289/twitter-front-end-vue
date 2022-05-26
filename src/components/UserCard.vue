@@ -35,8 +35,13 @@
             </div>
             <div v-else 
               @click.stop.prevent="unfollow(user.id)"
-              class="group-item">           
-                <button class="following">正在跟隨</button>           
+              class="group-item">    
+                <!-- TODO: 跟 Popular 連動、UserCard 數字增加 -->
+                <button 
+                  class="following"
+                >
+                  正在跟隨
+                </button>           
             </div>
           </template>         
           <div v-else class="group-item">

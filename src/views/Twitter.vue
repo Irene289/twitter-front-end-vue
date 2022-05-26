@@ -167,7 +167,11 @@ export default {
     Loading,
   },
   props: {
-    initialTweets: Array
+    // 接受 TwitterMain 因為 Sidebar 發送推文後更新的資料
+    initialTweets: {
+      type: Array,
+      required: true
+    }
   },
   data() {
     return {
@@ -203,9 +207,9 @@ export default {
   created() {
     this.fetchTweets();
   },
-  mounted() {
-    this.tweets = [...this.initialTweets]
-  },
+  // mounted() {
+  //   this.tweets = [...this.initialTweets]
+  // },
   methods: {
     // 拿到全部推文
     async fetchTweets() {

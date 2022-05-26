@@ -61,7 +61,6 @@ import { textFilter } from '../utils/mixins'
 import { visitPage } from "../utils/mixins"
 import UserTweetCard from "../components/UserTweetCard.vue"
 import { fromNowFilter } from "./../utils/mixins"
-// import userAPI from "../apis/user"
 import tweetAPI from "../apis/tweet"
 import {Toast} from '../utils/helpers'
 
@@ -72,7 +71,10 @@ export default {
     UserTweetCard,
   },
   props: {
-    initialTweets: Array
+    initialTweets: {
+      type: Array,
+      required: true
+    }
   },
   data() {
     return {
@@ -80,7 +82,7 @@ export default {
       newTweet: {},
       noTweets: false,
       isLikes: false,
-      isProcessing: false 
+      isProcessing: false,
     };
   },
   methods: {
@@ -151,11 +153,6 @@ export default {
         })
       }
     },
-  },
-  beforeRouteUpdate(to, from, next) {
-    const { id } = to.params;
-    this.fetchUserTweets(id);
-    next();
   },
   created() {
     this.tweets = [...this.initialTweets]

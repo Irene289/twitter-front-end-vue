@@ -75,8 +75,15 @@ export default {
       followers:[],
       noFollowers: false,
       isProcessing: false,
-      isLoading: false
+      isLoading: false,
     } 
+  },
+  props: {
+    // 點擊 Popular 追蹤/取消追蹤後更新的資料
+    initialFollowers: {
+      type: Array,
+      required: true
+    }
   },
   methods:{
     async fetchUserFollowers(id){
@@ -122,6 +129,7 @@ export default {
             }
           }
         })
+        this.$emit('after-userfollow')
         this.isProcessing = false
       }catch(error){
         this.isProcessing = false
@@ -149,6 +157,7 @@ export default {
             }
           }
         })
+        this.$emit('after-userfollow')
         this.isProcessing = false
       }catch(error){
         this.isProcessing = false
@@ -175,6 +184,12 @@ export default {
     this.fetchUserFollowers(id)
     next()
   },
+  watch: {
+    // 當 initialFollowers 有更新，就重新賦值給 followers
+    initialFollowers(newVal) {
+      this.followers = [...newVal]
+    }
+  }
 }
 </script>
 <style lang="scss" scoped>

@@ -3,7 +3,7 @@
     <h1>跟隨誰</h1>
     <div class="popular__list">
       <div 
-        v-for="user in topUsers"
+        v-for="user in popularUsers"
         :key="user.id"
         @click.stop.prevent="visit(user.id, 'user-tweets')"
         class="popular__list__item">
@@ -40,8 +40,15 @@ export default {
   mixins:[visitPage, imgFilter],
   data(){
     return{
-      topUsers:[],
+      popularUsers:[],
       isProcessing: false
+    }
+  },
+  props: {
+    // 點擊 UserFollowing 或 UserFollower 後，從 UserFollow 更新後傳來的資料
+    topUsers: {
+      type: Array,
+      required: true
     }
   },
   methods:{
@@ -52,7 +59,8 @@ export default {
       try{
         const {data, statusText} = await userAPI.getTopUsers({rank})
         // 後端已篩過非user
-        this.topUsers = data.filter(user => user.id !== this.currentUser.id )
+        this.popularUsers = data.filter(user => user.id !== this.currentUser.id )
+        console.log(this.topUsers)
         if(statusText !== "OK"){
           throw new Error(statusText)
         }
@@ -70,7 +78,7 @@ export default {
           if(statusText !=='OK'){
             throw new Error(statusText)
           }
-          this.topUsers = this.topUsers.map(user => {
+          this.popularUsers = this.popularUsers.map(user => {
             if(user.id !== id) {
               return user
             }
@@ -80,6 +88,12 @@ export default {
                 is_following: true
               }
             }
+          })
+          // 當點擊追蹤時，emit 回 UserFollow，讓 UserFollow 去 fetchUser 打 API 更新 followers 跟 followings
+          
+          this.$emit('after-follow', {
+            id,
+            status: 'follow'
           })
           this.isProcessing = false
         }catch(error){
@@ -97,7 +111,7 @@ export default {
         if(statusText !== 'OK'){
           throw new Error (statusText)
         }
-        this.topUsers = this.topUsers.map(user => {
+        this.popularUsers = this.popularUsers.map(user => {
           if(user.id !== id) {
             return user
           }
@@ -107,6 +121,11 @@ export default {
               is_following: false
             }
           }
+        })
+        // 同上
+        this.$emit('after-follow', {
+          id,
+          status: 'unfollow'
         })
         this.isProcessing = false
       }catch(error){
@@ -123,8 +142,13 @@ export default {
   },
   computed:{
     ...mapState(['currentUser'])
+  },
+  watch: {
+    // 當 topUsers 資料更新時，同步更新 popularUsers 資料
+    topUsers(newVal) {
+      this.popularUsers = [...newVal]
+    }
   }
-  //TODO:個人資料編輯後topUsers名稱沒有同步，
 }
 </script>
 <style lang="scss" scoped>
