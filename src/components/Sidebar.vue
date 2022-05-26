@@ -46,7 +46,7 @@
           <button
             class="modal-tweet"
             :disabled="isProcessing || isModalExceed"
-            @click.stop.prevent="createTweet"
+            @click.stop.prevent="updateTweet"
           >
             推文
           </button>
@@ -128,7 +128,11 @@
       </template>
     </ul>
 
-    <button class="tweet-btn" v-if="!isAdmin" @click.stop.prevent="tweetModal">
+    <button 
+      class="tweet-btn" 
+      v-if="!isAdmin" 
+      @click.stop.prevent="tweetModal"
+    >
       <p class="hidden">推文</p>
       <img class="show" src="../assets/static/images/tweet@2x.png" alt="">  
     </button>
@@ -155,7 +159,7 @@ import TweetModal from "../components/TweetModal";
 import tweetAPI from "../apis/tweet";
 import { Toast } from "../utils/helpers";
 import { mapState } from "vuex";
-// import store from '../store'
+// import store from '../store/index'
 
 export default {
   name: "Sidebar",
@@ -207,19 +211,29 @@ export default {
       localStorage.removeItem("token");
       this.$router.push("/signin");
     },
-    // 推一則推文
-    // async createTweet() {
-    //   if (!this.text) {
-    //       this.isModalEmpty = false;
-    //       return;
-    //     } else if (this.text.trim() === "") {
-    //       this.isModalEmpty = false;
-    //       return;
-    //     }
-    //   this.isProcessing = true;
-    //   this.newTweet = await store.dispatch('postTweet')
-    // },
-    async createTweet(payload) {
+    // 拿到全部推文
+    async fetchTweets() {
+      try {
+        this.isLoading = true
+        const { data, statusText } = await tweetAPI.getTweets();
+
+        if (statusText !== "OK") {
+          throw new Error(statusText);
+        }
+
+        // 篩除非user的用戶
+        this.tweets = data.filter((data) => data.User.role === "user");
+        this.isLoading = false
+      } catch (error) {
+        this.isLoading = false
+        console.log(error);
+        Toast.fire({
+          icon: "error",
+          title: "暫時無法取得推文",
+        });
+      }
+    },
+    async createTweet() {
       try {
         // 內容空白處理
         if (!this.text) {
@@ -231,12 +245,12 @@ export default {
         }
         this.isProcessing = true;
 
-        const { id, description, UserId, createdAt } = payload;
-
         const { data } = await tweetAPI.createTweet({
           description: this.text,
           UserId: this.currentUser.id,
         });
+
+        const { id, description, UserId, createdAt } = data.data
 
         this.newTweet = {
           id, // 推文 id
@@ -245,7 +259,10 @@ export default {
           User: { id: UserId },
         };
 
-        this.tweets = [{ ...this.newTweet }, ...this.tweets];
+        this.tweets = [
+          { ...this.newTweet }, 
+          ...this.tweets
+        ];
 
         if (data.status !== "success") {
           throw new Error(data.message);
@@ -271,6 +288,11 @@ export default {
         }
       }
     },
+    updateTweet() {
+      this.createTweet()
+      this.fetchTweets()
+      this.$emit('update', this.tweets)
+    },
     // 開啟 Modal
     tweetModal() {
       this.dNoneModal = !this.dNoneModal;
@@ -294,7 +316,7 @@ export default {
     },
   },
   computed: {
-    ...mapState(["currentUser", "tweet"]),
+    ...mapState(["currentUser"]),
   },
   watch: {
     text() {
@@ -303,6 +325,7 @@ export default {
   },
   created() {
     this.toggleNavList();
+    // this.fetchTweets()
   },
 };
 </script>

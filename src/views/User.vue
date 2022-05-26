@@ -4,7 +4,7 @@
     <div class="container">
       <div class="row">
         <div class="col-1 col-lg-2  sidebar">
-          <Sidebar />
+          <Sidebar @update="update" />
         </div>
         <div class="col-7 col-lg-7  content-container">
           <router-link to="/twitter" class="nav-link">
@@ -65,7 +65,7 @@
               </NavTab>
             </div>
             <div>
-              <router-view />
+              <router-view :initial-tweets="tweets" />
             </div>
           </div>
         </div>
@@ -108,7 +108,8 @@
           followerCount:'',
           followingCount:'',
           isLoading: false,
-        }  
+        },
+        tweets: [],          // 全部推文
       }
     },
     methods:{     
@@ -148,6 +149,7 @@
         try{
           const {data,statusText} = await userAPI.getTweets({id})
           this.tweetNum = data.length
+          this.tweets = data
           if(statusText !== 'OK'){
             throw new Error(statusText)
           }
@@ -157,6 +159,10 @@
             return
           }       
         }
+      },
+      update() {
+        const { id } = this.$route.params
+        this.fetchUserTweets(id)
       },
     },
     computed:{
@@ -173,7 +179,7 @@
       const {id} = this.$route.params
       this.fetchUser(id)
       this.fetchUserTweets(id)
-    }      
+    }
   }
 </script>
 <style lang="scss" scoped>
