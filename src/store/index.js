@@ -2,10 +2,9 @@ import Vue from 'vue'
 import Vuex from 'vuex'
 import userAPI from '../apis/user'
 import {Toast} from '../utils/helpers'
-import Loading from '../components/Loading.vue'
 import tweetAPI from "../apis/tweet"
 
-Vue.use(Vuex, Loading)
+Vue.use(Vuex)
 
 export default new Vuex.Store({
   state: {
@@ -57,9 +56,9 @@ export default new Vuex.Store({
       //移除localStoage裡儲存的
       localStorage.removeItem('token')
     },
-    setTweet(state, newTweet) {
-      state.tweet = newTweet
-    }
+    // setTweet(state, newTweet) {
+    //   state.tweet = newTweet
+    // }
   },
   actions: {
     async fetchCurrentUser({commit}){
@@ -91,7 +90,6 @@ export default new Vuex.Store({
     },
     async postTweet() {
       try {
-        // const { id, description, UserId, createdAt } = payload;
         const { data } = await tweetAPI.createTweet({
           description,
           // UserId,

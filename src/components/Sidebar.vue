@@ -29,6 +29,7 @@
                 v-model="text"
                 name="tweet"
                 placeholder="有什麼新鮮事？"
+                maxlength="140"
               >
               </textarea>
             </template>
@@ -151,8 +152,8 @@
 </template>
 <script>
 import TweetModal from "../components/TweetModal";
-// import tweetAPI from "../apis/tweet";
-// import { Toast } from "../utils/helpers";
+import tweetAPI from "../apis/tweet";
+import { Toast } from "../utils/helpers";
 import { mapState } from "vuex";
 // import store from '../store'
 
@@ -181,7 +182,7 @@ export default {
           path: "/admin/users",
         },
       ],
-      // tweets: [],
+      tweets: [],
       text: "",              // 推文
       newTweet: {},          // 新增推文
       dNoneModal: true,      // 控制 Modal
@@ -208,68 +209,68 @@ export default {
     },
     // 推一則推文
     // async createTweet() {
-    //   // if (!this.text) {
-    //   //     this.isModalEmpty = false;
-    //   //     return;
-    //   //   } else if (this.text.trim() === "") {
-    //   //     this.isModalEmpty = false;
-    //   //     return;
-    //   //   }
-    //   // this.isProcessing = true;
-    //   this.newTweet = await store.dispatch('postTweet')
-    // },
-    // async createTweet(payload) {
-    //   try {
-    //     // 內容空白處理
-    //     if (!this.text) {
+    //   if (!this.text) {
     //       this.isModalEmpty = false;
     //       return;
     //     } else if (this.text.trim() === "") {
     //       this.isModalEmpty = false;
     //       return;
     //     }
-    //     this.isProcessing = true;
-
-    //     const { id, description, UserId, createdAt } = payload;
-
-    //     const { data } = await tweetAPI.createTweet({
-    //       description: this.text,
-    //       UserId: this.currentUser.id,
-    //     });
-
-    //     this.newTweet = {
-    //       id, // 推文 id
-    //       description,
-    //       createdAt,
-    //       User: { id: UserId },
-    //     };
-
-    //     this.tweets = [{ ...this.newTweet }, ...this.tweets];
-
-    //     if (data.status !== "success") {
-    //       throw new Error(data.message);
-    //     } else {
-    //       Toast.fire({
-    //         icon: "success",
-    //         title: "成功送出回覆",
-    //       });
-    //       this.text = "";
-    //       this.dNoneModal = true;
-    //       this.isProcessing = false;
-    //     }
-    //   } catch (error) {
-    //     this.isProcessing = false;
-    //     if (error.response.status === 500) {
-    //       return;
-    //     } else {
-    //       console.log(error);
-    //       Toast.fire({
-    //         icon: "error",
-    //         title: "暫時無法推文",
-    //       });
-    //     }
-    //   }
+    //   this.isProcessing = true;
+    //   this.newTweet = await store.dispatch('postTweet')
     // },
+    async createTweet(payload) {
+      try {
+        // 內容空白處理
+        if (!this.text) {
+          this.isModalEmpty = false;
+          return;
+        } else if (this.text.trim() === "") {
+          this.isModalEmpty = false;
+          return;
+        }
+        this.isProcessing = true;
+
+        const { id, description, UserId, createdAt } = payload;
+
+        const { data } = await tweetAPI.createTweet({
+          description: this.text,
+          UserId: this.currentUser.id,
+        });
+
+        this.newTweet = {
+          id, // 推文 id
+          description,
+          createdAt,
+          User: { id: UserId },
+        };
+
+        this.tweets = [{ ...this.newTweet }, ...this.tweets];
+
+        if (data.status !== "success") {
+          throw new Error(data.message);
+        } else {
+          Toast.fire({
+            icon: "success",
+            title: "成功送出回覆",
+          });
+          this.text = "";
+          this.dNoneModal = true;
+          this.isProcessing = false;
+        }
+      } catch (error) {
+        this.isProcessing = false;
+        if (error.response.status === 500) {
+          return;
+        } else {
+          console.log(error);
+          Toast.fire({
+            icon: "error",
+            title: "暫時無法推文",
+          });
+        }
+      }
+    },
     // 開啟 Modal
     tweetModal() {
       this.dNoneModal = !this.dNoneModal;
