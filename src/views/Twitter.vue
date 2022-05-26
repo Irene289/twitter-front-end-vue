@@ -24,7 +24,10 @@
     </div>
     <div class="tweet-content scrollbar">
       <!-- slot -->
-      <UserTweetCard v-for="tweet in tweets" :key="tweet.id">
+      <UserTweetCard 
+        v-for="tweet in tweets"
+        :key="tweet.id"
+      >
         <template v-slot:avatar>
           <router-link
             :to="{ name: 'user-tweets', params: { id: tweet.User.id } }"
@@ -163,6 +166,13 @@ export default {
     TweetModal,
     Loading,
   },
+  props: {
+    // 接受 TwitterMain 因為 Sidebar 發送推文後更新的資料
+    initialTweets: {
+      type: Array,
+      required: true
+    }
+  },
   data() {
     return {
       text: "",            // 推文
@@ -190,10 +200,16 @@ export default {
     textReply() {
       this.modalWarning();
     },
+    initialTweets(newVal) {
+      this.tweets = [...newVal]
+    }
   },
   created() {
     this.fetchTweets();
   },
+  // mounted() {
+  //   this.tweets = [...this.initialTweets]
+  // },
   methods: {
     // 拿到全部推文
     async fetchTweets() {

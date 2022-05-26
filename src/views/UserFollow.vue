@@ -49,11 +49,18 @@
             </NavTab>
           </div>     
           <div class="scrollbar">
-            <router-view />
+            <router-view 
+              :initial-followings="followings"
+              :initial-followers="followers"
+              @after-userfollow="afterUserFollow"
+            />
           </div>
         </div>
         <div class="col-3  popular-users">
-          <Popular />
+          <Popular 
+            :top-users="topUsers"
+            @after-follow="afterPopularClick"
+          />
         </div>
       </div>      
     </div>  
@@ -66,6 +73,8 @@
   import Popular from '../components/Popular.vue'
   import Sidebar from '../components/Sidebar.vue'
   import NavTab from './../components/NavTab.vue'
+  import {mapState} from 'vuex'
+
   export default {
     name: 'UserFollow',
     mixins:[visitPage],
@@ -78,7 +87,10 @@
       return {
         userId:8,
         userName:'',
-        tweetNum:0
+        tweetNum:0,
+        followings: [],  // 要放 followers
+        followers: [],   // 要放 followings
+        topUsers: []
       }
     },
     methods:{
@@ -90,7 +102,9 @@
           const {data, statusText} = await userAPI.get({id:userId})   
           const {id,name} = data
           this.userId = id
-          this.userName = name        
+          this.userName = name  
+          this.followings = data.Follower  
+          this.followers = data.Following
           if(statusText !== 'OK'){
             throw new Error(statusText)
           }
@@ -115,13 +129,43 @@
             return
           }       
         }
+      },
+      async fetchTopUsers(rank){
+        try{
+          const {data, statusText} = await userAPI.getTopUsers({rank})
+          this.topUsers = [...data]
+          // 後端已篩過非user
+          this.topUsers = data.filter(user => user.id !== this.currentUser.id )
+          if(statusText !== "OK"){
+            throw new Error(statusText)
+          }
+        }catch(error){
+          Toast.fire({
+            icon: 'error',
+            title: '無法取得人氣用戶，請稍後再試'
+          })
+        }
+    },
+      afterPopularClick() {
+        const {id} = this.$route.params
+        // 接受 Popular 的 emit 後，去 fetchUser 打 API 更新 followers 跟 followings
+        this.fetchUser(id)
+      },
+      afterUserFollow() {
+        // 接受 UserFollowing 跟 UserFollower 的 emit 後，去 fetchTopUsers 打 API 更新 topUsers
+        // 再把 topUsers 用 props 傳遞到 Popular
+        this.fetchTopUsers(10)
       }
     },
      created(){
       const {id} = this.$route.params
       this.fetchUser(id)
       this.fetchUserTweets(id)
-    }      
+      this.fetchTopUsers(10)
+    },
+    computed:{
+      ...mapState(['currentUser'])
+    }, 
   }
 </script>
 <style lang="scss" scoped>

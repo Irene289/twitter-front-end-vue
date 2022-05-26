@@ -61,7 +61,6 @@ import { textFilter } from '../utils/mixins'
 import { visitPage } from "../utils/mixins"
 import UserTweetCard from "../components/UserTweetCard.vue"
 import { fromNowFilter } from "./../utils/mixins"
-import userAPI from "../apis/user"
 import tweetAPI from "../apis/tweet"
 import {Toast} from '../utils/helpers'
 
@@ -71,35 +70,22 @@ export default {
   components: {
     UserTweetCard,
   },
+  props: {
+    initialTweets: {
+      type: Array,
+      required: true
+    }
+  },
   data() {
     return {
       tweets: [],
+      newTweet: {},
       noTweets: false,
       isLikes: false,
-      isProcessing: false 
+      isProcessing: false,
     };
   },
   methods: {
-    async fetchUserTweets(id) {
-      try {
-        const { data, statusText } = await userAPI.getTweets({ id });
-        if (data.length === 0) {
-          this.noTweets = true;
-        } else {
-          this.noTweets = false;
-        }
-        // 篩除非user的用戶
-        this.tweets = data.filter( tweet => tweet.User.role === 'user')
-        if (statusText !== "OK") {
-          throw new Error(statusText);
-        }
-      } catch (error) {
-        if (error.response.status === 500) {
-          this.noTweets = true;
-          return;
-        }
-      }
-    },
     visit(id, pathName) {
       this.visitUserPage(id, pathName);
     },
@@ -112,12 +98,10 @@ export default {
         if (data.status !== "success") {
             throw new Error(data.status)
         }
-        // this.isLikes = true
         this.tweets = this.tweets.map( tweet => { 
           if (tweet.id !== id) {
             return tweet
           } else {
-            console.log(typeof tweet.Likes.likeTotal)
             return {
               ...tweet,
               Likes: {
@@ -170,15 +154,14 @@ export default {
       }
     },
   },
-  beforeRouteUpdate(to, from, next) {
-    const { id } = to.params;
-    this.fetchUserTweets(id);
-    next();
-  },
   created() {
-    const { id } = this.$route.params;
-    this.fetchUserTweets(id);
+    this.tweets = [...this.initialTweets]
   },
+  watch: {
+    initialTweets(newVal) {
+      this.tweets = [...newVal]
+    }
+  }
 };
 </script>
 

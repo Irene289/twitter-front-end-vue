@@ -4,7 +4,7 @@
     <div class="container">
       <div class="row">
         <div class="col-1 col-lg-2  sidebar">
-          <Sidebar />
+          <Sidebar @update="update" />
         </div>
         <div class="col-7 col-lg-7  content-container">
           <router-link to="/twitter" class="nav-link">
@@ -65,12 +65,15 @@
               </NavTab>
             </div>
             <div>
-              <router-view />
+              <router-view :initial-tweets="tweets" />
             </div>
           </div>
         </div>
         <div class="col-4 col-lg-3 popular-users">
-          <Popular />
+          <Popular 
+            :top-users="topUsers"
+            @after-follow="afterPopularClick"
+          />
         </div>
       </div>
     </div>
@@ -108,7 +111,9 @@
           followerCount:'',
           followingCount:'',
           isLoading: false,
-        }  
+        },
+        tweets: [],          // 全部推文
+        topUsers: []
       }
     },
     methods:{     
@@ -148,6 +153,8 @@
         try{
           const {data,statusText} = await userAPI.getTweets({id})
           this.tweetNum = data.length
+          this.tweets = data
+          
           if(statusText !== 'OK'){
             throw new Error(statusText)
           }
@@ -158,6 +165,38 @@
           }       
         }
       },
+      update() {
+        const { id } = this.$route.params
+        this.fetchUserTweets(id)
+      },
+      afterPopularClick(data) {
+        const { id, status } = data
+        if (this.currentUser.id === id) {
+          if (status === 'follow') {
+            this.user = {
+              ...this.user,
+              followingCount: this.user.followingCount + 1,
+            } 
+          } else {
+              this.user = {
+              ...this.user,
+              followingCount: this.user.followingCount - 1,
+            }
+          }
+        } else if (this.user.id === id) {
+          if (status === 'follow') {
+            this.user = {
+              ...this.user,
+              followerCount: this.user.followerCount + 1,
+            }
+          } else {
+            this.user = {
+              ...this.user,
+              followerCount: this.user.followerCount - 1,
+            }
+          }
+        }
+      }
     },
     computed:{
       ...mapState(['currentUser'])
@@ -173,7 +212,7 @@
       const {id} = this.$route.params
       this.fetchUser(id)
       this.fetchUserTweets(id)
-    }      
+    }
   }
 </script>
 <style lang="scss" scoped>
