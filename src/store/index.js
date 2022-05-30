@@ -1,7 +1,7 @@
 import Vue from 'vue'
 import Vuex from 'vuex'
 import userAPI from '../apis/user'
-import {Toast} from '../utils/helpers'
+import { Toast } from '../utils/helpers'
 
 Vue.use(Vuex)
 
@@ -10,29 +10,30 @@ export default new Vuex.Store({
     currentUser: {
       id: -1,
       name: '',
-      account:'',
+      account: '',
       email: '',
       avatarImg: '',
       is_admin: false
     },
-    userFollowings:[],
+    userFollowings: [],
     isAuthenticated: false,
-    token: ''
+    token: '',
+    isLoading: false
   },
   getters: {
   },
   mutations: {
-    setCurrentUser(state, currentUser){
+    setCurrentUser(state, currentUser) {
       state.currentUser = {
         ...state.currentUser,
         ...currentUser,
         avatarImg: currentUser.avatarImg ? currentUser.avatarImg : require('../assets/static/images/noImage@2x.png')
       }
-      state.token = localStorage.getItem('token'), 
-      state.isAuthenticated = true
+      state.token = localStorage.getItem('token'),
+        state.isAuthenticated = true
     },
     //登出
-    revokeAuthentication(state){
+    revokeAuthentication(state) {
       //清空state
       state.currentUser = {}
       //通過驗證改為false
@@ -42,23 +43,26 @@ export default new Vuex.Store({
       //移除localStoage裡儲存的
       localStorage.removeItem('token')
     },
+    setIsLoading(state, data) {
+      state.isLoading = data
+    }
   },
   actions: {
-    async fetchCurrentUser({commit}){
-      try{
-        const {data} = await userAPI.getCurrentUser()
-        const {user} = data.data
-        const {id, name, account, email, avatarImg, is_admin} = user
-        commit('setCurrentUser',{
+    async fetchCurrentUser({ commit }) {
+      try {
+        const { data } = await userAPI.getCurrentUser()
+        const { user } = data.data
+        const { id, name, account, email, avatarImg, is_admin } = user
+        commit('setCurrentUser', {
           id,
           name,
           account,
           email,
           avatarImg,
-          is_admin          
-        })  
+          is_admin
+        })
         return true
-      }catch(error){
+      } catch (error) {
         Toast.fire({
           icon: 'error',
           title: '無法取得當前用戶，請稍後再試'

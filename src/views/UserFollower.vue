@@ -1,7 +1,6 @@
 <template>
   <div class="follower-container">
-    <Loading v-if="isLoading" />
-    <template v-else>
+    <template>
       <h3 v-if="noFollowers">尚無追蹤者</h3>
       <template v-else>
         <UserFollowCard
@@ -54,7 +53,6 @@
   
 </template>
 <script>
-import Loading from '../components/Loading'
 import {imgFilter} from '../utils/mixins'
 import {mapState} from 'vuex'
 import {textFilter} from '../utils/mixins'
@@ -66,16 +64,14 @@ import {Toast} from '../utils/helpers'
 export default {
   name: 'UserFollower',
   components:{
-    UserFollowCard,
-    Loading
+    UserFollowCard
   },
   mixins:[textFilter, visitPage, imgFilter],
   data(){
     return{
       followers:[],
       noFollowers: false,
-      isProcessing: false,
-      isLoading: false,
+      isProcessing: false
     } 
   },
   props: {
@@ -88,7 +84,7 @@ export default {
   methods:{
     async fetchUserFollowers(id){
       try{
-        this.isLoading = true
+        this.$store.commit("setIsLoading", true);
         const {data, statusText} = await userAPI.get({id})
         const followers = data.Following
         // 篩除非user的用戶
@@ -102,9 +98,9 @@ export default {
         if(statusText !== 'OK'){
           throw new Error(statusText)
         }
-        this.isLoading = false
+        this.$store.commit("setIsLoading", false);
       }catch(error){
-        this.isLoading = false
+        this.$store.commit("setIsLoading", false);
         Toast.fire({
           icon:'error',
           title: '無法取得追蹤中用戶資料，請稍後再試'

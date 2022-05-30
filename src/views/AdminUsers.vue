@@ -1,6 +1,5 @@
 <template>
   <div class="container">
-    <Loading v-if="isLoading" />
       <div class="side-bar">
         <Sidebar />
       </div>    
@@ -52,23 +51,20 @@
 import Sidebar from '../components/Sidebar.vue'
 import adminAPI from '../apis/admin'
 import {Toast} from '../utils/helpers'
-import Loading from '../components/Loading'
 
 export default {
   components: { 
     Sidebar,
-    Loading
   },
   data(){
     return{
       users:[],
-      isLoading: false,
     }   
   },
   methods: {
     async getUsers(){
       try{
-        this.isLoading = true
+        this.$store.commit("setIsLoading", true);
         const {data, statusText} = await adminAPI.get()
         this.users = data.filter( user => user.role === 'user')
         this.users = this.users.map(user => {
@@ -85,9 +81,9 @@ export default {
         if(statusText !== 'OK'){
           throw new Error(statusText)
         }
-        this.isLoading = false
+        this.$store.commit("setIsLoading", false);
       }catch(error){
-        this.isLoading = false
+        this.$store.commit("setIsLoading", false);
         Toast.fire({
           icon: 'error',
           title: '無法取的使用者，請稍後再試'

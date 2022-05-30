@@ -1,6 +1,5 @@
 <template>
   <main>
-    <Loading v-if="isLoading" />
     <div class="container">
       <div class="row">
         <div class="col-1 col-lg-2  sidebar">
@@ -87,15 +86,13 @@
   import Sidebar from '../components/Sidebar.vue'
   import UserCard from '../components/UserCard.vue'
   import NavTab from './../components/NavTab.vue'
-  import Loading from '../components/Loading'
   export default {
     name: 'User',   
     components:{
       Popular,
       Sidebar,
       UserCard,
-      NavTab,
-      Loading
+      NavTab
     },
     data(){
       return {
@@ -110,7 +107,6 @@
           is_following:'',
           followerCount:'',
           followingCount:'',
-          isLoading: false,
         },
         tweets: [],          // 全部推文
         topUsers: []
@@ -119,7 +115,7 @@
     methods:{     
       async fetchUser(userId){
         try{
-          this.isLoading = true
+          this.$store.commit("setIsLoading", true);
           // TODO:篩除非user的用戶
           const {data, statusText} = await userAPI.get({id:userId})   
           const {id,role, name, account ,coverImg, avatarImg, introduction, is_following:isFollowing, Following: following, Follower: follower} = data
@@ -140,9 +136,9 @@
           if(statusText !== 'OK'){
             throw new Error(statusText)
           }
-          this.isLoading = false
+          this.$store.commit("setIsLoading", false);
         }catch(error){
-          this.isLoading = false
+          this.$store.commit("setIsLoading", false);
           Toast.fire({
             icon:'error',
             title: '無法載入使用者資訊，請稍後再試'

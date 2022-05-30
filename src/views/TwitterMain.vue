@@ -1,6 +1,5 @@
 <template>
   <main>
-    <Loading v-if="isLoading" />
     <div class="container">
       <div class="row">
         <!-- sidebar -->
@@ -28,19 +27,16 @@ import Popular from "../components/Popular.vue";
 import Sidebar from "../components/Sidebar.vue";
 import tweetAPI from "../apis/tweet"
 import { Toast } from "../utils/helpers"
-import Loading from '../components/Loading'
 
 export default {
   name: "TwitterMain",
   components: {
     Popular,
-    Sidebar,
-    Loading
+    Sidebar
   },
   data(){
     return {
       tweets: [],          // 全部推文
-      isLoading: false,
       topUsers: []
     }
   },
@@ -48,7 +44,6 @@ export default {
     // 拿到全部推文
     async fetchTweets() {
       try {
-        this.isLoading = true
         const { data, statusText } = await tweetAPI.getTweets();
 
         if (statusText !== "OK") {
@@ -57,9 +52,7 @@ export default {
         
         // 篩除非user的用戶
         this.tweets = data.filter((data) => data.User.role === "user");
-        this.isLoading = false
       } catch (error) {
-        this.isLoading = false
         console.log(error);
         Toast.fire({
           icon: "error",

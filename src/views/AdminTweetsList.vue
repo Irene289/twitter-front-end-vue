@@ -1,6 +1,5 @@
 <template>
   <div class="container">
-    <Loading v-if="isLoading" />
     <div class="side-bar"> 
       <Sidebar />
     </div>
@@ -48,12 +47,10 @@ import { fromNowFilter } from './../utils/mixins'
 import Sidebar from '../components/Sidebar.vue'
 import {Toast} from '../utils/helpers'
 import tweetAPI from '../apis/tweet'
-import Loading from '../components/Loading'
 export default {
   name:'AdminTweetsList',
   components: { 
-    Sidebar,
-    Loading
+    Sidebar
   },
   mixins:[fromNowFilter, textFilter, imgFilter],
   data () {
@@ -61,7 +58,6 @@ export default {
       tweets:[],
       isAdmin: true,
       isProcessing: false,
-      isLoading: false,
       isConfirm: false
     }
   },
@@ -86,15 +82,15 @@ export default {
      
     async fetchTweets(){
       try{  
-        this.isLoading = true
+        this.$store.commit("setIsLoading", true);
         const {data, statusText} = await tweetAPI.getTweets()
         this.tweets = data
         if(statusText !== 'OK'){
           throw new Error(statusText) 
         }
-        this.isLoading = false
+        this.$store.commit("setIsLoading", false);
       }catch(error){
-        this.isLoading = false
+        this.$store.commit("setIsLoading", false);
         Toast.fire({
           icon:'error',
           title:'無法取得推文資料，請稍後再試'

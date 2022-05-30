@@ -1,13 +1,8 @@
 <template>
   <div>
-    <Loading v-if="isLoading" />
     <div class="title">
-      <router-link to="/twitter" >
-      <img
-        src="../assets/static/images/back@2x.png"
-        alt=""
-        
-      />
+      <router-link to="/twitter">
+        <img src="../assets/static/images/back@2x.png" alt="" />
       </router-link>
       <h1>推文</h1>
     </div>
@@ -69,15 +64,17 @@
           <router-link
             :to="{ name: 'user-tweets', params: { id: reply.User.id } }"
           >
-            <img class="avatar" :src="reply.User.avatarImg | avatarFilter" alt="" />
+            <img
+              class="avatar"
+              :src="reply.User.avatarImg | avatarFilter"
+              alt=""
+            />
           </router-link>
         </template>
         <template v-slot:name>
           {{ reply.User.name }}
         </template>
-        <template v-slot:id>
-          @{{ reply.User.account }}
-        </template>
+        <template v-slot:id> @{{ reply.User.account }} </template>
         <template v-slot:post-time>
           {{ reply.User.createdAt | fromNow }}
         </template>
@@ -191,7 +188,6 @@ import { fromNowFilter, textFilter } from "./../utils/mixins";
 import tweetAPI from "../apis/tweet";
 import { Toast } from "../utils/helpers";
 import { mapState } from "vuex";
-import Loading from '../components/Loading.vue'
 
 export default {
   name: "TwitterReply",
@@ -199,27 +195,24 @@ export default {
   components: {
     UserTweetCard,
     TweetModal,
-    Loading
   },
   data() {
     return {
-      tweet: {},       // 要回覆的對象
-      replies: [],     // 回覆對象的其他回覆
+      tweet: {}, // 要回覆的對象
+      replies: [], // 回覆對象的其他回覆
       textReply: "",
       dNoneModal: true,
       isProcessing: false,
-      isLoading: true,
       isModalEmpty: true,
       isModalExceed: false,
       // isProcessing: false
     };
   },
-  beforeRouteUpdate(to, from, next){
-    const { id } = to.params
-    this.fetchTweet(id)
-    this.fetchReplies(id)
-    next()
-    // console.log(id)
+  beforeRouteUpdate(to, from, next) {
+    const { id } = to.params;
+    this.fetchTweet(id);
+    this.fetchReplies(id);
+    next();
   },
   watch: {
     textReply() {
@@ -233,20 +226,19 @@ export default {
   methods: {
     // 顯示推文資訊
     async fetchTweet(id) {
-      try {  
-        this.isLoading = true
+      try {
+        this.$store.commit("setIsLoading", true);
         const { data, statusText } = await tweetAPI.getTweet({ id });
 
         if (statusText !== "OK") {
           throw new Error(statusText);
         }
-        const { Replies } = data
+        const { Replies } = data;
 
         this.tweet = data;
-        this.replies = Replies
-        this.isLoading = false
+        this.replies = Replies;
+        this.$store.commit("setIsLoading", false);
       } catch (error) {
-        this.isLoading = false
         console.log(error);
         Toast.fire({
           icon: "error",
@@ -258,10 +250,10 @@ export default {
     async handleReply(TweetId) {
       try {
         // 內容空白處理
-        if (!this.textReply || this.textReply.trim() === '') {
+        if (!this.textReply || this.textReply.trim() === "") {
           this.isModalEmpty = false;
-          return
-        } 
+          return;
+        }
         this.isProcessing = true;
 
         const { data } = await tweetAPI.createReply({
@@ -281,15 +273,12 @@ export default {
           },
         };
 
-        this.replies = [
-          { ...this.textReply }, 
-          ...this.replies
-        ];
+        this.replies = [{ ...this.textReply }, ...this.replies];
 
         this.tweet = {
           ...this.tweet,
-          replyTotal: this.tweet.replyTotal + 1
-        }
+          replyTotal: this.tweet.replyTotal + 1,
+        };
 
         if (data.status !== "success") {
           throw new Error(data.message);

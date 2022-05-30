@@ -1,6 +1,5 @@
 <template>
   <div>
-    <Loading v-if="isLoading" />
     <div class="title">
       <h1>首頁</h1>
     </div>
@@ -10,7 +9,7 @@
         <label for=""></label>
         <textarea v-model="text" name="tweet" placeholder="有什麼新鮮事？">
         </textarea>
-        <span class="text-length">{{text.length}}/140</span>
+        <span class="text-length">{{ text.length }}/140</span>
         <span v-if="!isEmpty" class="text-empty">內容不可空白</span>
         <span v-if="isExceed" class="text-exceed">字數不可超過 140 字</span>
         <button
@@ -24,15 +23,16 @@
     </div>
     <div class="tweet-content scrollbar">
       <!-- slot -->
-      <UserTweetCard 
-        v-for="tweet in tweets"
-        :key="tweet.id"
-      >
+      <UserTweetCard v-for="tweet in tweets" :key="tweet.id">
         <template v-slot:avatar>
           <router-link
             :to="{ name: 'user-tweets', params: { id: tweet.User.id } }"
           >
-            <img class="avatar" :src="tweet.User.avatarImg | avatarFilter" alt="" />
+            <img
+              class="avatar"
+              :src="tweet.User.avatarImg | avatarFilter"
+              alt=""
+            />
           </router-link>
         </template>
         <template v-slot:name>
@@ -93,7 +93,11 @@
           <TweetModal>
             <!--   推文 -->
             <template v-slot:replytoAvatarImg>
-              <img class="avatar" :src=" tweet.User.avatarImg | avatarFilter " alt="" />
+              <img
+                class="avatar"
+                :src="tweet.User.avatarImg | avatarFilter"
+                alt=""
+              />
             </template>
             <template v-slot:replyto>
               <p class="content-info-name">{{ tweet.User.name }}</p>
@@ -149,14 +153,13 @@
 </template>
 
 <script>
-import {imgFilter} from '../utils/mixins'
-import UserTweetCard from "../components/UserTweetCard"
-import TweetModal from "../components/TweetModal"
-import { fromNowFilter, textFilter } from "./../utils/mixins"
-import tweetAPI from "../apis/tweet"
-import { Toast } from "../utils/helpers"
-import { mapState } from "vuex"
-import Loading from '../components/Loading'
+import { imgFilter } from "../utils/mixins";
+import UserTweetCard from "../components/UserTweetCard";
+import TweetModal from "../components/TweetModal";
+import { fromNowFilter, textFilter } from "./../utils/mixins";
+import tweetAPI from "../apis/tweet";
+import { Toast } from "../utils/helpers";
+import { mapState } from "vuex";
 
 export default {
   name: "Twitter",
@@ -164,33 +167,31 @@ export default {
   components: {
     UserTweetCard,
     TweetModal,
-    Loading,
   },
   props: {
     // 接受 TwitterMain 因為 Sidebar 發送推文後更新的資料
     initialTweets: {
       type: Array,
-      required: true
-    }
+      required: true,
+    },
   },
   data() {
     return {
-      text: "",            // 推文
-      textReply: "",       // 回覆
-      tweets: [],          // 全部推文
-      tweet: {},           // 單一推文
-      newTweet: {},        // 新增推文
-      newReply: {},        // 新增推文回覆
-      dNoneModal: true,    // 控制 Modal
-      isReplyModel: true,  // 控制 Modal
-      placeholder: "",     // 控制推文跟回覆的 placeholder
+      text: "", // 推文
+      textReply: "", // 回覆
+      tweets: [], // 全部推文
+      tweet: {}, // 單一推文
+      newTweet: {}, // 新增推文
+      newReply: {}, // 新增推文回覆
+      dNoneModal: true, // 控制 Modal
+      isReplyModel: true, // 控制 Modal
+      placeholder: "", // 控制推文跟回覆的 placeholder
       isProcessing: false, // 按鈕送出
-      isLoading: false,
       isEmpty: true,
       isExceed: false,
       isModalEmpty: true,
       isModalExceed: false,
-      likeUnlikeProcessing: false //likeUnlike
+      likeUnlikeProcessing: false, //likeUnlike
     };
   },
   watch: {
@@ -201,20 +202,17 @@ export default {
       this.modalWarning();
     },
     initialTweets(newVal) {
-      this.tweets = [...newVal]
-    }
+      this.tweets = [...newVal];
+    },
   },
   created() {
     this.fetchTweets();
   },
-  // mounted() {
-  //   this.tweets = [...this.initialTweets]
-  // },
   methods: {
     // 拿到全部推文
     async fetchTweets() {
       try {
-        this.isLoading = true
+        this.$store.commit("setIsLoading", true);
         const { data, statusText } = await tweetAPI.getTweets();
 
         if (statusText !== "OK") {
@@ -223,9 +221,9 @@ export default {
 
         // 篩除非user的用戶
         this.tweets = data.filter((data) => data.User.role === "user");
-        this.isLoading = false
+        this.$store.commit("setIsLoading", false);
       } catch (error) {
-        this.isLoading = false
+        this.$store.commit("setIsLoading", false);
         console.log(error);
         Toast.fire({
           icon: "error",
@@ -255,8 +253,8 @@ export default {
         this.newTweet = {
           id,
           description,
-          User: { 
-            id: UserId, 
+          User: {
+            id: UserId,
             account: this.currentUser.account,
             name: this.currentUser.name,
             avatarImg: this.currentUser.avatarImg,
@@ -349,7 +347,7 @@ export default {
     // 按讚
     async likeTweet(id) {
       try {
-        this.likeUnlikeProcessing = true
+        this.likeUnlikeProcessing = true;
         const { data } = await tweetAPI.likeTweet({ id });
 
         if (data.status !== "success") {
@@ -369,9 +367,9 @@ export default {
             };
           }
         });
-        this.likeUnlikeProcessing = false
+        this.likeUnlikeProcessing = false;
       } catch (error) {
-        this.likeUnlikeProcessing = false
+        this.likeUnlikeProcessing = false;
         Toast.fire({
           icon: "error",
           title: "無法按讚，請稍後再試",
@@ -381,7 +379,7 @@ export default {
     // 取消讚
     async unlikeTweet(id) {
       try {
-        this.likeUnlikeProcessing = true
+        this.likeUnlikeProcessing = true;
         const { data } = await tweetAPI.unlikeTweet({ id });
 
         if (data.status !== "success") {
@@ -401,9 +399,9 @@ export default {
             };
           }
         });
-        this.likeUnlikeProcessing = false
+        this.likeUnlikeProcessing = false;
       } catch (error) {
-        this.likeUnlikeProcessing = false
+        this.likeUnlikeProcessing = false;
         Toast.fire({
           icon: "error",
           title: "無法取消讚，請稍後再試",
@@ -432,7 +430,7 @@ export default {
     },
     // 關閉 Modal
     handleCloseBtn() {
-      this.isModalEmpty = true
+      this.isModalEmpty = true;
       this.dNoneModal = !this.dNoneModal;
       this.textReply = "";
     },
