@@ -51,6 +51,7 @@ export default {
     async handleSubmit(){
       try{
         this.isProcessing = true
+        this.$store.commit("setIsLoading", true);
         if ( !this.account || !this.password ) {
           this.isProcessing = false
           Toast.fire({
@@ -75,13 +76,15 @@ export default {
         }
        if(isAdmin && route === 'admin'){
          // token
-        localStorage.setItem('token', data.data.token)      
+        localStorage.setItem('token', data.data.token)
+        this.$store.commit("setIsLoading", false);      
         this.$router.push('/admin/tweets')
         return
         } 
       else if(!isAdmin && route === 'sign-in'){
         localStorage.setItem('token', data.data.token)
         this.$store.commit('setCurrentUser',user )
+        this.$store.commit("setIsLoading", false);
         this.$router.push('/twitter')
         return
       } else {

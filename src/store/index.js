@@ -18,7 +18,7 @@ export default new Vuex.Store({
     userFollowings: [],
     isAuthenticated: false,
     token: '',
-    isLoading: false
+    isLoading: true
   },
   getters: {
   },
@@ -43,8 +43,8 @@ export default new Vuex.Store({
       //移除localStoage裡儲存的
       localStorage.removeItem('token')
     },
-    setIsLoading(state, data) {
-      state.isLoading = data
+    setIsLoading(state, status) {
+      state.isLoading = status
     }
   },
   actions: {

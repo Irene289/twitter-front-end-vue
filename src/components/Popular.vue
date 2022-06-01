@@ -60,7 +60,6 @@ export default {
         const {data, statusText} = await userAPI.getTopUsers({rank})
         // 後端已篩過非user
         this.popularUsers = data.filter(user => user.id !== this.currentUser.id )
-        console.log(this.topUsers)
         if(statusText !== "OK"){
           throw new Error(statusText)
         }

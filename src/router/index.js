@@ -134,6 +134,10 @@ router.beforeEach(async (to, from, next) => {
   const storageToken = localStorage.getItem('token')
   const stateToken = store.state.token
   let isAuthenticated = store.state.isAuthenticated
+
+  // 使用 progress bar
+  // store.commit("setIsLoading", true);
+
   // console.log(to.matched.some(record => record.meta.requiresAuth))
   // 路由元資訊 .meta $route.matched 搭配路由守衛 進行驗證
   if (to.matched.some(record => record.meta.requiresAuth)) {
@@ -156,5 +160,12 @@ router.beforeEach(async (to, from, next) => {
     return
   }
 })
+
+// router.afterEach((to, from) => {
+//   console.log({to, from})
+//   setTimeout(() => {
+//     store.commit("setIsLoading", false);
+//   }, 1000)
+// })
 
 export default router

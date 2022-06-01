@@ -181,7 +181,7 @@
 </template>
 
 <script>
-// import {imgFilter} from '../utils/mixins'
+import {imgFilter} from '../utils/mixins'
 import UserTweetCard from "../components/UserTweetCard.vue";
 import TweetModal from "../components/TweetModal";
 import { fromNowFilter, textFilter } from "./../utils/mixins";
@@ -191,7 +191,7 @@ import { mapState } from "vuex";
 
 export default {
   name: "TwitterReply",
-  mixins: [fromNowFilter, textFilter],
+  mixins: [fromNowFilter, textFilter, imgFilter],
   components: {
     UserTweetCard,
     TweetModal,
@@ -204,15 +204,8 @@ export default {
       dNoneModal: true,
       isProcessing: false,
       isModalEmpty: true,
-      isModalExceed: false,
-      // isProcessing: false
+      isModalExceed: false
     };
-  },
-  beforeRouteUpdate(to, from, next) {
-    const { id } = to.params;
-    this.fetchTweet(id);
-    this.fetchReplies(id);
-    next();
   },
   watch: {
     textReply() {
@@ -237,6 +230,11 @@ export default {
 
         this.tweet = data;
         this.replies = Replies;
+
+        // this.$nextTick(() => {
+          // this.isLoading = false
+        //   console.log('nextTick:', this.isLoading)  // nextTick: false
+        // })
         this.$store.commit("setIsLoading", false);
       } catch (error) {
         console.log(error);
@@ -312,9 +310,9 @@ export default {
           throw new Error(data.status);
         }
 
-        this.tweet.isLike = true;
         this.tweet = {
           ...this.tweet,
+          isLike: true,
           likeTotal: this.tweet.likeTotal + 1,
         };
         this.isProcessing = false;
@@ -336,9 +334,10 @@ export default {
         if (data.status !== "success") {
           throw new Error(data.status);
         }
-        this.tweet.isLike = false;
+
         this.tweet = {
           ...this.tweet,
+          isLike: false,
           likeTotal: this.tweet.likeTotal - 1,
         };
         this.isProcessing = false;
