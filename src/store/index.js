@@ -18,7 +18,7 @@ export default new Vuex.Store({
     userFollowings: [],
     isAuthenticated: false,
     token: '',
-    isLoading: true
+    isLoading: false
   },
   getters: {
   },
