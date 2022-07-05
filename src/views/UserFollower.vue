@@ -184,6 +184,11 @@ export default {
     // 當 initialFollowers 有更新，就重新賦值給 followers
     initialFollowers(newVal) {
       this.followers = [...newVal]
+      if (this.followers.length === 0) {
+        this.noFollowers = true
+      } else {
+        this.noFollowers = false
+      }
     }
   }
 }

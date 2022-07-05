@@ -51,7 +51,6 @@ export default {
     async handleSubmit(){
       try{
         this.isProcessing = true
-        this.$store.commit("setIsLoading", true);
         if ( !this.account || !this.password ) {
           this.isProcessing = false
           Toast.fire({
@@ -67,6 +66,7 @@ export default {
         if ( data.status !== 'success' ) {
           throw new Error(data.message)
         }
+        this.$store.commit("setIsLoading", true);
         const {user} = data.data
         const isAdmin = user.is_admin
         const route = this.$route.name
@@ -88,10 +88,11 @@ export default {
         this.$router.push('/twitter')
         return
       } else {
+        this.$store.commit("setIsLoading", false);
         this.isProcessing= false,
         this.isValid = false
         }
-         this.password = ''
+        this.password = ''
         this.isProcessing = false
       }catch(error){
         this.isProcessing = false

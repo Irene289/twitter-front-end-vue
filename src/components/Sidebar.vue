@@ -250,20 +250,6 @@ export default {
           UserId: this.currentUser.id,
         });
 
-        const { id, description, UserId, createdAt } = data.data
-
-        this.newTweet = {
-          id, // 推文 id
-          description,
-          createdAt,
-          User: { id: UserId },
-        };
-
-        this.tweets = [
-          { ...this.newTweet }, 
-          ...this.tweets
-        ];
-
         if (data.status !== "success") {
           throw new Error(data.message);
         } else {
@@ -288,11 +274,11 @@ export default {
         }
       }
     },
-    updateTweet() {
-      this.createTweet()
-      this.fetchTweets()
+    async updateTweet() {
+      //使用sync await確保createTweet動作完成後，再emit給TwitterMain處理update的動作
+      const update = await this.createTweet()
       // 點擊 Modal 中的推文按鈕後，emit 到 TwitterMain
-      this.$emit('update')
+      this.$emit('update', update)
     },
     // 開啟 Modal
     tweetModal() {

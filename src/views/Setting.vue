@@ -168,7 +168,6 @@ export default {
   watch: {
     user() {
       this.textWarning()
-      console.log(this.user.account)
     }
   },
   created() {

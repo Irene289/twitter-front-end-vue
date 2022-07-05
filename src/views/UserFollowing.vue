@@ -188,6 +188,11 @@ export default {
     // 當 initialFollowings 有更新，就重新賦值給 followings
     initialFollowings(newVal) {
       this.followings = [...newVal]
+      if (this.followings.length === 0) {
+        this.noFollowings = true
+      } else {
+        this.noFollowings = false
+      }      
     }
   }
 }
