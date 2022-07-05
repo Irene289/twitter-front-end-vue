@@ -116,7 +116,6 @@
       async fetchUser(userId){
         try{
           this.$store.commit("setIsLoading", true);
-          // TODO:篩除非user的用戶
           const {data, statusText} = await userAPI.get({id:userId})   
           const {id,role, name, account ,coverImg, avatarImg, introduction, is_following:isFollowing, Following: following, Follower: follower} = data
 
@@ -157,6 +156,8 @@
         } catch(error){
           if(error.response.status === 500){
             this.tweetNum = 0
+            //無推文時會報錯500，所以當無推文時需要給空陣列否則tweets的資料不會被更新
+            this.tweets = []
             return
           }       
         }
@@ -197,7 +198,7 @@
     computed:{
       ...mapState(['currentUser'])
     },
-     beforeRouteUpdate(to, from, next){
+    beforeRouteUpdate(to, from, next){
       const {id} = to.params
       this.newRoute = id
       this.fetchUser(id)
