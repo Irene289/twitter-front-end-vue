@@ -160,6 +160,11 @@ export default {
   watch: {
     initialTweets(newVal) {
       this.tweets = [...newVal]
+      if (this.tweets.length === 0) {
+        this.noTweets = true
+      } else {
+        this.noTweets = false
+      }   
     }
   }
 };
