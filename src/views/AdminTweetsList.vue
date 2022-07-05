@@ -104,10 +104,8 @@ export default {
         showCancelButton: true
       }).then( result => {
           if(result.value){
-            console.log('刪除',result.value)
             return this.deleteTweet(id)
           }else if(result.dismiss === 'cancel'){
-            console.log('取消',result)
             return        
           }
         }
